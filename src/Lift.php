@@ -18,24 +18,12 @@ trait Lift
 
     public static function bootLift(): void
     {
-        static::creating(function (Model $model) {
-            $propsWithAttributes = self::getPropertiesWithAtributes($model);
-
-            self::applyValidations($propsWithAttributes);
+        static::saving(function (Model $model) {
+            self::applyValidations(self::getPropertiesWithAtributes($model));
         });
 
-        static::updating(function (Model $model) {
-            $propsWithAttributes = self::getPropertiesWithAtributes($model, $model->getDirty());
-
-            self::applyValidations($propsWithAttributes);
-        });
-
-        self::created(function (Model $model) {
+        static::saved(function (Model $model) {
             self::fillProperties($model, $model->getAttributes());
-        });
-
-        self::updated(function (Model $model) {
-            self::fillProperties($model, $model->getDirty());
         });
     }
 
@@ -54,10 +42,9 @@ trait Lift
         ];
     }
 
-    private static function getPropertiesWithAtributes(Model $model, array $properties = []): Collection
+    private static function getPropertiesWithAtributes(Model $model): Collection
     {
         $publicProperties = self::getModelPublicProperties($model);
-        $propertyKeys = array_keys($properties);
         $result = [];
 
         foreach ($publicProperties as $prop) {
@@ -66,13 +53,9 @@ trait Lift
                     continue;
                 }
 
-                if ($propertyKeys !== [] && ! in_array($prop, $propertyKeys)) {
-                    continue;
+                if (! blank($model->getKey()) && ! $model->isDirty($prop)) {
+                    $model->setAttribute($prop, $model->{$prop});
                 }
-
-                $value = $properties !== []
-                    ? $properties[$prop]
-                    : $model->getAttribute($prop);
 
                 $reflectionProperty = new ReflectionProperty($model, $prop);
                 $attributes = $reflectionProperty->getAttributes();
@@ -80,7 +63,7 @@ trait Lift
                 if (count($attributes) > 0) {
                     $result[] = new PropertyInfo(
                         name: $prop,
-                        value: $value ?? null,
+                        value: $model->getAttribute($prop) ?? null,
                         attributes: collect($attributes),
                     );
                 }
