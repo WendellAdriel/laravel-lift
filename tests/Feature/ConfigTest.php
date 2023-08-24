@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-use WendellAdriel\Lift\Tests\Datasets\ProductHidden;
+use Illuminate\Validation\ValidationException;
+use WendellAdriel\Lift\Tests\Datasets\ProductConfig;
 
-it('set properties to hidden', function () {
-    $product = ProductHidden::create([
+it('can set all configurations with the Config attribute', function () {
+    $product = ProductConfig::create([
         'name' => 'Product 1',
         'price' => '10.99',
         'random_number' => '123',
@@ -19,3 +20,11 @@ it('set properties to hidden', function () {
         ->and($product->expires_at->format('Y-m-d H:i:s'))->toBe('2023-12-31 23:59:59')
         ->and($product->toArray())->not->toHaveKey('random_number');
 });
+
+it('throws validation error if data is invalid when set with the Config attribute', function () {
+    ProductConfig::create([
+        'name' => 'Product 1',
+        'price' => '10.99',
+        'random_number' => '123',
+    ]);
+})->throws(ValidationException::class);
