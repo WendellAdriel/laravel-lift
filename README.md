@@ -241,6 +241,37 @@ final class Product extends Model
 }
 ```
 
+#### Config
+
+The `Config` attribute allows you to set your model's **public properties** configurations for all the above attributes
+with a single attribute.
+
+```php
+use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Model;
+use WendellAdriel\Lift\Attributes\Config;
+use WendellAdriel\Lift\Lift;
+
+class ProductConfig extends Model
+{
+    use Lift;
+
+    #[Config(fillable: true, rules: ['required', 'string'], messages: ['required' => 'The PRODUCT NAME field cannot be empty.'])]
+    public string $name;
+
+    #[Config(fillable: true, cast: 'float', rules: ['required', 'numeric'])]
+    public float $price;
+
+    #[Config(fillable: true, cast: 'int', hidden: true, rules: ['required', 'integer'])]
+    public int $random_number;
+
+    #[Config(fillable: true, cast: 'immutable_datetime', rules: ['required', 'date_format:Y-m-d H:i:s'])]
+    public CarbonImmutable $expires_at;
+
+    protected $table = 'products';
+}
+```
+
 ## Credits
 
 - [Wendell Adriel](https://github.com/WendellAdriel)
