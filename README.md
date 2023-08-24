@@ -62,10 +62,11 @@ While the `Lift` trait provides a way to set **public properties** on your model
 
 #### Cast
 
-The `Cast` attribute allows you to cast your model's **public properties** to a specific type. It works the same way as
-it would be using the `casts` property on your model, but you can set it directly on your **public properties**.
+The `Cast` attribute allows you to cast your model's **public properties** to a specific type and also to type your public properties.
+It works the same way as it would be using the `casts` property on your model, but you can set it directly on your **public properties**.
 
 ```php
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use WendellAdriel\Lift\Attributes\Cast;
 use WendellAdriel\Lift\Lift;
@@ -74,19 +75,19 @@ final class Product extends Model
 {
     use Lift;
 
-    public $name;
+    public string $name;
 
     #[Cast('float')]
-    public $price;
+    public float $price;
 
     #[Cast('int')]
-    public $category_id;
+    public int $category_id;
 
     #[Cast('boolean')]
-    public $is_active;
+    public bool $is_active;
 
     #[Cast('immutable_datetime')]
-    public $promotion_expires_at;
+    public CarbonImmutable $promotion_expires_at;
 }
 ```
 
@@ -96,6 +97,7 @@ When you use the `Lift` trait, your model's **public properties** are automatica
 `Fillable` attribute to set your **public properties** as **fillable**.
 
 ```php
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use WendellAdriel\Lift\Attributes\Cast;
 use WendellAdriel\Lift\Attributes\Fillable;
@@ -106,23 +108,23 @@ final class Product extends Model
     use Lift;
 
     #[Fillable]
-    public $name;
+    public string $name;
 
     #[Fillable]
     #[Cast('float')]
-    public $price;
+    public float $price;
 
     #[Fillable]
     #[Cast('int')]
-    public $category_id;
+    public int $category_id;
 
     #[Fillable]
     #[Cast('boolean')]
-    public $is_active;
+    public bool $is_active;
 
     #[Fillable]
     #[Cast('immutable_datetime')]
-    public $promotion_expires_at;
+    public CarbonImmutable $promotion_expires_at;
 }
 ```
 
@@ -132,6 +134,7 @@ The `Hidden` attribute allows you to hide your model's **public properties** the
 `hidden` property on your model, but you can set it directly on your **public properties**.
 
 ```php
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use WendellAdriel\Lift\Attributes\Cast;
 use WendellAdriel\Lift\Attributes\Fillable;
@@ -143,23 +146,23 @@ final class Product extends Model
     use Lift;
 
     #[Fillable]
-    public $name;
+    public string $name;
 
     #[Fillable]
     #[Cast('float')]
-    public $price;
+    public float $price;
 
     #[Fillable]
     #[Cast('int')]
-    public $category_id;
+    public int $category_id;
 
     #[Fillable]
     #[Cast('boolean')]
-    public $is_active;
+    public bool $is_active;
 
     #[Fillable]
     #[Cast('immutable_datetime')]
-    public $promotion_expires_at;
+    public CarbonImmutable $promotion_expires_at;
 
     #[Hidden]
     #[Fillable]
@@ -173,6 +176,7 @@ The `Rules` attribute allows you to set your model's **public properties** valid
 with the `rules` function on a `FormRequest`, but you can set it directly on your **public properties**.
 
 ```php
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use WendellAdriel\Lift\Attributes\Cast;
 use WendellAdriel\Lift\Attributes\Fillable;
@@ -186,27 +190,27 @@ final class Product extends Model
 
     #[Rules(['required', 'string'])]
     #[Fillable]
-    public $name;
+    public string $name;
 
     #[Rules(['required', 'numeric'])]
     #[Fillable]
     #[Cast('float')]
-    public $price;
+    public float $price;
 
     #[Rules(['required', 'integer'])]
     #[Fillable]
     #[Cast('int')]
-    public $category_id;
+    public int $category_id;
 
     #[Rules(['required', 'boolean'])]
     #[Fillable]
     #[Cast('boolean')]
-    public $is_active;
+    public bool $is_active;
 
     #[Rules(['required', 'date_format:Y-m-d H:i:s'])]
     #[Fillable]
     #[Cast('immutable_datetime')]
-    public $promotion_expires_at;
+    public CarbonImmutable $promotion_expires_at;
 
     #[Rules(['required', 'string'])]
     #[Hidden]
@@ -229,7 +233,7 @@ final class Product extends Model
 
     #[Rules(['required', 'string'], ['required' => 'The Product name can not be empty'])]
     #[Fillable]
-    public $name;
+    public string $name;
 }
 ```
 
