@@ -5,25 +5,27 @@ declare(strict_types=1);
 use Illuminate\Validation\ValidationException;
 use WendellAdriel\Lift\Tests\Datasets\User;
 
-it('throws validation error if model data is invalid', function () {
-    User::create([
-        'name' => fake()->name,
-        'email' => fake()->unique()->safeEmail,
-    ]);
-})->throws(ValidationException::class);
+describe('Create model', function () {
+    it('throws validation error if model data is invalid', function () {
+        User::create([
+            'name' => fake()->name,
+            'email' => fake()->unique()->safeEmail,
+        ]);
+    })->throws(ValidationException::class);
 
-it('does not throw validation error if model data is valid', function () {
-    $user = User::create([
-        'name' => fake()->name,
-        'email' => fake()->unique()->safeEmail,
-        'password' => 's3Cr3t@!!!',
-    ]);
+    it('does not throw validation error if model data is valid', function () {
+        $user = User::create([
+            'name' => fake()->name,
+            'email' => fake()->unique()->safeEmail,
+            'password' => 's3Cr3t@!!!',
+        ]);
 
-    $this->assertDatabaseCount(User::class, 1);
-    $this->assertDatabaseHas(User::class, [
-        'name' => $user->name,
-        'email' => $user->email,
-    ]);
+        $this->assertDatabaseCount(User::class, 1);
+        $this->assertDatabaseHas(User::class, [
+            'name' => $user->name,
+            'email' => $user->email,
+        ]);
+    });
 });
 
 describe('Update using update method', function () {
@@ -92,7 +94,7 @@ describe('Update using fill + save method', function () {
     });
 });
 
-describe('Update with changing individual properties', function () {
+describe('Update changing individual properties', function () {
     it('throws validation error if model data is invalid on update', function () {
         $user = User::create([
             'name' => fake()->name,

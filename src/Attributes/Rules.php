@@ -7,7 +7,7 @@ namespace WendellAdriel\Lift\Attributes;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Rules
+final class Rules
 {
     public function __construct(
         /**
