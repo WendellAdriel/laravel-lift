@@ -1,0 +1,36 @@
+name: run-tests
+
+on: [push, pull_request]
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                php: [8.2, 8.1]
+                dependency-version: [prefer-lowest, prefer-stable]
+
+        name: PHP ${{ matrix.php }} - ${{ matrix.dependency-version }} - ${{ matrix.os }}
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: ${{ matrix.php }}
+                  coverage: none
+
+            - name: Install dependencies
+              run: |
+                  composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction
+
+            - name: Code Style 👨‍🏭
+              run: composer test:lint
+
+            - name: Pest Tests 🧫
+              run: composer test:unit
+
+            - name: PHPStan 🧪
+              run: composer test:static
