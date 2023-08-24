@@ -4,3 +4,6 @@ parameters:
         - src/
 
     level: 9
+
+    excludePaths:
+        - src/Support/PropertyInfo.php
