@@ -19,7 +19,219 @@ composer require wendelladriel/laravel-lift
 
 ## Usage
 
-TBD
+**Lift** is a package that provides a `Trait` and `Attributes` to your **Eloquent Models** to make them more powerful.
+
+### Trait
+
+```php
+use Illuminate\Database\Eloquent\Model;
+use WendellAdriel\Lift\Lift;
+
+final class Product extends Model
+{
+    use Lift;
+}
+```
+
+Using the `Lift` trait, your model now supports **public properties** to be set on it, so you can have a more readable code and
+a better **DX** in your code editor IDE with **auto-completion**.
+
+```php
+use Illuminate\Database\Eloquent\Model;
+use WendellAdriel\Lift\Lift;
+
+final class Product extends Model
+{
+    use Lift;
+
+    public $name;
+
+    public $price;
+
+    public $category_id;
+
+    public $is_active;
+
+    public $promotion_expires_at;
+}
+```
+
+### Attributes
+
+While the `Lift` trait provides a way to set **public properties** on your model, the `Attributes` take your model to the next level.
+
+#### Cast
+
+The `Cast` attribute allows you to cast your model's **public properties** to a specific type. It works the same way as
+it would be using the `casts` property on your model, but you can set it directly on your **public properties**.
+
+```php
+use Illuminate\Database\Eloquent\Model;
+use WendellAdriel\Lift\Attributes\Cast;
+use WendellAdriel\Lift\Lift;
+
+final class Product extends Model
+{
+    use Lift;
+
+    public $name;
+
+    #[Cast('float')]
+    public $price;
+
+    #[Cast('int')]
+    public $category_id;
+
+    #[Cast('boolean')]
+    public $is_active;
+
+    #[Cast('immutable_datetime')]
+    public $promotion_expires_at;
+}
+```
+
+#### Fillable
+
+When you use the `Lift` trait, your model's **public properties** are automatically set as **guarded**. You can use the
+`Fillable` attribute to set your **public properties** as **fillable**.
+
+```php
+use Illuminate\Database\Eloquent\Model;
+use WendellAdriel\Lift\Attributes\Cast;
+use WendellAdriel\Lift\Attributes\Fillable;
+use WendellAdriel\Lift\Lift;
+
+final class Product extends Model
+{
+    use Lift;
+
+    #[Fillable]
+    public $name;
+
+    #[Fillable]
+    #[Cast('float')]
+    public $price;
+
+    #[Fillable]
+    #[Cast('int')]
+    public $category_id;
+
+    #[Fillable]
+    #[Cast('boolean')]
+    public $is_active;
+
+    #[Fillable]
+    #[Cast('immutable_datetime')]
+    public $promotion_expires_at;
+}
+```
+
+#### Hidden
+
+The `Hidden` attribute allows you to hide your model's **public properties** the same way as you would do using the
+`hidden` property on your model, but you can set it directly on your **public properties**.
+
+```php
+use Illuminate\Database\Eloquent\Model;
+use WendellAdriel\Lift\Attributes\Cast;
+use WendellAdriel\Lift\Attributes\Fillable;
+use WendellAdriel\Lift\Attributes\Hidden;
+use WendellAdriel\Lift\Lift;
+
+final class Product extends Model
+{
+    use Lift;
+
+    #[Fillable]
+    public $name;
+
+    #[Fillable]
+    #[Cast('float')]
+    public $price;
+
+    #[Fillable]
+    #[Cast('int')]
+    public $category_id;
+
+    #[Fillable]
+    #[Cast('boolean')]
+    public $is_active;
+
+    #[Fillable]
+    #[Cast('immutable_datetime')]
+    public $promotion_expires_at;
+
+    #[Hidden]
+    #[Fillable]
+    public string $sensitive_data;
+}
+```
+
+#### Rules
+
+The `Rules` attribute allows you to set your model's **public properties** validation rules the same way as you would do
+with the `rules` function on a `FormRequest`, but you can set it directly on your **public properties**.
+
+```php
+use Illuminate\Database\Eloquent\Model;
+use WendellAdriel\Lift\Attributes\Cast;
+use WendellAdriel\Lift\Attributes\Fillable;
+use WendellAdriel\Lift\Attributes\Hidden;
+use WendellAdriel\Lift\Attributes\Rules;
+use WendellAdriel\Lift\Lift;
+
+final class Product extends Model
+{
+    use Lift;
+
+    #[Rules(['required', 'string'])]
+    #[Fillable]
+    public $name;
+
+    #[Rules(['required', 'numeric'])]
+    #[Fillable]
+    #[Cast('float')]
+    public $price;
+
+    #[Rules(['required', 'integer'])]
+    #[Fillable]
+    #[Cast('int')]
+    public $category_id;
+
+    #[Rules(['required', 'boolean'])]
+    #[Fillable]
+    #[Cast('boolean')]
+    public $is_active;
+
+    #[Rules(['required', 'date_format:Y-m-d H:i:s'])]
+    #[Fillable]
+    #[Cast('immutable_datetime')]
+    public $promotion_expires_at;
+
+    #[Rules(['required', 'string'])]
+    #[Hidden]
+    #[Fillable]
+    public string $sensitive_data;
+}
+```
+
+You can also pass a second parameter to the `Rules` attribute to set a custom error message for the validation rule.
+
+```php
+use Illuminate\Database\Eloquent\Model;
+use WendellAdriel\Lift\Attributes\Fillable;
+use WendellAdriel\Lift\Attributes\Rules;
+use WendellAdriel\Lift\Lift;
+
+final class Product extends Model
+{
+    use Lift;
+
+    #[Rules(['required', 'string'], ['required' => 'The Product name can not be empty'])]
+    #[Fillable]
+    public $name;
+}
+```
 
 ## Credits
 
