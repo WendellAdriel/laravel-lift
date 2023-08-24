@@ -20,12 +20,7 @@ trait RulesValidation
      */
     private static function applyValidations(Collection $properties): void
     {
-        $validatedProperties = $properties->filter(
-            fn ($property) => $property->attributes->contains(
-                fn ($attribute) => in_array($attribute->getName(), [Rules::class, Password::class])
-            )
-        );
-
+        $validatedProperties = self::getPropertiesForAttributes($properties, [Rules::class, Password::class]);
         $data = [];
         $rules = [];
         $messages = [];
