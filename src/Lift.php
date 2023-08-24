@@ -27,12 +27,8 @@ trait Lift
             self::castValues($model, $properties);
         });
 
-        static::saved(function (Model $model) {
-            $properties = self::getPropertiesWithAtributes($model);
-
-            self::castValues($model, $properties);
-            self::fillProperties($model, $model->getAttributes());
-        });
+        static::saved(fn (Model $model) => self::fillProperties($model));
+        static::retrieved(fn (Model $model) => self::fillProperties($model));
     }
 
     public function syncOriginal(): void
@@ -68,7 +64,7 @@ trait Lift
                     continue;
                 }
 
-                if (! blank($model->getKey()) && ! $model->isDirty($prop)) {
+                if (! blank($model->getKey()) && ! $model->isDirty($prop) && isset($model->{$prop})) {
                     $model->setAttribute($prop, $model->{$prop});
                 }
 
@@ -116,9 +112,11 @@ trait Lift
         );
     }
 
-    private static function fillProperties(Model $model, array $properties): void
+    private static function fillProperties(Model $model): void
     {
-        foreach ($properties as $key => $value) {
+        self::castValues($model, self::getPropertiesWithAtributes($model));
+
+        foreach ($model->getAttributes() as $key => $value) {
             $model->{$key} = $model->hasCast($key) ? $model->castAttribute($key, $value) : $value;
         }
     }
