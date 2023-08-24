@@ -176,6 +176,8 @@ final class Product extends Model
 
 #### Rules
 
+> ⚠️ **The rules will be validated only when you save your model (create or update)**
+
 The `Rules` attribute allows you to set your model's **public properties** validation rules the same way as you would do
 with the `rules` function on a `FormRequest`, but you can set it directly on your **public properties**.
 
