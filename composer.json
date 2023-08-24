@@ -18,7 +18,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "WendellAdriel\\Lift\\Tests\\": "tests/"
+            "Tests\\": "tests/"
         }
     },
     "support": {
@@ -42,7 +42,8 @@
         "laravel/pint": "^1.11",
         "phpstan/phpstan": "^1.10",
         "nunomaduro/larastan": "^2.0",
-        "orchestra/testbench": "^8.9"
+        "orchestra/testbench": "^8.9",
+        "pestphp/pest-plugin-faker": "^2.0"
     },
     "scripts": {
         "lint": "pint",

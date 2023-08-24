@@ -19,7 +19,7 @@ trait Lift
     public static function bootLift(): void
     {
         static::creating(function (Model $model) {
-            $propsWithAttributes = self::getPropertiesWithAtributes($model, $model->getAttributes());
+            $propsWithAttributes = self::getPropertiesWithAtributes($model);
 
             self::applyValidations($propsWithAttributes);
         });
@@ -29,19 +29,50 @@ trait Lift
 
             self::applyValidations($propsWithAttributes);
         });
+
+        self::created(function (Model $model) {
+            self::fillProperties($model, $model->getAttributes());
+        });
+
+        self::updated(function (Model $model) {
+            self::fillProperties($model, $model->getDirty());
+        });
     }
 
-    private static function getPropertiesWithAtributes(Model $model, array $properties): Collection
+    protected static function ignoredProperties(): array
+    {
+        return [
+            'incrementing',
+            'preventsLazyLoading',
+            'exists',
+            'wasRecentlyCreated',
+            'snakeAttributes',
+            'encrypter',
+            'manyMethods',
+            'timestamps',
+            'usesUniqueIds',
+        ];
+    }
+
+    private static function getPropertiesWithAtributes(Model $model, array $properties = []): Collection
     {
         $publicProperties = self::getModelPublicProperties($model);
-        $propertyKeys = array_values($properties);
+        $propertyKeys = array_keys($properties);
         $result = [];
 
         foreach ($publicProperties as $prop) {
             try {
-                if (! in_array($prop, $propertyKeys)) {
+                if (in_array($prop, self::ignoredProperties())) {
                     continue;
                 }
+
+                if ($propertyKeys !== [] && ! in_array($prop, $propertyKeys)) {
+                    continue;
+                }
+
+                $value = $properties !== []
+                    ? $properties[$prop]
+                    : $model->getAttribute($prop);
 
                 $reflectionProperty = new ReflectionProperty($model, $prop);
                 $attributes = $reflectionProperty->getAttributes();
@@ -49,7 +80,7 @@ trait Lift
                 if (count($attributes) > 0) {
                     $result[] = new PropertyInfo(
                         name: $prop,
-                        value: $properties[$prop] ?? null,
+                        value: $value ?? null,
                         attributes: collect($attributes),
                     );
                 }
@@ -71,5 +102,12 @@ trait Lift
         }
 
         return $properties;
+    }
+
+    private static function fillProperties(Model $model, array $properties): void
+    {
+        foreach ($properties as $key => $value) {
+            $model->{$key} = $value;
+        }
     }
 }
