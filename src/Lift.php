@@ -20,11 +20,9 @@ trait Lift
 
     public static function bootLift(): void
     {
-
         static::saving(function (Model $model) {
             $properties = self::getPropertiesWithAtributes($model);
 
-            self::applyAttributesGuard($model, $properties);
             self::applyValidations($properties);
             self::castValues($model, $properties);
         });
@@ -35,6 +33,13 @@ trait Lift
             self::castValues($model, $properties);
             self::fillProperties($model, $model->getAttributes());
         });
+    }
+
+    public function syncOriginal(): void
+    {
+        parent::syncOriginal();
+
+        self::applyAttributesGuard($this, self::getPropertiesWithAtributes($this));
     }
 
     protected static function ignoredProperties(): array
