@@ -21,6 +21,10 @@ composer require wendelladriel/laravel-lift
 
 **Lift** is a package that provides a `Trait` and `Attributes` to your **Eloquent Models** to make them more powerful.
 
+> ⚠️
+> **Currently, this package relies heavily on Eloquent Events to work properly, so when dealing with code that does not fire**
+> **these events, it could have unexpected issues. If you find any issues, create an issue and/or submit a PR for it.**
+
 ### Trait
 
 ```php
