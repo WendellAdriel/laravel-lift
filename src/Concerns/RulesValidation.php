@@ -7,7 +7,6 @@ namespace WendellAdriel\Lift\Concerns;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
-use WendellAdriel\Lift\Attributes\Password;
 use WendellAdriel\Lift\Attributes\Rules;
 use WendellAdriel\Lift\Support\PropertyInfo;
 
@@ -34,12 +33,6 @@ trait RulesValidation
                 $rulesArguments = $rulesAttribute->getArguments();
                 $rules[$property->name] = $rulesArguments[0];
                 $messages[$property->name] = $rulesArguments[1] ?? [];
-            }
-
-            $passwordAttribute = $property->attributes->first(fn ($attribute) => $attribute->getName() === Password::class);
-            if (! blank($passwordAttribute)) {
-                $passwordInstance = $passwordAttribute->newInstance();
-                $rules[$property->name][] = $passwordInstance->getRule();
             }
         });
 
