@@ -11,12 +11,13 @@ use ReflectionException;
 use ReflectionProperty;
 use WendellAdriel\Lift\Concerns\AttributesGuard;
 use WendellAdriel\Lift\Concerns\CastValues;
+use WendellAdriel\Lift\Concerns\CustomPrimary;
 use WendellAdriel\Lift\Concerns\RulesValidation;
 use WendellAdriel\Lift\Support\PropertyInfo;
 
 trait Lift
 {
-    use RulesValidation, CastValues, AttributesGuard;
+    use RulesValidation, CastValues, AttributesGuard, CustomPrimary;
 
     public static function bootLift(): void
     {
@@ -35,7 +36,9 @@ trait Lift
     {
         parent::syncOriginal();
 
-        self::applyAttributesGuard($this, self::getPropertiesWithAtributes($this));
+        $properties = self::getPropertiesWithAtributes($this);
+        $this->applyPrimaryKey($properties);
+        $this->applyAttributesGuard($properties);
     }
 
     protected static function ignoredProperties(): array
@@ -108,6 +111,19 @@ trait Lift
         return $properties->filter(
             fn ($property) => $property->attributes->contains(
                 fn ($attribute) => in_array($attribute->getName(), $attributes)
+            )
+        );
+    }
+
+    /**
+     * @param  Collection<PropertyInfo>  $properties
+     * @param  class-string  $attributeClass
+     */
+    private static function getPropertyForAttribute(Collection $properties, string $attributeClass): ?PropertyInfo
+    {
+        return $properties->first(
+            fn ($property) => $property->attributes->contains(
+                fn ($attribute) => $attribute->getName() === $attributeClass
             )
         );
     }

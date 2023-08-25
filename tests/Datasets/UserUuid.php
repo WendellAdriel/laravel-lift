@@ -9,12 +9,12 @@ use WendellAdriel\Lift\Attributes\PrimaryKey;
 use WendellAdriel\Lift\Attributes\Rules;
 use WendellAdriel\Lift\Lift;
 
-class User extends Model
+class UserUuid extends Model
 {
     use Lift;
 
-    #[PrimaryKey]
-    public int $id;
+    #[PrimaryKey(type: 'string', incrementing: false)]
+    public string $uuid;
 
     #[Rules(['required', 'string'], ['required' => 'The user name cannot be empty'])]
     public string $name;
@@ -24,6 +24,8 @@ class User extends Model
 
     #[Rules(['required', 'string', 'min:8'])]
     public string $password;
+
+    protected $table = 'users_uuid';
 
     protected $fillable = [
         'name',

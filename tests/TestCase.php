@@ -22,6 +22,22 @@ abstract class TestCase extends BaseTestCase
             $table->timestamps();
         });
 
+        Schema::create('users_uuid', function (Blueprint $table) {
+            $table->string('uuid')->primary();
+            $table->string('name');
+            $table->string('email');
+            $table->string('password');
+            $table->timestamps();
+        });
+
+        Schema::create('users_custom', function (Blueprint $table) {
+            $table->integer('id')->primary();
+            $table->string('name');
+            $table->string('email');
+            $table->string('password');
+            $table->timestamps();
+        });
+
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('name');
