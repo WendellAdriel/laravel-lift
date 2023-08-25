@@ -123,3 +123,27 @@ describe('Update changing individual properties', function () {
         ]);
     });
 });
+
+describe('Gets model validation rules and messages statically', function () {
+    it('gets validation rules', function () {
+        $rules = User::validationRules();
+
+        expect($rules)->toBe([
+            'name' => ['required', 'string'],
+            'email' => ['required', 'email'],
+            'password' => ['required', 'string', 'min:8'],
+        ]);
+    });
+
+    it('gets validation messages', function () {
+        $messages = User::validationMessages();
+
+        expect($messages)->toBe([
+            'name' => [
+                'required' => 'The user name cannot be empty',
+            ],
+            'email' => [],
+            'password' => [],
+        ]);
+    });
+});

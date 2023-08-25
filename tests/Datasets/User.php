@@ -12,7 +12,7 @@ class User extends Model
 {
     use Lift;
 
-    #[Rules(['required', 'string'])]
+    #[Rules(['required', 'string'], ['required' => 'The user name cannot be empty'])]
     public string $name;
 
     #[Rules(['required', 'email'])]

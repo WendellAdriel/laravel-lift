@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace WendellAdriel\Lift\Concerns;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -13,6 +14,36 @@ use WendellAdriel\Lift\Support\PropertyInfo;
 
 trait RulesValidation
 {
+    private static ?array $modelRules = null;
+
+    private static ?array $modelMessages = null;
+
+    public static function validationRules(): array
+    {
+        if (is_null(self::$modelRules)) {
+            self::$modelRules = [];
+            self::$modelMessages = [];
+
+            $model = new static();
+            self::buildValidationRules($model);
+        }
+
+        return self::$modelRules;
+    }
+
+    public static function validationMessages(): array
+    {
+        if (is_null(self::$modelMessages)) {
+            self::$modelRules = [];
+            self::$modelMessages = [];
+
+            $model = new static();
+            self::buildValidationRules($model);
+        }
+
+        return self::$modelMessages;
+    }
+
     /**
      * @param  Collection<PropertyInfo>  $properties
      *
@@ -20,50 +51,49 @@ trait RulesValidation
      */
     private static function applyValidations(Collection $properties): void
     {
-        $data = [];
-        $rules = [];
-        $messages = [];
+        $validatedProperties = self::getPropertiesForAttributes($properties, [Rules::class]);
+        $data = $validatedProperties->mapWithKeys(fn ($property) => [$property->name => $property->value]);
+
+        $configProperties = self::getPropertiesForAttributes($properties, [Config::class]);
+        $data = $data->merge($configProperties->mapWithKeys(fn ($property) => [$property->name => $property->value]));
+
+        $validator = Validator::make(
+            data: $data->toArray(),
+            rules: self::validationRules(),
+            messages: self::validationMessages(),
+        );
+
+        if ($validator->fails()) {
+            throw new ValidationException($validator);
+        }
+    }
+
+    private static function buildValidationRules(Model $model): void
+    {
+        $properties = self::getPropertiesWithAtributes($model);
 
         $validatedProperties = self::getPropertiesForAttributes($properties, [Rules::class]);
-        $validatedProperties->each(function ($property) use (&$data, &$rules, &$messages) {
-            $data[$property->name] = $property->value;
-            $rules[$property->name] = [];
-            $messages[$property->name] = [];
-
+        $validatedProperties->each(function ($property) {
             $rulesAttribute = $property->attributes->first(fn ($attribute) => $attribute->getName() === Rules::class);
             if (blank($rulesAttribute)) {
                 return;
             }
 
             $rulesAttribute = $rulesAttribute->newInstance();
-            $rules[$property->name] = $rulesAttribute->rules;
-            $messages[$property->name] = $rulesAttribute->messages;
+            self::$modelRules[$property->name] = $rulesAttribute->rules;
+            self::$modelMessages[$property->name] = $rulesAttribute->messages;
         });
 
         $configProperties = self::getPropertiesForAttributes($properties, [Config::class]);
-        $configProperties->each(function ($property) use (&$data, &$rules, &$messages) {
-            $data[$property->name] = $property->value;
-            $rules[$property->name] = [];
-            $messages[$property->name] = [];
-
+        $configProperties->each(function ($property) {
             $configAttribute = $property->attributes->first(fn ($attribute) => $attribute->getName() === Config::class);
             if (blank($configAttribute)) {
                 return;
             }
 
             $configAttribute = $configAttribute->newInstance();
-            $rules[$property->name] = $configAttribute->rules;
-            $messages[$property->name] = $configAttribute->messages;
+            self::$modelRules[$property->name] = $configAttribute->rules;
+            self::$modelMessages[$property->name] = $configAttribute->messages;
         });
-
-        $validator = Validator::make(
-            data: $data,
-            rules: $rules,
-            messages: $messages,
-        );
-
-        if ($validator->fails()) {
-            throw new ValidationException($validator);
-        }
     }
 }
