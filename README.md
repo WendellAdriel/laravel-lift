@@ -13,6 +13,7 @@
 </p>
 
 <p align="center">
+    <a href="#documentation">Documentation</a> |
     <a href="#installation">Installation</a> |
     <a href="#trait">Trait</a> |
     <a href="#attributes">Attributes</a> |
@@ -26,6 +27,9 @@
 > ⚠️
 > **Currently, this package relies heavily on Eloquent Events to work properly, so when dealing with code that does not fire**
 > **these events, it could have unexpected issues. If you find any issues, create an issue and/or submit a PR for it.**
+
+## Documentation
+[![Docs Button]][Docs Link]
 
 ## Installation
 
@@ -326,3 +330,7 @@ $productRules = Product::validationMessages();
 ## Contributing
 
 Check the **[Contributing Guide](CONTRIBUTING.md)**.
+
+<!---------------------------------------------------------------------------->
+[Docs Button]: https://img.shields.io/badge/Documentation-40CA00?style=for-the-badge&logoColor=white&logo=GitBook
+[Docs Link]: https://wendell-adriel.gitbook.io/laravel-lift/
