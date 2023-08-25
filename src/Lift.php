@@ -26,6 +26,13 @@ trait Lift
 
             self::applyValidations($properties);
             self::castValues($model, $properties);
+
+            $publicProperties = self::getModelPublicProperties($model);
+            foreach ($publicProperties as $prop) {
+                if (isset($model->{$prop}) && is_null($model->getAttribute($prop))) {
+                    $model->setAttribute($prop, $model->{$prop});
+                }
+            }
         });
 
         static::saved(fn (Model $model) => self::fillProperties($model));
@@ -63,10 +70,6 @@ trait Lift
 
         foreach ($publicProperties as $prop) {
             try {
-                if (in_array($prop, self::ignoredProperties())) {
-                    continue;
-                }
-
                 if (! blank($model->getKey()) && ! $model->isDirty($prop) && isset($model->{$prop})) {
                     $model->setAttribute($prop, $model->{$prop});
                 }
@@ -95,6 +98,9 @@ trait Lift
         $properties = [];
 
         foreach ($reflectionClass->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
+            if (in_array($property->getName(), self::ignoredProperties())) {
+                continue;
+            }
             $properties[] = $property->getName();
         }
 
