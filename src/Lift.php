@@ -27,15 +27,18 @@ trait Lift
     public static function bootLift(): void
     {
         static::saving(function (Model $model) {
+            self::syncCostumColumns($model);
             $properties = self::getPropertiesWithAtributes($model);
 
             self::applyValidations($properties);
             self::castValues($model, $properties);
 
             $publicProperties = self::getModelPublicProperties($model);
+            $customColumns = self::customColumns();
             foreach ($publicProperties as $prop) {
-                if (isset($model->{$prop}) && is_null($model->getAttribute($prop))) {
-                    $model->setAttribute($prop, $model->{$prop});
+                $modelProp = $customColumns[$prop] ?? $prop;
+                if (isset($model->{$prop}) && is_null($model->getAttribute($modelProp))) {
+                    $model->setAttribute($modelProp, $model->{$prop});
                 }
             }
         });
@@ -72,12 +75,15 @@ trait Lift
     private static function getPropertiesWithAtributes(Model $model): Collection
     {
         $publicProperties = self::getModelPublicProperties($model);
+        $customColumns = self::customColumns();
         $result = [];
 
         foreach ($publicProperties as $prop) {
             try {
+                $modelProp = $customColumns[$prop] ?? $prop;
+
                 if (! blank($model->getKey()) && ! $model->isDirty($prop) && isset($model->{$prop})) {
-                    $model->setAttribute($prop, $model->{$prop});
+                    $model->setAttribute($modelProp, $model->{$prop});
                 }
 
                 $reflectionProperty = new ReflectionProperty($model, $prop);
@@ -86,7 +92,7 @@ trait Lift
                 if (count($attributes) > 0) {
                     $result[] = new PropertyInfo(
                         name: $prop,
-                        value: $model->getAttribute($prop) ?? null,
+                        value: $model->getAttribute($modelProp) ?? null,
                         attributes: collect($attributes),
                     );
                 }
@@ -147,5 +153,7 @@ trait Lift
         foreach ($model->getAttributes() as $key => $value) {
             $model->{$key} = $model->hasCast($key) ? $model->castAttribute($key, $value) : $value;
         }
+
+        self::syncColumnsToCustom($model);
     }
 }
