@@ -1,4 +1,5 @@
 <div align="center">
+    <img src="https://github.com/WendellAdriel/laravel-lift/raw/main/art/laravel-lift-logo.svg" alt="Lift for Laravel" height="300"/>
     <p>
         <h1>🏋️ Lift for Laravel</h1>
         Take your Eloquent Models to the next level
