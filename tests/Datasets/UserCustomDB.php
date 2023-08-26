@@ -6,30 +6,26 @@ namespace WendellAdriel\Lift\Tests\Datasets;
 
 use Illuminate\Database\Eloquent\Model;
 use WendellAdriel\Lift\Attributes\DB;
+use WendellAdriel\Lift\Attributes\Fillable;
 use WendellAdriel\Lift\Attributes\PrimaryKey;
 use WendellAdriel\Lift\Attributes\Rules;
 use WendellAdriel\Lift\Lift;
 
-#[DB(table: 'users')]
-class UserCustom extends Model
+#[DB(connection: 'mysql', table: 'users_custom_db', timestamps: false)]
+class UserCustomDB extends Model
 {
     use Lift;
 
-    #[PrimaryKey(incrementing: false)]
+    #[PrimaryKey]
     public int $id;
 
     #[Rules(['required', 'string'], ['required' => 'The user name cannot be empty'])]
+    #[Fillable]
     public string $name;
 
     #[Rules(['required', 'email'])]
+    #[Fillable]
     public string $email;
 
-    #[Rules(['required', 'string', 'min:8'])]
-    public string $password;
-
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
+    public ?string $password;
 }

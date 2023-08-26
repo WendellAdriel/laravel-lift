@@ -12,12 +12,17 @@ use ReflectionProperty;
 use WendellAdriel\Lift\Concerns\AttributesGuard;
 use WendellAdriel\Lift\Concerns\CastValues;
 use WendellAdriel\Lift\Concerns\CustomPrimary;
+use WendellAdriel\Lift\Concerns\DatabaseConfigurations;
 use WendellAdriel\Lift\Concerns\RulesValidation;
 use WendellAdriel\Lift\Support\PropertyInfo;
 
 trait Lift
 {
-    use RulesValidation, CastValues, AttributesGuard, CustomPrimary;
+    use AttributesGuard,
+        CastValues,
+        CustomPrimary,
+        DatabaseConfigurations,
+        RulesValidation;
 
     public static function bootLift(): void
     {
@@ -42,6 +47,7 @@ trait Lift
     public function syncOriginal(): void
     {
         parent::syncOriginal();
+        $this->applyDatabaseConfigurations();
 
         $properties = self::getPropertiesWithAtributes($this);
         $this->applyPrimaryKey($properties);
