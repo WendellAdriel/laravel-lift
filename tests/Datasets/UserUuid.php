@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace WendellAdriel\Lift\Tests\Datasets;
 
 use Illuminate\Database\Eloquent\Model;
+use WendellAdriel\Lift\Attributes\DB;
 use WendellAdriel\Lift\Attributes\PrimaryKey;
 use WendellAdriel\Lift\Attributes\Rules;
 use WendellAdriel\Lift\Lift;
 
+#[DB(table: 'users_uuid')]
 class UserUuid extends Model
 {
     use Lift;
@@ -24,8 +26,6 @@ class UserUuid extends Model
 
     #[Rules(['required', 'string', 'min:8'])]
     public string $password;
-
-    protected $table = 'users_uuid';
 
     protected $fillable = [
         'name',

@@ -7,8 +7,10 @@ namespace WendellAdriel\Lift\Tests\Datasets;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use WendellAdriel\Lift\Attributes\Config;
+use WendellAdriel\Lift\Attributes\DB;
 use WendellAdriel\Lift\Lift;
 
+#[DB(table: 'products')]
 class ProductConfig extends Model
 {
     use Lift;
@@ -24,6 +26,4 @@ class ProductConfig extends Model
 
     #[Config(fillable: true, cast: 'immutable_datetime', rules: ['required', 'date_format:Y-m-d H:i:s'])]
     public CarbonImmutable $expires_at;
-
-    protected $table = 'products';
 }
