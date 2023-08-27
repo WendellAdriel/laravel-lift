@@ -539,6 +539,18 @@ class Product extends Model
 }
 ```
 
+```php
+final class PriceChangedEvent
+{
+    use Dispatchable, InteractsWithSockets, SerializesModels;
+
+    public function __construct(
+        public Product $product,
+    ) {
+    }
+}
+```
+
 ## Methods
 
 When using the `Lift` trait, your model will have some new methods available.
