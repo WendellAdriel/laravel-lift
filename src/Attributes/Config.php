@@ -13,6 +13,8 @@ final class Config
         public ?string $cast = null,
         public bool $fillable = false,
         public bool $hidden = false,
+        public ?string $column = null,
+        public mixed $default = null,
         /**
          * @var array<string>
          */

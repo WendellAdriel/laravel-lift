@@ -6,6 +6,7 @@ namespace WendellAdriel\Lift\Tests\Datasets;
 
 use Illuminate\Database\Eloquent\Model;
 use WendellAdriel\Lift\Attributes\Column;
+use WendellAdriel\Lift\Attributes\Config;
 use WendellAdriel\Lift\Attributes\DB;
 use WendellAdriel\Lift\Attributes\Fillable;
 use WendellAdriel\Lift\Attributes\PrimaryKey;
@@ -32,7 +33,7 @@ class UserColumn extends Model
 
     #[Rules(['required', 'string', 'min:8'])]
     #[Fillable]
-    #[Column(name: 'password', default: 'generatePassword')]
+    #[Config(column: 'password', default: 'generatePassword')]
     public string $user_password;
 
     public function generatePassword(): string

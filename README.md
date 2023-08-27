@@ -259,7 +259,7 @@ final class Product extends Model
 ### Config
 
 The `Config` attribute allows you to set your model's **public properties** configurations for the attributes:
-`Cast`, `Fillable`, `Hidden` and `Rules`.
+`Cast`, `Column`, `Fillable`, `Hidden` and `Rules`.
 
 ```php
 use Carbon\CarbonImmutable;
@@ -274,7 +274,10 @@ class Product extends Model
     #[Config(fillable: true, rules: ['required', 'string'], messages: ['required' => 'The PRODUCT NAME field cannot be empty.'])]
     public string $name;
 
-    #[Config(fillable: true, cast: 'float', rules: ['required', 'numeric'])]
+    #[Config(fillable: true, column: 'description', rules: ['required', 'string'])]
+    public string $product_description;
+
+    #[Config(fillable: true, cast: 'float', default: 0.0, rules: ['sometimes', 'numeric'])]
     public float $price;
 
     #[Config(fillable: true, cast: 'int', hidden: true, rules: ['required', 'integer'])]

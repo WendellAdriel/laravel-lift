@@ -7,6 +7,7 @@ namespace WendellAdriel\Lift\Concerns;
 use Illuminate\Database\Eloquent\Model;
 use ReflectionClass;
 use WendellAdriel\Lift\Attributes\Column;
+use WendellAdriel\Lift\Attributes\Config;
 use WendellAdriel\Lift\Attributes\DB;
 
 trait DatabaseConfigurations
@@ -54,6 +55,22 @@ trait DatabaseConfigurations
             }
             if (! is_null($columnAttribute->default)) {
                 self::$modelDefaultValues[$property->name] = $columnAttribute->default;
+            }
+        });
+
+        $configColumns = self::getPropertiesForAttributes($properties, [Config::class]);
+        $configColumns->each(function ($property) {
+            $configAttribute = $property->attributes->first(fn ($attribute) => $attribute->getName() === Config::class);
+            if (blank($configAttribute)) {
+                return;
+            }
+
+            $configAttribute = $configAttribute->newInstance();
+            if (! is_null($configAttribute->column)) {
+                self::$modelCustomColumns[$property->name] = $configAttribute->column;
+            }
+            if (! is_null($configAttribute->default)) {
+                self::$modelDefaultValues[$property->name] = $configAttribute->default;
             }
         });
     }
