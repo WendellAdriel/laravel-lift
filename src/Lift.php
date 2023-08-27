@@ -6,6 +6,7 @@ namespace WendellAdriel\Lift;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\ValidationException;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionProperty;
@@ -14,6 +15,8 @@ use WendellAdriel\Lift\Concerns\CastValues;
 use WendellAdriel\Lift\Concerns\CustomPrimary;
 use WendellAdriel\Lift\Concerns\DatabaseConfigurations;
 use WendellAdriel\Lift\Concerns\RulesValidation;
+use WendellAdriel\Lift\Concerns\WatchProperties;
+use WendellAdriel\Lift\Exceptions\ImmutablePropertyException;
 use WendellAdriel\Lift\Support\PropertyInfo;
 
 trait Lift
@@ -22,14 +25,27 @@ trait Lift
         CastValues,
         CustomPrimary,
         DatabaseConfigurations,
-        RulesValidation;
+        RulesValidation,
+        WatchProperties;
 
+    /**
+     * @throws ImmutablePropertyException|ValidationException
+     */
     public static function bootLift(): void
     {
         static::saving(function (Model $model) {
             self::syncCostumColumns($model);
-            $properties = self::getPropertiesWithAtributes($model);
 
+            if (! blank($model->getKey())) {
+                $immutableProperties = self::immutableProperties();
+                foreach ($immutableProperties as $prop) {
+                    if ($model->getAttribute($prop) !== $model->{$prop}) {
+                        throw new ImmutablePropertyException($prop);
+                    }
+                }
+            }
+
+            $properties = self::getPropertiesWithAtributes($model);
             self::applyValidations($properties);
             self::castValues($model, $properties);
 
@@ -41,9 +57,30 @@ trait Lift
                     $model->setAttribute($modelProp, $model->{$prop});
                 }
             }
+
+            if (! blank($model->getKey())) {
+                $model->dispatchEvents = [];
+                $watchedProperties = self::watchedProperties();
+
+                foreach ($watchedProperties as $prop => $event) {
+                    if ($model->isDirty($prop)) {
+                        $model->dispatchEvents[] = $prop;
+                    }
+                }
+            }
         });
 
-        static::saved(fn (Model $model) => self::fillProperties($model));
+        static::saved(function (Model $model) {
+            self::fillProperties($model);
+
+            foreach ($model->dispatchEvents as $prop) {
+                $event = self::watchedProperties()[$prop];
+                event(new $event($model));
+            }
+
+            $model->dispatchEvents = [];
+        });
+
         static::retrieved(fn (Model $model) => self::fillProperties($model));
     }
 

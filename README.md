@@ -259,7 +259,7 @@ final class Product extends Model
 ### Config
 
 The `Config` attribute allows you to set your model's **public properties** configurations for the attributes:
-`Cast`, `Fillable`, `Hidden` and `Rules`.
+`Cast`, `Column`, `Fillable`, `Hidden`, `Immutable`, `Rules` and `Watch`.
 
 ```php
 use Carbon\CarbonImmutable;
@@ -274,13 +274,16 @@ class Product extends Model
     #[Config(fillable: true, rules: ['required', 'string'], messages: ['required' => 'The PRODUCT NAME field cannot be empty.'])]
     public string $name;
 
-    #[Config(fillable: true, cast: 'float', rules: ['required', 'numeric'])]
+    #[Config(fillable: true, column: 'description', rules: ['required', 'string'])]
+    public string $product_description;
+
+    #[Config(fillable: true, cast: 'float', default: 0.0, rules: ['sometimes', 'numeric'], watch: ProductPriceChanged::class)]
     public float $price;
 
     #[Config(fillable: true, cast: 'int', hidden: true, rules: ['required', 'integer'])]
     public int $random_number;
 
-    #[Config(fillable: true, cast: 'immutable_datetime', rules: ['required', 'date_format:Y-m-d H:i:s'])]
+    #[Config(fillable: true, cast: 'immutable_datetime', immutable: true , rules: ['required', 'date_format:Y-m-d H:i:s'])]
     public CarbonImmutable $expires_at;
 }
 ```
@@ -458,6 +461,84 @@ final class Product extends Model
 }
 ```
 
+### Immutable
+
+The `Immutable` attribute allows you to set your model's **public properties** as immutable. This means that once the model
+is created, the **public properties** will not be able to be changed. If you try to change the value of an immutable property
+an `WendellAdriel\Lift\Exceptions\ImmutablePropertyException` will be thrown.
+
+```php
+use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Model;
+use WendellAdriel\Lift\Attributes\Cast;
+use WendellAdriel\Lift\Attributes\Fillable;
+use WendellAdriel\Lift\Attributes\Immutable;
+use WendellAdriel\Lift\Lift;
+
+class Product extends Model
+{
+    use Lift;
+
+    #[Immutable]
+    #[Fillable]
+    public string $name;
+
+    #[Fillable]
+    #[Cast('float')]
+    public float $price;
+}
+```
+
+Example:
+
+```php
+$product = Product::create([
+    'name' => 'Product Name',
+    'price' => 10.0,
+]);
+
+$product->name = 'New Product Name';
+$product->save(); // Will throw an ImmutablePropertyException
+```
+
+### Watch
+
+By default, **Eloquent** already fires events when updating models, but it is a generic event. With the `Watch` attribute
+you can set a specific event to be fired when a specific **public property** is updated. The event will receive as a parameter
+the updated model instance.
+
+```php
+use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Model;
+use Tests\Datasets\PriceChangedEvent;
+use Tests\Datasets\RandomNumberChangedEvent;
+use WendellAdriel\Lift\Attributes\Cast;
+use WendellAdriel\Lift\Attributes\Fillable;
+use WendellAdriel\Lift\Attributes\Watch;
+use WendellAdriel\Lift\Lift;
+
+class Product extends Model
+{
+    use Lift;
+
+    #[Fillable]
+    public string $name;
+
+    #[Watch(PriceChangedEvent::class)]
+    #[Fillable]
+    #[Cast('float')]
+    public float $price;
+
+    #[Fillable]
+    #[Cast('int')]
+    public int $random_number;
+
+    #[Fillable]
+    #[Cast('immutable_datetime')]
+    public CarbonImmutable $expires_at;
+}
+```
+
 ## Methods
 
 When using the `Lift` trait, your model will have some new methods available.
@@ -492,6 +573,19 @@ $productDefaultValues = Product::defaultValues();
 ]
 ```
 
+### immutableProperties
+
+The `immutableProperties` method returns an array with all the **public properties** that are immutable.
+
+```php
+$productImmutableProperties = Product::immutableProperties();
+
+// WILL RETURN
+[
+    'name',
+]
+```
+
 ### validationRules
 
 The `validationRules` method returns an array with all the validation rules for your model's **public properties**.
@@ -523,6 +617,19 @@ $productRules = Product::validationMessages();
     'price' => [],
     'random_number' => [],
     'expires_at' => [],
+]
+```
+
+### watchedProperties
+
+The `watchedProperties` method returns an array with all the **public properties** that have a custom event set.
+
+```php
+$productWatchedProperties = Product::watchedProperties();
+
+// WILL RETURN
+[
+    'price' => PriceChangedEvent::class,
 ]
 ```
 
