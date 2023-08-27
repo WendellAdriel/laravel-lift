@@ -6,6 +6,7 @@ namespace WendellAdriel\Lift;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\ValidationException;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionProperty;
@@ -14,6 +15,7 @@ use WendellAdriel\Lift\Concerns\CastValues;
 use WendellAdriel\Lift\Concerns\CustomPrimary;
 use WendellAdriel\Lift\Concerns\DatabaseConfigurations;
 use WendellAdriel\Lift\Concerns\RulesValidation;
+use WendellAdriel\Lift\Exceptions\ImmutablePropertyException;
 use WendellAdriel\Lift\Support\PropertyInfo;
 
 trait Lift
@@ -24,12 +26,24 @@ trait Lift
         DatabaseConfigurations,
         RulesValidation;
 
+    /**
+     * @throws ImmutablePropertyException|ValidationException
+     */
     public static function bootLift(): void
     {
         static::saving(function (Model $model) {
             self::syncCostumColumns($model);
-            $properties = self::getPropertiesWithAtributes($model);
 
+            if (! blank($model->getKey())) {
+                $immutableProperties = self::immutableProperties();
+                foreach ($immutableProperties as $prop) {
+                    if ($model->getAttribute($prop) !== $model->{$prop}) {
+                        throw new ImmutablePropertyException($prop);
+                    }
+                }
+            }
+
+            $properties = self::getPropertiesWithAtributes($model);
             self::applyValidations($properties);
             self::castValues($model, $properties);
 

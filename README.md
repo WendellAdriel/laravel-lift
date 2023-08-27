@@ -259,7 +259,7 @@ final class Product extends Model
 ### Config
 
 The `Config` attribute allows you to set your model's **public properties** configurations for the attributes:
-`Cast`, `Column`, `Fillable`, `Hidden` and `Rules`.
+`Cast`, `Column`, `Fillable`, `Hidden`, `Immutable` and `Rules`.
 
 ```php
 use Carbon\CarbonImmutable;
@@ -283,7 +283,7 @@ class Product extends Model
     #[Config(fillable: true, cast: 'int', hidden: true, rules: ['required', 'integer'])]
     public int $random_number;
 
-    #[Config(fillable: true, cast: 'immutable_datetime', rules: ['required', 'date_format:Y-m-d H:i:s'])]
+    #[Config(fillable: true, cast: 'immutable_datetime', immutable: true , rules: ['required', 'date_format:Y-m-d H:i:s'])]
     public CarbonImmutable $expires_at;
 }
 ```
@@ -461,6 +461,46 @@ final class Product extends Model
 }
 ```
 
+### Immutable
+
+The `Immutable` attribute allows you to set your model's **public properties** as immutable. This means that once the model
+is created, the **public properties** will not be able to be changed. If you try to change the value of an immutable property
+an `WendellAdriel\Lift\Exceptions\ImmutablePropertyException` will be thrown.
+
+```php
+use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Model;
+use WendellAdriel\Lift\Attributes\Cast;
+use WendellAdriel\Lift\Attributes\Fillable;
+use WendellAdriel\Lift\Attributes\Immutable;
+use WendellAdriel\Lift\Lift;
+
+class Product extends Model
+{
+    use Lift;
+
+    #[Immutable]
+    #[Fillable]
+    public string $name;
+
+    #[Fillable]
+    #[Cast('float')]
+    public float $price;
+}
+```
+
+Example:
+
+```php
+$product = Product::create([
+    'name' => 'Product Name',
+    'price' => 10.0,
+]);
+
+$product->name = 'New Product Name';
+$product->save(); // Will throw an ImmutablePropertyException
+```
+
 ## Methods
 
 When using the `Lift` trait, your model will have some new methods available.
@@ -492,6 +532,19 @@ $productDefaultValues = Product::defaultValues();
 [
     'price' => 0.0,
     'promotional_price' => 'generatePromotionalPrice',
+]
+```
+
+### immutableProperties
+
+The `immutableProperties` method returns an array with all the **public properties** that are immutable.
+
+```php
+$productImmutableProperties = Product::immutableProperties();
+
+// WILL RETURN
+[
+    'name',
 ]
 ```
 
