@@ -15,6 +15,7 @@ use WendellAdriel\Lift\Concerns\CastValues;
 use WendellAdriel\Lift\Concerns\CustomPrimary;
 use WendellAdriel\Lift\Concerns\DatabaseConfigurations;
 use WendellAdriel\Lift\Concerns\RulesValidation;
+use WendellAdriel\Lift\Concerns\WatchProperties;
 use WendellAdriel\Lift\Exceptions\ImmutablePropertyException;
 use WendellAdriel\Lift\Support\PropertyInfo;
 
@@ -24,7 +25,8 @@ trait Lift
         CastValues,
         CustomPrimary,
         DatabaseConfigurations,
-        RulesValidation;
+        RulesValidation,
+        WatchProperties;
 
     /**
      * @throws ImmutablePropertyException|ValidationException
@@ -55,9 +57,30 @@ trait Lift
                     $model->setAttribute($modelProp, $model->{$prop});
                 }
             }
+
+            if (! blank($model->getKey())) {
+                $model->dispatchEvents = [];
+                $watchedProperties = self::watchedProperties();
+
+                foreach ($watchedProperties as $prop => $event) {
+                    if ($model->isDirty($prop)) {
+                        $model->dispatchEvents[] = $prop;
+                    }
+                }
+            }
         });
 
-        static::saved(fn (Model $model) => self::fillProperties($model));
+        static::saved(function (Model $model) {
+            self::fillProperties($model);
+
+            foreach ($model->dispatchEvents as $prop) {
+                $event = self::watchedProperties()[$prop];
+                event(new $event($model));
+            }
+
+            $model->dispatchEvents = [];
+        });
+
         static::retrieved(fn (Model $model) => self::fillProperties($model));
     }
 

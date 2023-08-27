@@ -259,7 +259,7 @@ final class Product extends Model
 ### Config
 
 The `Config` attribute allows you to set your model's **public properties** configurations for the attributes:
-`Cast`, `Column`, `Fillable`, `Hidden`, `Immutable` and `Rules`.
+`Cast`, `Column`, `Fillable`, `Hidden`, `Immutable`, `Rules` and `Watch`.
 
 ```php
 use Carbon\CarbonImmutable;
@@ -277,7 +277,7 @@ class Product extends Model
     #[Config(fillable: true, column: 'description', rules: ['required', 'string'])]
     public string $product_description;
 
-    #[Config(fillable: true, cast: 'float', default: 0.0, rules: ['sometimes', 'numeric'])]
+    #[Config(fillable: true, cast: 'float', default: 0.0, rules: ['sometimes', 'numeric'], watch: ProductPriceChanged::class)]
     public float $price;
 
     #[Config(fillable: true, cast: 'int', hidden: true, rules: ['required', 'integer'])]
@@ -501,6 +501,44 @@ $product->name = 'New Product Name';
 $product->save(); // Will throw an ImmutablePropertyException
 ```
 
+### Watch
+
+By default, **Eloquent** already fires events when updating models, but it is a generic event. With the `Watch` attribute
+you can set a specific event to be fired when a specific **public property** is updated. The event will receive as a parameter
+the updated model instance.
+
+```php
+use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Model;
+use Tests\Datasets\PriceChangedEvent;
+use Tests\Datasets\RandomNumberChangedEvent;
+use WendellAdriel\Lift\Attributes\Cast;
+use WendellAdriel\Lift\Attributes\Fillable;
+use WendellAdriel\Lift\Attributes\Watch;
+use WendellAdriel\Lift\Lift;
+
+class Product extends Model
+{
+    use Lift;
+
+    #[Fillable]
+    public string $name;
+
+    #[Watch(PriceChangedEvent::class)]
+    #[Fillable]
+    #[Cast('float')]
+    public float $price;
+
+    #[Fillable]
+    #[Cast('int')]
+    public int $random_number;
+
+    #[Fillable]
+    #[Cast('immutable_datetime')]
+    public CarbonImmutable $expires_at;
+}
+```
+
 ## Methods
 
 When using the `Lift` trait, your model will have some new methods available.
@@ -579,6 +617,19 @@ $productRules = Product::validationMessages();
     'price' => [],
     'random_number' => [],
     'expires_at' => [],
+]
+```
+
+### watchedProperties
+
+The `watchedProperties` method returns an array with all the **public properties** that have a custom event set.
+
+```php
+$productWatchedProperties = Product::watchedProperties();
+
+// WILL RETURN
+[
+    'price' => PriceChangedEvent::class,
 ]
 ```
 

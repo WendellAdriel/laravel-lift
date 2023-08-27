@@ -16,6 +16,7 @@ final class Config
         public bool $immutable = false,
         public ?string $column = null,
         public mixed $default = null,
+        public ?string $watch = null,
         /**
          * @var array<string>
          */
