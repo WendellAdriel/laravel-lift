@@ -14,6 +14,7 @@ use WendellAdriel\Lift\Concerns\AttributesGuard;
 use WendellAdriel\Lift\Concerns\CastValues;
 use WendellAdriel\Lift\Concerns\CustomPrimary;
 use WendellAdriel\Lift\Concerns\DatabaseConfigurations;
+use WendellAdriel\Lift\Concerns\ManageRelations;
 use WendellAdriel\Lift\Concerns\RulesValidation;
 use WendellAdriel\Lift\Concerns\WatchProperties;
 use WendellAdriel\Lift\Exceptions\ImmutablePropertyException;
@@ -25,6 +26,7 @@ trait Lift
         CastValues,
         CustomPrimary,
         DatabaseConfigurations,
+        ManageRelations,
         RulesValidation,
         WatchProperties;
 
@@ -68,6 +70,8 @@ trait Lift
                     }
                 }
             }
+
+            self::handleRelationsKeys($model);
         });
 
         static::saved(function (Model $model) {
@@ -88,6 +92,7 @@ trait Lift
     {
         parent::syncOriginal();
         $this->applyDatabaseConfigurations();
+        self::buildRelations($this);
 
         $properties = self::getPropertiesWithAtributes($this);
         $this->applyPrimaryKey($properties);

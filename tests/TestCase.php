@@ -54,5 +54,13 @@ abstract class TestCase extends BaseTestCase
             $table->timestamp('expires_at');
             $table->timestamps();
         });
+
+        Schema::create('posts', function (Blueprint $table) {
+            $table->id();
+            $table->string('title');
+            $table->float('content');
+            $table->foreignId('user_id')->nullable()->constrained('users');
+            $table->timestamps();
+        });
     }
 }
