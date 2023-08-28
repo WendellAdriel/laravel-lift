@@ -171,10 +171,6 @@ it('loads HasOneThrough relation', function () {
 
 })->todo();
 
-it('loads MorphedByMany relation', function () {
-
-})->todo();
-
 it('loads MorphMany relation', function () {
 
 })->todo();
