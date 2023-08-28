@@ -210,8 +210,22 @@ it('loads MorphMany/MorphTo relations', function () {
 });
 
 it('loads MorphOne relation', function () {
+    $user = User::create([
+        'name' => fake()->name,
+        'email' => fake()->unique()->safeEmail,
+        'password' => 's3Cr3T@!!!',
+    ]);
+    $image = $user->image()->save(new Image());
 
-})->todo();
+    expect($user->image->id)->toBe($image->id)
+        ->and($image->imageable->id)->toBe($user->id);
+
+    $user = User::query()->find($user->id);
+    expect($user->image->id)->toBe($image->id);
+
+    $image = Image::query()->find($image->id);
+    expect($image->imageable->id)->toBe($user->id);
+});
 
 it('loads MorphToMany relation', function () {
 
