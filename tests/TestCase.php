@@ -109,5 +109,17 @@ abstract class TestCase extends BaseTestCase
             $table->morphs('imageable');
             $table->timestamps();
         });
+
+        Schema::create('tags', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
+        });
+
+        Schema::create('taggables', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('tag_id')->constrained();
+            $table->morphs('taggable');
+            $table->timestamps();
+        });
     }
 }

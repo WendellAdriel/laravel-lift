@@ -10,6 +10,7 @@ use WendellAdriel\Lift\Tests\Datasets\Phone;
 use WendellAdriel\Lift\Tests\Datasets\Post;
 use WendellAdriel\Lift\Tests\Datasets\Role;
 use WendellAdriel\Lift\Tests\Datasets\Seller;
+use WendellAdriel\Lift\Tests\Datasets\Tag;
 use WendellAdriel\Lift\Tests\Datasets\User;
 
 it('loads BelongsTo relation', function () {
@@ -227,6 +228,17 @@ it('loads MorphOne relation', function () {
     expect($image->imageable->id)->toBe($user->id);
 });
 
-it('loads MorphToMany relation', function () {
+it('loads MorphToMany/MorphedByMany relations', function () {
+    $post = Post::create([
+        'title' => fake()->sentence,
+        'content' => fake()->paragraph,
+    ]);
+    $tag = Tag::create();
 
-})->todo();
+    $post->tags()->attach($tag);
+
+    expect($post->tags)->toHaveCount(1)
+        ->and($post->tags->first()->id)->toBe($tag->id)
+        ->and($tag->posts)->toHaveCount(1)
+        ->and($tag->posts->first()->id)->toBe($post->id);
+});
