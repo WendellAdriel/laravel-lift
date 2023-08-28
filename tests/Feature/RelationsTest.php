@@ -27,10 +27,12 @@ it('loads BelongsTo relation', function () {
 
     $post->user()->associate($user);
     $post->save();
-    expect($post->user->id)->toBe($user->id);
+    expect($post->user->id)->toBe($user->id)
+        ->and($post->user_id)->toBe($user->id);
 
     $post = Post::query()->find($post->id);
-    expect($post->user->id)->toBe($user->id);
+    expect($post->user->id)->toBe($user->id)
+        ->and($post->user_id)->toBe($user->id);
 
     $postWithoutUser = Post::create([
         'title' => fake()->sentence,
@@ -98,14 +100,16 @@ it('loads HasMany relation', function () {
 
     expect($user->posts)->toHaveCount(1)
         ->and($user->posts->first()->id)->toBe($post->id)
-        ->and($post->user->id)->toBe($user->id);
+        ->and($post->user->id)->toBe($user->id)
+        ->and($post->user_id)->toBe($user->id);
 
     $user = User::query()->find($user->id);
     expect($user->posts)->toHaveCount(1)
         ->and($user->posts->first()->id)->toBe($post->id);
 
     $post = Post::query()->find($post->id);
-    expect($post->user->id)->toBe($user->id);
+    expect($post->user->id)->toBe($user->id)
+        ->and($post->user_id)->toBe($user->id);
 
     $userWithoutPosts = User::create([
         'name' => fake()->name,
@@ -155,13 +159,15 @@ it('loads HasOne relation', function () {
     $user->phone()->save($phone);
 
     expect($user->phone->id)->toBe($phone->id)
-        ->and($phone->user->id)->toBe($user->id);
+        ->and($phone->user->id)->toBe($user->id)
+        ->and($phone->user_id)->toBe($user->id);
 
     $user = User::query()->find($user->id);
     expect($user->phone->id)->toBe($phone->id);
 
     $phone = Phone::query()->find($phone->id);
-    expect($phone->user->id)->toBe($user->id);
+    expect($phone->user->id)->toBe($user->id)
+        ->and($phone->user_id)->toBe($user->id);
 
     $userWithoutPhone = User::create([
         'name' => fake()->name,
