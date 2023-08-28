@@ -267,7 +267,7 @@ use Illuminate\Database\Eloquent\Model;
 use WendellAdriel\Lift\Attributes\Config;
 use WendellAdriel\Lift\Lift;
 
-class Product extends Model
+final class Product extends Model
 {
     use Lift;
 
@@ -475,7 +475,7 @@ use WendellAdriel\Lift\Attributes\Fillable;
 use WendellAdriel\Lift\Attributes\Immutable;
 use WendellAdriel\Lift\Lift;
 
-class Product extends Model
+final class Product extends Model
 {
     use Lift;
 
@@ -517,7 +517,7 @@ use WendellAdriel\Lift\Attributes\Fillable;
 use WendellAdriel\Lift\Attributes\Watch;
 use WendellAdriel\Lift\Lift;
 
-class Product extends Model
+final class Product extends Model
 {
     use Lift;
 
@@ -548,6 +548,175 @@ final class PriceChangedEvent
         public Product $product,
     ) {
     }
+}
+```
+
+### Relationships
+
+With **Lift**, you can configure all of your Model **relationships** using **Attributes**. It works the same way when defining
+them with methods, so all of them accept the same parameters as the methods.
+
+#### BelongsTo
+
+```php
+#[BelongsTo(User::class)]
+final class Post extends Model
+{
+    use Lift;
+    // ...
+}
+```
+
+#### BelongsToMany
+
+```php
+#[BelongsToMany(Role::class)]
+final class User extends Model
+{
+    use Lift;
+    // ...
+}
+```
+
+```php
+#[BelongsToMany(User::class)]
+final class Role extends Model
+{
+    use Lift;
+    // ...
+}
+```
+
+#### HasMany
+
+```php
+#[HasMany(Post::class)]
+final class User extends Model
+{
+    use Lift;
+    // ...
+}
+```
+
+#### HasManyThrough
+
+```php
+#[HasMany(User::class)]
+#[HasManyThrough(Post::class, User::class)]
+final class Country extends Model
+{
+    use Lift;
+    // ...
+}
+```
+
+```php
+#[HasMany(Post::class)]
+final class User extends Model
+{
+    use Lift;
+    // ...
+}
+```
+
+```php
+#[BelongsTo(User::class)]
+final class Post extends Model
+{
+    use Lift;
+    // ...
+}
+```
+
+#### HasOne
+
+```php
+#[HasOne(Phone::class)]
+final class User extends Model
+{
+    use Lift;
+    // ...
+}
+```
+
+#### HasOneThrough
+
+```php
+#[HasOneThrough(Manufacturer::class, Computer::class)]
+#[HasOne(Computer::class)]
+final class Seller extends Model
+{
+    use Lift;
+    // ...
+}
+```
+
+```php
+#[HasOne(Manufacturer::class)]
+final class Computer extends Model
+{
+    use Lift;
+    // ...
+}
+```
+
+#### MorphMany/MorphTo
+
+```php
+#[MorphMany(Image::class, 'imageable')]
+final class Post extends Model
+{
+    use Lift;
+    // ...
+}
+```
+
+```php
+#[MorphTo('imageable')]
+final class Image extends Model
+{
+    use Lift;
+    // ...
+}
+```
+
+#### MorphOne/MorphTo
+
+```php
+#[MorphOne(Image::class, 'imageable')]
+final class User extends Model
+{
+    use Lift;
+    // ...
+}
+```
+
+```php
+#[MorphTo('imageable')]
+final class Image extends Model
+{
+    use Lift;
+    // ...
+}
+```
+
+#### MorphToMany/MorphedByMany
+
+```php
+#[MorphToMany(Tag::class, 'taggable')]
+final class Post extends Model
+{
+    use Lift;
+    // ...
+}
+```
+
+```php
+#[MorphedByMany(Post::class, 'taggable')]
+final class Tag extends Model
+{
+    use Lift;
+    // ...
 }
 ```
 
