@@ -267,7 +267,7 @@ use Illuminate\Database\Eloquent\Model;
 use WendellAdriel\Lift\Attributes\Config;
 use WendellAdriel\Lift\Lift;
 
-class Product extends Model
+final class Product extends Model
 {
     use Lift;
 
@@ -475,7 +475,7 @@ use WendellAdriel\Lift\Attributes\Fillable;
 use WendellAdriel\Lift\Attributes\Immutable;
 use WendellAdriel\Lift\Lift;
 
-class Product extends Model
+final class Product extends Model
 {
     use Lift;
 
@@ -517,7 +517,7 @@ use WendellAdriel\Lift\Attributes\Fillable;
 use WendellAdriel\Lift\Attributes\Watch;
 use WendellAdriel\Lift\Lift;
 
-class Product extends Model
+final class Product extends Model
 {
     use Lift;
 
@@ -553,14 +553,14 @@ final class PriceChangedEvent
 
 ### Relationships
 
-With **Lift**, you can configure all of your Models **relationships** using **Attributes**. It works the same way when defining
+With **Lift**, you can configure all of your Model **relationships** using **Attributes**. It works the same way when defining
 them with methods, so all of them accept the same parameters as the methods.
 
 #### BelongsTo
 
 ```php
 #[BelongsTo(User::class)]
-class Post extends Model
+final class Post extends Model
 {
     use Lift;
     // ...
@@ -571,7 +571,7 @@ class Post extends Model
 
 ```php
 #[BelongsToMany(Role::class)]
-class User extends Model
+final class User extends Model
 {
     use Lift;
     // ...
@@ -580,7 +580,7 @@ class User extends Model
 
 ```php
 #[BelongsToMany(User::class)]
-class Role extends Model
+final class Role extends Model
 {
     use Lift;
     // ...
@@ -591,7 +591,7 @@ class Role extends Model
 
 ```php
 #[HasMany(Post::class)]
-class User extends Model
+final class User extends Model
 {
     use Lift;
     // ...
@@ -603,7 +603,7 @@ class User extends Model
 ```php
 #[HasMany(User::class)]
 #[HasManyThrough(Post::class, User::class)]
-class Country extends Model
+final class Country extends Model
 {
     use Lift;
     // ...
@@ -612,7 +612,7 @@ class Country extends Model
 
 ```php
 #[HasMany(Post::class)]
-class User extends Model
+final class User extends Model
 {
     use Lift;
     // ...
@@ -621,7 +621,7 @@ class User extends Model
 
 ```php
 #[BelongsTo(User::class)]
-class Post extends Model
+final class Post extends Model
 {
     use Lift;
     // ...
@@ -632,7 +632,7 @@ class Post extends Model
 
 ```php
 #[HasOne(Phone::class)]
-class User extends Model
+final class User extends Model
 {
     use Lift;
     // ...
@@ -644,7 +644,7 @@ class User extends Model
 ```php
 #[HasOneThrough(Manufacturer::class, Computer::class)]
 #[HasOne(Computer::class)]
-class Seller extends Model
+final class Seller extends Model
 {
     use Lift;
     // ...
@@ -653,18 +653,18 @@ class Seller extends Model
 
 ```php
 #[HasOne(Manufacturer::class)]
-class Computer extends Model
+final class Computer extends Model
 {
     use Lift;
     // ...
 }
 ```
 
-#### MorphMany/MarphTo
+#### MorphMany/MorphTo
 
 ```php
 #[MorphMany(Image::class, 'imageable')]
-class Post extends Model
+final class Post extends Model
 {
     use Lift;
     // ...
@@ -673,18 +673,18 @@ class Post extends Model
 
 ```php
 #[MorphTo('imageable')]
-class Image extends Model
+final class Image extends Model
 {
     use Lift;
     // ...
 }
 ```
 
-#### MorphOne
+#### MorphOne/MorphTo
 
 ```php
 #[MorphOne(Image::class, 'imageable')]
-class User extends Model
+final class User extends Model
 {
     use Lift;
     // ...
@@ -693,7 +693,7 @@ class User extends Model
 
 ```php
 #[MorphTo('imageable')]
-class Image extends Model
+final class Image extends Model
 {
     use Lift;
     // ...
@@ -704,7 +704,7 @@ class Image extends Model
 
 ```php
 #[MorphToMany(Tag::class, 'taggable')]
-class Post extends Model
+final class Post extends Model
 {
     use Lift;
     // ...
@@ -713,7 +713,7 @@ class Post extends Model
 
 ```php
 #[MorphedByMany(Post::class, 'taggable')]
-class Tag extends Model
+final class Tag extends Model
 {
     use Lift;
     // ...
