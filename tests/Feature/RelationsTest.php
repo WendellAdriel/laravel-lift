@@ -166,3 +166,27 @@ it('loads HasOne relation', function () {
 
     expect($userWithoutPhone->phone)->toBeNull();
 });
+
+it('loads HasOneThrough relation', function () {
+
+})->todo();
+
+it('loads MorphedByMany relation', function () {
+
+})->todo();
+
+it('loads MorphMany relation', function () {
+
+})->todo();
+
+it('loads MorphOne relation', function () {
+
+})->todo();
+
+it('loads MorphTo relation', function () {
+
+})->todo();
+
+it('loads MorphToMany relation', function () {
+
+})->todo();
