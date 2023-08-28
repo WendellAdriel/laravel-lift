@@ -51,33 +51,21 @@ trait ManageRelations
                 }
             );
 
-            self::$relationsConfig[$relation->relationClass ?? $relation->morphName] = $relation;
+            if ($relation instanceof BelongsTo) {
+                self::$relationsConfig[$relation->relationClass ?? $relation->morphName] = $relation;
+            }
         }
     }
 
     private static function handleRelationsKeys(Model $model): void
     {
         foreach (self::relationsConfig() as $relatedClass => $relationConfig) {
-            if (! class_exists($relatedClass)) {
-                continue;
+            $related = new $relatedClass();
+
+            $foreignKey = $relationConfig->relationArguments()[1] ?? Str::snake($relationConfig->relationName()) . '_' . $related->getKeyName();
+            if (! isset($model->{$foreignKey}) || blank($model->{$foreignKey})) {
+                $model->{$foreignKey} = $model->getAttribute($foreignKey);
             }
-
-            $relatedInstance = new $relatedClass();
-            match (true) {
-                $relationConfig instanceof BelongsTo => self::handleBelongsTo($model, $relatedInstance, $relationConfig->relationName(), $relationConfig->relationArguments()),
-                default => null,
-            };
-        }
-    }
-
-    /**
-     * @param  array<mixed>  $relationArguments
-     */
-    private static function handleBelongsTo(Model $model, Model $related, string $relationName, array $relationArguments): void
-    {
-        $foreignKey = $relationArguments[1] ?? Str::snake($relationName) . '_' . $related->getKeyName();
-        if (! isset($model->{$foreignKey}) || blank($model->{$foreignKey})) {
-            $model->{$foreignKey} = $model->getAttribute($foreignKey);
         }
     }
 }
