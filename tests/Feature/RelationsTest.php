@@ -2,10 +2,13 @@
 
 declare(strict_types=1);
 
+use WendellAdriel\Lift\Tests\Datasets\Computer;
 use WendellAdriel\Lift\Tests\Datasets\Country;
+use WendellAdriel\Lift\Tests\Datasets\Manufacturer;
 use WendellAdriel\Lift\Tests\Datasets\Phone;
 use WendellAdriel\Lift\Tests\Datasets\Post;
 use WendellAdriel\Lift\Tests\Datasets\Role;
+use WendellAdriel\Lift\Tests\Datasets\Seller;
 use WendellAdriel\Lift\Tests\Datasets\User;
 
 it('loads BelongsTo relation', function () {
@@ -168,8 +171,23 @@ it('loads HasOne relation', function () {
 });
 
 it('loads HasOneThrough relation', function () {
+    $seller = Seller::create();
+    $computer = Computer::create();
+    $manufacturer = Manufacturer::create();
 
-})->todo();
+    $seller->computer()->save($computer);
+    $computer->manufacturer()->save($manufacturer);
+
+    expect($seller->manufacturer->id)->toBe($manufacturer->id)
+        ->and($seller->computer->id)->toBe($computer->id)
+        ->and($computer->manufacturer->id)->toBe($manufacturer->id);
+
+    $seller = Seller::query()->find($seller->id);
+    expect($seller->manufacturer->id)->toBe($manufacturer->id);
+
+    $sellerWithoutManufacturer = Seller::create();
+    expect($sellerWithoutManufacturer->manufacturer)->toBeNull();
+});
 
 it('loads MorphMany relation', function () {
 

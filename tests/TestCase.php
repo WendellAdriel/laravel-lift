@@ -86,5 +86,22 @@ abstract class TestCase extends BaseTestCase
             $table->foreignId('user_id')->nullable()->constrained();
             $table->timestamps();
         });
+
+        Schema::create('sellers', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
+        });
+
+        Schema::create('computers', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('seller_id')->nullable()->constrained();
+            $table->timestamps();
+        });
+
+        Schema::create('manufacturers', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('computer_id')->nullable()->constrained();
+            $table->timestamps();
+        });
     }
 }
