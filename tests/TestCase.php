@@ -80,5 +80,11 @@ abstract class TestCase extends BaseTestCase
             $table->id();
             $table->timestamps();
         });
+
+        Schema::create('phones', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->nullable()->constrained();
+            $table->timestamps();
+        });
     }
 }
