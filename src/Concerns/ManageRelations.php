@@ -51,13 +51,17 @@ trait ManageRelations
                 }
             );
 
-            self::$relationsConfig[$relation->relationClass] = $relation;
+            self::$relationsConfig[$relation->relationClass ?? $relation->morphName] = $relation;
         }
     }
 
     private static function handleRelationsKeys(Model $model): void
     {
         foreach (self::relationsConfig() as $relatedClass => $relationConfig) {
+            if (! class_exists($relatedClass)) {
+                continue;
+            }
+
             $relatedInstance = new $relatedClass();
             match (true) {
                 $relationConfig instanceof BelongsTo => self::handleBelongsTo($model, $relatedInstance, $relationConfig->relationName(), $relationConfig->relationArguments()),

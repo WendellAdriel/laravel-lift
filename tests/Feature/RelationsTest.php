@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use WendellAdriel\Lift\Tests\Datasets\Computer;
 use WendellAdriel\Lift\Tests\Datasets\Country;
+use WendellAdriel\Lift\Tests\Datasets\Image;
 use WendellAdriel\Lift\Tests\Datasets\Manufacturer;
 use WendellAdriel\Lift\Tests\Datasets\Phone;
 use WendellAdriel\Lift\Tests\Datasets\Post;
@@ -189,15 +190,26 @@ it('loads HasOneThrough relation', function () {
     expect($sellerWithoutManufacturer->manufacturer)->toBeNull();
 });
 
-it('loads MorphMany relation', function () {
+it('loads MorphMany/MorphTo relations', function () {
+    $post = Post::create([
+        'title' => fake()->sentence,
+        'content' => fake()->paragraph,
+    ]);
+    $image = $post->images()->save(new Image());
 
-})->todo();
+    expect($post->images)->toHaveCount(1)
+        ->and($post->images->first()->id)->toBe($image->id)
+        ->and($image->imageable->id)->toBe($post->id);
+
+    $post = Post::query()->find($post->id);
+    expect($post->images)->toHaveCount(1)
+        ->and($post->images->first()->id)->toBe($image->id);
+
+    $image = Image::query()->find($image->id);
+    expect($image->imageable->id)->toBe($post->id);
+});
 
 it('loads MorphOne relation', function () {
-
-})->todo();
-
-it('loads MorphTo relation', function () {
 
 })->todo();
 

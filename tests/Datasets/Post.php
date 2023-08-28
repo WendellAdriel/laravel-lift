@@ -8,9 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 use WendellAdriel\Lift\Attributes\Fillable;
 use WendellAdriel\Lift\Attributes\PrimaryKey;
 use WendellAdriel\Lift\Attributes\Relations\BelongsTo;
+use WendellAdriel\Lift\Attributes\Relations\MorphMany;
 use WendellAdriel\Lift\Lift;
 
 #[BelongsTo(User::class)]
+#[MorphMany(Image::class, 'imageable')]
 class Post extends Model
 {
     use Lift;

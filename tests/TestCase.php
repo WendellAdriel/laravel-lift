@@ -103,5 +103,11 @@ abstract class TestCase extends BaseTestCase
             $table->foreignId('computer_id')->nullable()->constrained();
             $table->timestamps();
         });
+
+        Schema::create('images', function (Blueprint $table) {
+            $table->id();
+            $table->morphs('imageable');
+            $table->timestamps();
+        });
     }
 }
