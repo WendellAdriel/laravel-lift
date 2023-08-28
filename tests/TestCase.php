@@ -19,6 +19,7 @@ abstract class TestCase extends BaseTestCase
             $table->string('name');
             $table->string('email');
             $table->string('password');
+            $table->foreignId('country_id')->nullable()->constrained();
             $table->timestamps();
         });
 
@@ -72,6 +73,11 @@ abstract class TestCase extends BaseTestCase
             $table->id();
             $table->foreignId('user_id')->constrained();
             $table->foreignId('role_id')->constrained();
+            $table->timestamps();
+        });
+
+        Schema::create('countries', function (Blueprint $table) {
+            $table->id();
             $table->timestamps();
         });
     }

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use WendellAdriel\Lift\Tests\Datasets\Country;
 use WendellAdriel\Lift\Tests\Datasets\Post;
 use WendellAdriel\Lift\Tests\Datasets\Role;
 use WendellAdriel\Lift\Tests\Datasets\User;
@@ -107,4 +108,32 @@ it('loads HasMany relation', function () {
     ]);
 
     expect($userWithoutPosts->posts)->toHaveCount(0);
+});
+
+it('loads HasManyThrough relation', function () {
+    $country = Country::create();
+
+    $user = User::create([
+        'name' => fake()->name,
+        'email' => fake()->unique()->safeEmail,
+        'password' => 's3Cr3T@!!!',
+    ]);
+
+    $post = Post::create([
+        'title' => fake()->sentence,
+        'content' => fake()->paragraph,
+    ]);
+
+    $country->users()->save($user);
+    $user->posts()->save($post);
+
+    expect($country->posts)->toHaveCount(1)
+        ->and($country->posts->first()->id)->toBe($post->id);
+
+    $country = Country::query()->find($country->id);
+    expect($country->posts)->toHaveCount(1)
+        ->and($country->posts->first()->id)->toBe($post->id);
+
+    $countryWithoutPosts = Country::create();
+    expect($countryWithoutPosts->posts)->toHaveCount(0);
 });
