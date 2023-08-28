@@ -62,5 +62,17 @@ abstract class TestCase extends BaseTestCase
             $table->foreignId('user_id')->nullable()->constrained('users');
             $table->timestamps();
         });
+
+        Schema::create('roles', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
+        });
+
+        Schema::create('role_user', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained();
+            $table->foreignId('role_id')->constrained();
+            $table->timestamps();
+        });
     }
 }

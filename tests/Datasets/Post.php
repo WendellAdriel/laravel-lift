@@ -5,15 +5,13 @@ declare(strict_types=1);
 namespace WendellAdriel\Lift\Tests\Datasets;
 
 use Illuminate\Database\Eloquent\Model;
-use WendellAdriel\Lift\Attributes\DB;
 use WendellAdriel\Lift\Attributes\Fillable;
 use WendellAdriel\Lift\Attributes\PrimaryKey;
 use WendellAdriel\Lift\Attributes\Relations\BelongsTo;
 use WendellAdriel\Lift\Lift;
 
 #[BelongsTo(User::class)]
-#[DB(table: 'posts')]
-class PostBelongsTo extends Model
+class Post extends Model
 {
     use Lift;
 

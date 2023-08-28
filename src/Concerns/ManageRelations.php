@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace WendellAdriel\Lift\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\RelationNotFoundException;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Str;
 use ReflectionAttribute;
@@ -62,7 +61,7 @@ trait ManageRelations
             $relatedInstance = new $relatedClass();
             match (true) {
                 $relationConfig instanceof BelongsTo => self::handleBelongsTo($model, $relatedInstance, $relationConfig->relationName(), $relationConfig->relationArguments()),
-                default => throw new RelationNotFoundException(),
+                default => null,
             };
         }
     }
