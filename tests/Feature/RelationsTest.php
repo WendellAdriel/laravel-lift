@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use WendellAdriel\Lift\Tests\Datasets\Book;
+use WendellAdriel\Lift\Tests\Datasets\BookCase;
 use WendellAdriel\Lift\Tests\Datasets\Computer;
 use WendellAdriel\Lift\Tests\Datasets\Country;
 use WendellAdriel\Lift\Tests\Datasets\Image;
@@ -247,4 +249,26 @@ it('loads MorphToMany/MorphedByMany relations', function () {
         ->and($post->tags->first()->id)->toBe($tag->id)
         ->and($tag->posts)->toHaveCount(1)
         ->and($tag->posts->first()->id)->toBe($post->id);
+});
+
+it('loads a camelCase relation', function () {
+    $bookCase = BookCase::create([
+        'name' => fake()->name,
+    ]);
+
+    $book = $bookCase->books()->create([
+        'name' => fake()->name,
+    ]);
+
+    expect($bookCase->books)->toHaveCount(1)
+        ->and($bookCase->books->first()->id)->toBe($book->id)
+        ->and($book->bookCase->id)->toBe($bookCase->id)
+        ->and($book->book_case_id)->toBe($bookCase->id);
+
+    $bookCase = BookCase::query()->find($bookCase->id);
+    expect($bookCase->books)->toHaveCount(1)
+        ->and($bookCase->books->first()->id)->toBe($book->id);
+
+    $book = Book::query()->find($book->id);
+    expect($book->bookCase->id)->toBe($bookCase->id);
 });
