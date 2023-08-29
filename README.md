@@ -16,18 +16,35 @@
 <p align="center">
     <a href="#documentation">Documentation</a> |
     <a href="#installation">Installation</a> |
-    <a href="#trait">Trait</a> |
     <a href="#attributes">Attributes</a> |
     <a href="#method">Methods</a> |
     <a href="#credits">Credits</a> |
     <a href="#contributing">Contributing</a>
 </p>
 
-**Lift** is a package that provides a `Trait`, `Attributes` and some `methods` to your **Eloquent Models** to make them more powerful.
+**Lift** is a package that boosts your Eloquent Models in Laravel.
 
-> ⚠️
-> **Currently, this package relies heavily on Eloquent Events to work properly, so when dealing with code that does not fire**
-> **these events, it could have unexpected issues. If you find any issues, create an issue and/or submit a PR for it.**
+It lets you create public properties in Eloquent Models that match your table schema. This makes your models easier to
+read and work with in any IDE.
+
+The package intelligently uses PHP 8’s attributes, and gives you complete freedom in setting up your models. For
+instance, you can put validation rules right into your models - a simple and easy-to-understand arrangement compared
+to a separate request class. Plus, all these settings are easily reachable through handy new methods.
+
+With a focus on simplicity, **Lift** depends on **Eloquent Events** to work. This means the package fits easily into your
+project, without needing any major changes (unless you’ve turned off event triggering).
+
+To start using **Lift**, you just need to add the `Lift` trait to your Eloquent Models, and you're ready to go.
+
+```php
+use Illuminate\Database\Eloquent\Model;
+use WendellAdriel\Lift\Lift;
+
+final class Product extends Model
+{
+    use Lift;
+}
+```
 
 ## Documentation
 [![Docs Button]][Docs Link]
@@ -36,41 +53,6 @@
 
 ```bash
 composer require wendelladriel/laravel-lift
-```
-
-## Trait
-
-```php
-use Illuminate\Database\Eloquent\Model;
-use WendellAdriel\Lift\Lift;
-
-final class Product extends Model
-{
-    use Lift;
-}
-```
-
-Using the `Lift` trait, your model now supports **public properties** to be set on it, so you can have a more readable code and
-a better **DX** in your code editor IDE with **auto-completion**.
-
-```php
-use Illuminate\Database\Eloquent\Model;
-use WendellAdriel\Lift\Lift;
-
-final class Product extends Model
-{
-    use Lift;
-
-    public $name;
-
-    public $price;
-
-    public $category_id;
-
-    public $is_active;
-
-    public $promotion_expires_at;
-}
 ```
 
 ## Attributes
