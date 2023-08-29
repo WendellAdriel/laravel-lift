@@ -18,7 +18,7 @@ class BookCase extends Model
     #[PrimaryKey]
     public int $id;
 
-    #[Rules(['required', 'string'], ['required' => 'The book name cannot be empty'])]
+    #[Rules(['required', 'string'], ['required' => 'The bookcase name cannot be empty'])]
     public string $name;
 
     protected $fillable = [
