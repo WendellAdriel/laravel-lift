@@ -272,6 +272,8 @@ final class Product extends Model
 
 ### Primary Key
 
+> ⚠️ **When assigning a property as the Primary Key, you can't set a custom column name for it since it's not supported**
+
 By default, the Eloquent Model uses the `id` column as the primary key as an auto-incrementing integer value.
 With the `PrimaryKey` attribute you can configure in a simple and easy way the primary key of your model.
 
