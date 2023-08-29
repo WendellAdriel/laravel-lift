@@ -22,14 +22,14 @@ trait ManageRelations
     /**
      * @return array<class-string, RelationAttribute>
      */
-    private static function relationsConfig(): array
+    private static function relationsConfig(Model $model): array
     {
         if (is_null(self::$relationsConfig)) {
             self::$relationsConfig = [];
             self::buildRelations(new static());
         }
 
-        return self::$relationsConfig;
+        return self::$relationsConfig[$model::class] ?? [];
     }
 
     private static function buildRelations(Model $model): void
@@ -52,14 +52,14 @@ trait ManageRelations
             );
 
             if ($relation instanceof BelongsTo) {
-                self::$relationsConfig[$relation->relationClass ?? $relation->morphName] = $relation;
+                self::$relationsConfig[$model::class][$relation->relationClass ?? $relation->morphName] = $relation;
             }
         }
     }
 
     private static function handleRelationsKeys(Model $model): void
     {
-        foreach (self::relationsConfig() as $relatedClass => $relationConfig) {
+        foreach (self::relationsConfig($model) as $relatedClass => $relationConfig) {
             $related = new $relatedClass();
 
             $foreignKey = $relationConfig->relationArguments()[1] ?? Str::snake($relationConfig->relationName()) . '_' . $related->getKeyName();

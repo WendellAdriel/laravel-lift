@@ -15,6 +15,7 @@ use WendellAdriel\Lift\Lift;
 
 #[BelongsToMany(Role::class)]
 #[HasMany(Post::class)]
+#[HasMany(WorkBook::class)]
 #[HasOne(Phone::class)]
 #[MorphOne(Image::class, 'imageable')]
 class User extends Model

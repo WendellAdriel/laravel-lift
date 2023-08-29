@@ -134,5 +134,26 @@ abstract class TestCase extends BaseTestCase
             $table->string('name');
             $table->timestamps();
         });
+
+        Schema::create('libraries', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
+        });
+
+        Schema::create('library_books', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('library_id')->nullable()->constrained();
+            $table->foreignId('book_case_id')->nullable()->constrained();
+            $table->string('name');
+            $table->timestamps();
+        });
+
+        Schema::create('work_books', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->nullable()->constrained();
+            $table->foreignId('book_case_id')->nullable()->constrained();
+            $table->string('name');
+            $table->timestamps();
+        });
     }
 }
