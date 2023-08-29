@@ -121,5 +121,18 @@ abstract class TestCase extends BaseTestCase
             $table->morphs('taggable');
             $table->timestamps();
         });
+
+        Schema::create('book_cases', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });
+
+        Schema::create('books', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('book_case_id')->nullable()->constrained();
+            $table->string('name');
+            $table->timestamps();
+        });
     }
 }
