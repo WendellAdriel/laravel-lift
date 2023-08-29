@@ -22,15 +22,15 @@ final class MorphMany implements RelationAttribute
     public string $morphName;
 
     /**
-     * @var array<mixed>
+     * @var array<string>
      */
     public array $arguments = [];
 
     /**
      * @param  class-string  $relationClass
-     * @param  array<mixed>  ...$arguments
+     * @param  array<string>  ...$arguments
      */
-    public function __construct(string $relationClass, string $morphName, array ...$arguments)
+    public function __construct(string $relationClass, string $morphName, string ...$arguments)
     {
         $this->relationClass = $relationClass;
         $this->morphName = $morphName;
@@ -39,6 +39,6 @@ final class MorphMany implements RelationAttribute
 
     public function relationName(): string
     {
-        return Str::plural(mb_strtolower(class_basename($this->relationClass)));
+        return Str::plural(Str::camel(class_basename($this->relationClass)));
     }
 }

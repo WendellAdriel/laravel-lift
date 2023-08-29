@@ -25,14 +25,14 @@ final class HasOneThrough implements RelationAttribute
     public string $throughClass;
 
     /**
-     * @var array<mixed>
+     * @var array<string>
      */
     public array $arguments = [];
 
     /**
      * @param  class-string  $relationClass
      * @param  class-string  $throughClass
-     * @param  array<mixed>  ...$arguments
+     * @param  array<string>  ...$arguments
      */
     public function __construct(string $relationClass, string $throughClass, array ...$arguments)
     {
@@ -43,6 +43,6 @@ final class HasOneThrough implements RelationAttribute
 
     public function relationName(): string
     {
-        return Str::singular(mb_strtolower(class_basename($this->relationClass)));
+        return Str::singular(Str::camel(class_basename($this->relationClass)));
     }
 }

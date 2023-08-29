@@ -20,15 +20,15 @@ final class BelongsToMany implements RelationAttribute
     public string $relationClass;
 
     /**
-     * @var array<mixed>
+     * @var array<string>
      */
     public array $arguments = [];
 
     /**
      * @param  class-string  $relationClass
-     * @param  array<mixed>  ...$arguments
+     * @param  array<string>  ...$arguments
      */
-    public function __construct(string $relationClass, array ...$arguments)
+    public function __construct(string $relationClass, string ...$arguments)
     {
         $this->relationClass = $relationClass;
         $this->arguments = [$relationClass, ...$arguments];
@@ -36,6 +36,6 @@ final class BelongsToMany implements RelationAttribute
 
     public function relationName(): string
     {
-        return Str::plural(mb_strtolower(class_basename($this->relationClass)));
+        return Str::plural(Str::camel(class_basename($this->relationClass)));
     }
 }
