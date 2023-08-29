@@ -36,6 +36,6 @@ final class HasOne implements RelationAttribute
 
     public function relationName(): string
     {
-        return Str::singular(mb_strtolower(class_basename($this->relationClass)));
+        return Str::singular(Str::camel(class_basename($this->relationClass)));
     }
 }

@@ -43,6 +43,6 @@ final class HasManyThrough implements RelationAttribute
 
     public function relationName(): string
     {
-        return Str::plural(mb_strtolower(class_basename($this->relationClass)));
+        return Str::plural(Str::camel(class_basename($this->relationClass)));
     }
 }
