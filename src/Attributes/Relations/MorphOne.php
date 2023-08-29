@@ -22,7 +22,7 @@ final class MorphOne implements RelationAttribute
     public string $morphName;
 
     /**
-     * @var array<string>
+     * @var array<string|class-string>
      */
     public array $arguments = [];
 

@@ -25,7 +25,7 @@ final class HasOneThrough implements RelationAttribute
     public string $throughClass;
 
     /**
-     * @var array<string>
+     * @var array<string|class-string>
      */
     public array $arguments = [];
 
@@ -34,7 +34,7 @@ final class HasOneThrough implements RelationAttribute
      * @param  class-string  $throughClass
      * @param  array<string>  ...$arguments
      */
-    public function __construct(string $relationClass, string $throughClass, array ...$arguments)
+    public function __construct(string $relationClass, string $throughClass, string ...$arguments)
     {
         $this->relationClass = $relationClass;
         $this->throughClass = $throughClass;

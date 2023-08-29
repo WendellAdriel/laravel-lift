@@ -25,7 +25,7 @@ final class HasManyThrough implements RelationAttribute
     public string $throughClass;
 
     /**
-     * @var array<string>
+     * @var array<string|class-string>
      */
     public array $arguments = [];
 

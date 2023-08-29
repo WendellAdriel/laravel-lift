@@ -16,7 +16,7 @@ final class MorphTo implements RelationAttribute
     public string $morphName;
 
     /**
-     * @var array<mixed>
+     * @var array<string|class-string>
      */
     public array $arguments = [];
 
