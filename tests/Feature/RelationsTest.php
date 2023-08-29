@@ -303,7 +303,7 @@ it('loads a relation with arguments', function () {
     ]);
 
     $price = $book->prices()->create([
-        'price' => fake()->randomFloat(2),
+        'price' => fake()->numberBetween(1, 500),
     ]);
 
     expect($book->prices)->toHaveCount(1)
