@@ -16,14 +16,14 @@ final class MorphTo implements RelationAttribute
     public string $morphName;
 
     /**
-     * @var array<mixed>
+     * @var array<string|class-string>
      */
     public array $arguments = [];
 
     /**
-     * @param  array<mixed>  ...$arguments
+     * @param  array<string>  ...$arguments
      */
-    public function __construct(string $morphName, array ...$arguments)
+    public function __construct(string $morphName, string ...$arguments)
     {
         $this->morphName = $morphName;
         $this->arguments = [$morphName, ...$arguments];

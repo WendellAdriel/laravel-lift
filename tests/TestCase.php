@@ -134,5 +134,12 @@ abstract class TestCase extends BaseTestCase
             $table->string('name');
             $table->timestamps();
         });
+
+        Schema::create('prices', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('custom_id')->nullable()->constrained();
+            $table->decimal('price');
+            $table->timestamps();
+        });
     }
 }

@@ -10,6 +10,7 @@ use WendellAdriel\Lift\Tests\Datasets\Image;
 use WendellAdriel\Lift\Tests\Datasets\Manufacturer;
 use WendellAdriel\Lift\Tests\Datasets\Phone;
 use WendellAdriel\Lift\Tests\Datasets\Post;
+use WendellAdriel\Lift\Tests\Datasets\Price;
 use WendellAdriel\Lift\Tests\Datasets\Role;
 use WendellAdriel\Lift\Tests\Datasets\Seller;
 use WendellAdriel\Lift\Tests\Datasets\Tag;
@@ -271,4 +272,26 @@ it('loads a camelCase relation', function () {
 
     $book = Book::query()->find($book->id);
     expect($book->bookCase->id)->toBe($bookCase->id);
+});
+
+it('loads a relation with arguments', function () {
+    $book = Book::create([
+        'name' => fake()->name,
+    ]);
+
+    $price = $book->prices()->create([
+        'price' => fake()->randomFloat(2),
+    ]);
+
+    expect($book->prices)->toHaveCount(1)
+        ->and($book->prices->first()->id)->toBe($price->id)
+        ->and($price->book->id)->toBe($book->id)
+        ->and($price->custom_id)->toBe($book->id);
+
+    $book = Book::query()->find($book->id);
+    expect($book->prices)->toHaveCount(1)
+        ->and($book->prices->first()->id)->toBe($price->id);
+
+    $price = Price::query()->find($price->id);
+    expect($price->book->id)->toBe($price->id);
 });
