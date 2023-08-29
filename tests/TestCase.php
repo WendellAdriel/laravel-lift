@@ -153,8 +153,10 @@ abstract class TestCase extends BaseTestCase
             $table->foreignId('user_id')->nullable()->constrained();
             $table->foreignId('book_case_id')->nullable()->constrained();
             $table->string('name');
+            $table->timestamps();
+        });
 
-          Schema::create('prices', function (Blueprint $table) {
+        Schema::create('prices', function (Blueprint $table) {
             $table->id();
             $table->foreignId('custom_id')->nullable()->constrained();
             $table->decimal('price');
