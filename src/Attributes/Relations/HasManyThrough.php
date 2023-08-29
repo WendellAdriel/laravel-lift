@@ -25,16 +25,16 @@ final class HasManyThrough implements RelationAttribute
     public string $throughClass;
 
     /**
-     * @var array<mixed>
+     * @var array<string|class-string>
      */
     public array $arguments = [];
 
     /**
      * @param  class-string  $relationClass
      * @param  class-string  $throughClass
-     * @param  array<mixed>  ...$arguments
+     * @param  array<string>  ...$arguments
      */
-    public function __construct(string $relationClass, string $throughClass, array ...$arguments)
+    public function __construct(string $relationClass, string $throughClass, string ...$arguments)
     {
         $this->relationClass = $relationClass;
         $this->throughClass = $throughClass;

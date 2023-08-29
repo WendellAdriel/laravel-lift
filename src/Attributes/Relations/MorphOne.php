@@ -22,15 +22,15 @@ final class MorphOne implements RelationAttribute
     public string $morphName;
 
     /**
-     * @var array<mixed>
+     * @var array<string|class-string>
      */
     public array $arguments = [];
 
     /**
      * @param  class-string  $relationClass
-     * @param  array<mixed>  ...$arguments
+     * @param  array<string>  ...$arguments
      */
-    public function __construct(string $relationClass, string $morphName, array ...$arguments)
+    public function __construct(string $relationClass, string $morphName, string ...$arguments)
     {
         $this->relationClass = $relationClass;
         $this->morphName = $morphName;
