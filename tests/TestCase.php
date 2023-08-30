@@ -162,5 +162,10 @@ abstract class TestCase extends BaseTestCase
             $table->decimal('price');
             $table->timestamps();
         });
+
+        Schema::create('movies', function (Blueprint $table) {
+            $table->string('movie_id')->primary();
+            $table->timestamps();
+        });
     }
 }
