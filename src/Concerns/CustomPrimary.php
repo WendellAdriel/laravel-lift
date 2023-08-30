@@ -16,11 +16,13 @@ trait CustomPrimary
     private function applyPrimaryKey(Collection $properties): void
     {
         $primaryKeyProperty = self::getPropertyForAttribute($properties, PrimaryKey::class);
+        $customColumns = self::customColumns();
         if (! blank($primaryKeyProperty)) {
             $primaryKeyAttribute = $primaryKeyProperty->attributes->first(fn ($attribute) => $attribute->getName() === PrimaryKey::class);
             if (! blank($primaryKeyAttribute)) {
                 $primaryKeyAttribute = $primaryKeyAttribute->newInstance();
-                $this->setKeyName($primaryKeyProperty->name);
+
+                $this->setKeyName($customColumns[$primaryKeyProperty->name] ?? $primaryKeyProperty->name);
                 $this->setKeyType($primaryKeyAttribute->type);
                 $this->setIncrementing($primaryKeyAttribute->incrementing);
 
