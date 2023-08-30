@@ -18,6 +18,33 @@ it('returns model default values', function () {
     ]);
 });
 
+it('returns array with model properties when custom columns are defined', function () {
+    $user = UserColumn::create([
+        'name' => fake()->name,
+        'user_email' => fake()->unique()->safeEmail,
+        'user_password' => 's3Cr3T@!!!',
+    ]);
+
+    expect($user->toArray())->toHaveKeys([
+        'id',
+        'name',
+        'user_email',
+        'user_password',
+        'created_at',
+        'updated_at',
+    ]);
+});
+
+it('returns json with model properties when custom columns are defined', function () {
+    $user = UserColumn::create([
+        'name' => fake()->name,
+        'user_email' => fake()->unique()->safeEmail,
+        'user_password' => 's3Cr3T@!!!',
+    ]);
+
+    expect($user->toJson())->toBe(json_encode($user->toArray()));
+});
+
 describe('creates new model with custom columns', function () {
     it('creates model with individual properties set', function () {
         $user = new UserColumn();
