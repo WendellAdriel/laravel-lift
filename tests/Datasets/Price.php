@@ -18,8 +18,8 @@ class Price extends Model
     #[PrimaryKey]
     public int $id;
 
-    #[Rules(['required', 'decimal:2'])]
-    public float $price;
+    #[Rules(['required', 'integer'])]
+    public int $price;
 
     protected $fillable = [
         'price',
