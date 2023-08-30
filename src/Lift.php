@@ -99,6 +99,19 @@ trait Lift
         $this->applyAttributesGuard($properties);
     }
 
+    public function toArray(): array
+    {
+        $array = parent::toArray();
+        $customColumns = array_flip(self::customColumns());
+        $result = [];
+
+        foreach ($array as $key => $value) {
+            $result[$customColumns[$key] ?? $key] = $value;
+        }
+
+        return $result;
+    }
+
     protected static function ignoredProperties(): array
     {
         return [
