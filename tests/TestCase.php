@@ -167,6 +167,14 @@ abstract class TestCase extends BaseTestCase
             $table->string('movie_id')->primary();
             $table->timestamps();
         });
+
+        Schema::create('users_migrated', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('email');
+            $table->string('password');
+            $table->timestamps();
+        });
     }
 
     protected function getPackageProviders($app)
