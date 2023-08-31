@@ -2,13 +2,15 @@
 
 declare(strict_types=1);
 
-namespace WendellAdriel\Lift\Tests\Datasets;
+namespace Tests\Datasets;
 
 use Illuminate\Database\Eloquent\Model;
+use WendellAdriel\Lift\Attributes\DB;
 use WendellAdriel\Lift\Attributes\PrimaryKey;
 use WendellAdriel\Lift\Attributes\Rules;
 use WendellAdriel\Lift\Lift;
 
+#[DB(table: 'users')]
 class UserCustom extends Model
 {
     use Lift;
@@ -24,8 +26,6 @@ class UserCustom extends Model
 
     #[Rules(['required', 'string', 'min:8'])]
     public string $password;
-
-    protected $table = 'users';
 
     protected $fillable = [
         'name',

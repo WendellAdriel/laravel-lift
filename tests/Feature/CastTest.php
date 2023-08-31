@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use WendellAdriel\Lift\Tests\Datasets\Product;
+use Tests\Datasets\Product;
 
 it('casts values when creating model', function () {
     $product = Product::create([

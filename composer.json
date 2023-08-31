@@ -56,6 +56,13 @@
             "@test:static"
         ]
     },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "WendellAdriel\\Lift\\Providers\\LiftServiceProvider"
+            ]
+        }
+    },
     "config": {
         "allow-plugins": {
             "pestphp/pest-plugin": true

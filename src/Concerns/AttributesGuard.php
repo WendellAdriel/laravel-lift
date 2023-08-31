@@ -4,14 +4,49 @@ declare(strict_types=1);
 
 namespace WendellAdriel\Lift\Concerns;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use WendellAdriel\Lift\Attributes\Config;
 use WendellAdriel\Lift\Attributes\Fillable;
 use WendellAdriel\Lift\Attributes\Hidden;
+use WendellAdriel\Lift\Attributes\Immutable;
 use WendellAdriel\Lift\Support\PropertyInfo;
 
 trait AttributesGuard
 {
+    private static ?array $immutableProperties = null;
+
+    public static function immutableProperties(): array
+    {
+        if (is_null(self::$immutableProperties)) {
+            self::$immutableProperties = [];
+            self::buildImmutableProperties(new static());
+        }
+
+        return self::$immutableProperties;
+    }
+
+    private static function buildImmutableProperties(Model $model): void
+    {
+        $properties = self::getPropertiesWithAtributes($model);
+
+        $immutableColumns = self::getPropertiesForAttributes($properties, [Immutable::class]);
+        $immutableColumns->each(fn ($property) => self::$immutableProperties[] = $property->name);
+
+        $configColumns = self::getPropertiesForAttributes($properties, [Config::class]);
+        $configColumns->each(function ($property) {
+            $configAttribute = $property->attributes->first(fn ($attribute) => $attribute->getName() === Config::class);
+            if (blank($configAttribute)) {
+                return;
+            }
+
+            $configAttribute = $configAttribute->newInstance();
+            if ($configAttribute->immutable) {
+                self::$immutableProperties[] = $property->name;
+            }
+        });
+    }
+
     /**
      * @param  Collection<PropertyInfo>  $properties
      */

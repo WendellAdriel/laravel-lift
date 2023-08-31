@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use WendellAdriel\Lift\Tests\Datasets\ProductFillable;
-use WendellAdriel\Lift\Tests\Datasets\UserGuarded;
+use Tests\Datasets\ProductFillable;
+use Tests\Datasets\UserGuarded;
 
 it('set fillable properties', function () {
     $product = ProductFillable::create([

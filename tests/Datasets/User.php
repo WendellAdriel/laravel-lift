@@ -2,13 +2,22 @@
 
 declare(strict_types=1);
 
-namespace WendellAdriel\Lift\Tests\Datasets;
+namespace Tests\Datasets;
 
 use Illuminate\Database\Eloquent\Model;
 use WendellAdriel\Lift\Attributes\PrimaryKey;
+use WendellAdriel\Lift\Attributes\Relations\BelongsToMany;
+use WendellAdriel\Lift\Attributes\Relations\HasMany;
+use WendellAdriel\Lift\Attributes\Relations\HasOne;
+use WendellAdriel\Lift\Attributes\Relations\MorphOne;
 use WendellAdriel\Lift\Attributes\Rules;
 use WendellAdriel\Lift\Lift;
 
+#[BelongsToMany(Role::class)]
+#[HasMany(Post::class)]
+#[HasMany(WorkBook::class)]
+#[HasOne(Phone::class)]
+#[MorphOne(Image::class, 'imageable')]
 class User extends Model
 {
     use Lift;

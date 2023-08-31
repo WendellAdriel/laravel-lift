@@ -1,4 +1,5 @@
 <div align="center">
+    <img src="https://github.com/WendellAdriel/laravel-lift/raw/main/art/laravel-lift-logo.svg" alt="Lift for Laravel" height="300"/>
     <p>
         <h1>🏋️ Lift for Laravel</h1>
         Take your Eloquent Models to the next level
@@ -15,18 +16,36 @@
 <p align="center">
     <a href="#documentation">Documentation</a> |
     <a href="#installation">Installation</a> |
-    <a href="#trait">Trait</a> |
     <a href="#attributes">Attributes</a> |
     <a href="#method">Methods</a> |
+    <a href="#commands">Commands</a> |
     <a href="#credits">Credits</a> |
     <a href="#contributing">Contributing</a>
 </p>
 
-**Lift** is a package that provides a `Trait`, `Attributes` and some `methods` to your **Eloquent Models** to make them more powerful.
+**Lift** is a package that boosts your Eloquent Models in Laravel.
 
-> ⚠️
-> **Currently, this package relies heavily on Eloquent Events to work properly, so when dealing with code that does not fire**
-> **these events, it could have unexpected issues. If you find any issues, create an issue and/or submit a PR for it.**
+It lets you create public properties in Eloquent Models that match your table schema. This makes your models easier to
+read and work with in any IDE.
+
+The package intelligently uses PHP 8’s attributes, and gives you complete freedom in setting up your models. For
+instance, you can put validation rules right into your models - a simple and easy-to-understand arrangement compared
+to a separate request class. Plus, all these settings are easily reachable through handy new methods.
+
+With a focus on simplicity, **Lift** depends on **Eloquent Events** to work. This means the package fits easily into your
+project, without needing any major changes (unless you’ve turned off event triggering).
+
+To start using **Lift**, you just need to add the `Lift` trait to your Eloquent Models, and you're ready to go.
+
+```php
+use Illuminate\Database\Eloquent\Model;
+use WendellAdriel\Lift\Lift;
+
+final class Product extends Model
+{
+    use Lift;
+}
+```
 
 ## Documentation
 [![Docs Button]][Docs Link]
@@ -35,41 +54,6 @@
 
 ```bash
 composer require wendelladriel/laravel-lift
-```
-
-## Trait
-
-```php
-use Illuminate\Database\Eloquent\Model;
-use WendellAdriel\Lift\Lift;
-
-final class Product extends Model
-{
-    use Lift;
-}
-```
-
-Using the `Lift` trait, your model now supports **public properties** to be set on it, so you can have a more readable code and
-a better **DX** in your code editor IDE with **auto-completion**.
-
-```php
-use Illuminate\Database\Eloquent\Model;
-use WendellAdriel\Lift\Lift;
-
-final class Product extends Model
-{
-    use Lift;
-
-    public $name;
-
-    public $price;
-
-    public $category_id;
-
-    public $is_active;
-
-    public $promotion_expires_at;
-}
 ```
 
 ## Attributes
@@ -258,7 +242,7 @@ final class Product extends Model
 ### Config
 
 The `Config` attribute allows you to set your model's **public properties** configurations for the attributes:
-`Cast`, `Fillable`, `Hidden` and `Rules`.
+`Cast`, `Column`, `Fillable`, `Hidden`, `Immutable`, `Rules` and `Watch`.
 
 ```php
 use Carbon\CarbonImmutable;
@@ -266,20 +250,23 @@ use Illuminate\Database\Eloquent\Model;
 use WendellAdriel\Lift\Attributes\Config;
 use WendellAdriel\Lift\Lift;
 
-class Product extends Model
+final class Product extends Model
 {
     use Lift;
 
     #[Config(fillable: true, rules: ['required', 'string'], messages: ['required' => 'The PRODUCT NAME field cannot be empty.'])]
     public string $name;
 
-    #[Config(fillable: true, cast: 'float', rules: ['required', 'numeric'])]
+    #[Config(fillable: true, column: 'description', rules: ['required', 'string'])]
+    public string $product_description;
+
+    #[Config(fillable: true, cast: 'float', default: 0.0, rules: ['sometimes', 'numeric'], watch: ProductPriceChanged::class)]
     public float $price;
 
     #[Config(fillable: true, cast: 'int', hidden: true, rules: ['required', 'integer'])]
     public int $random_number;
 
-    #[Config(fillable: true, cast: 'immutable_datetime', rules: ['required', 'date_format:Y-m-d H:i:s'])]
+    #[Config(fillable: true, cast: 'immutable_datetime', immutable: true , rules: ['required', 'date_format:Y-m-d H:i:s'])]
     public CarbonImmutable $expires_at;
 }
 ```
@@ -334,9 +321,434 @@ final class Product extends Model
 }
 ```
 
+### DB
+
+The `DB` class attribute allows you to customize the database connection, table and timestamps of your model. If you
+don't set any of the attribute parameters, the default values will be used.
+
+```php
+use Illuminate\Database\Eloquent\Model;
+use WendellAdriel\Lift\Attributes\DB;
+use WendellAdriel\Lift\Attributes\Fillable;
+use WendellAdriel\Lift\Attributes\PrimaryKey;
+use WendellAdriel\Lift\Attributes\Rules;
+use WendellAdriel\Lift\Lift;
+
+#[DB(connection: 'mysql', table: 'custom_products_table', timestamps: false)]
+final class Product extends Model
+{
+    use Lift;
+
+    #[PrimaryKey(type: 'string', incrementing: false)]
+    public string $uuid;
+
+    #[Rules(['required', 'string'], ['required' => 'The Product name can not be empty'])]
+    #[Fillable]
+    public string $name;
+}
+```
+
+### Column
+
+The `Column` attribute allows you to customize the column name of your model's **public properties**.
+In the example below the `product_name` property will be mapped to the `name` column on the database table:
+
+```php
+use Illuminate\Database\Eloquent\Model;
+use WendellAdriel\Lift\Attributes\Column;
+use WendellAdriel\Lift\Attributes\Fillable;
+use WendellAdriel\Lift\Attributes\PrimaryKey;
+use WendellAdriel\Lift\Attributes\Rules;
+use WendellAdriel\Lift\Lift;
+
+final class Product extends Model
+{
+    use Lift;
+
+    #[PrimaryKey]
+    public int $id;
+
+    #[Rules(['required', 'string'], ['required' => 'The Product name can not be empty'])]
+    #[Fillable]
+    #[Column('name')]
+    public string $product_name;
+}
+```
+
+You can also set a default value for your **public properties** using the `Column` attribute.
+In the example below the `price` property will be mapped to the `price` column on the database table and will have a
+default value of `0.0`:
+
+```php
+use Illuminate\Database\Eloquent\Model;
+use WendellAdriel\Lift\Attributes\Cast;
+use WendellAdriel\Lift\Attributes\Column;
+use WendellAdriel\Lift\Attributes\Fillable;
+use WendellAdriel\Lift\Attributes\PrimaryKey;
+use WendellAdriel\Lift\Attributes\Rules;
+use WendellAdriel\Lift\Lift;
+
+final class Product extends Model
+{
+    use Lift;
+
+    #[PrimaryKey]
+    public int $id;
+
+    #[Rules(['required', 'string'], ['required' => 'The Product name can not be empty'])]
+    #[Fillable]
+    #[Column('name')]
+    public string $product_name;
+    
+    #[Column(default: 0.0)]
+    #[Cast('float')]
+    public float $price;
+}
+```
+
+You can also set a default value for your **public properties** passing a function name as the default value:
+
+```php
+use Illuminate\Database\Eloquent\Model;
+use WendellAdriel\Lift\Attributes\Cast;
+use WendellAdriel\Lift\Attributes\Column;
+use WendellAdriel\Lift\Attributes\Fillable;
+use WendellAdriel\Lift\Attributes\PrimaryKey;
+use WendellAdriel\Lift\Attributes\Rules;
+use WendellAdriel\Lift\Lift;
+
+final class Product extends Model
+{
+    use Lift;
+
+    #[PrimaryKey]
+    public int $id;
+
+    #[Rules(['required', 'string'], ['required' => 'The Product name can not be empty'])]
+    #[Fillable]
+    #[Column('name')]
+    public string $product_name;
+    
+    #[Column(default: 0.0)]
+    #[Cast('float')]
+    public float $price;
+    
+    #[Column(default: 'generatePromotionalPrice')]
+    #[Cast('float')]
+    public float $promotional_price;
+    
+    public function generatePromotionalPrice(): float
+    {
+        return $this->price * 0.8;
+    }
+}
+```
+
+### Immutable
+
+The `Immutable` attribute allows you to set your model's **public properties** as immutable. This means that once the model
+is created, the **public properties** will not be able to be changed. If you try to change the value of an immutable property
+an `WendellAdriel\Lift\Exceptions\ImmutablePropertyException` will be thrown.
+
+```php
+use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Model;
+use WendellAdriel\Lift\Attributes\Cast;
+use WendellAdriel\Lift\Attributes\Fillable;
+use WendellAdriel\Lift\Attributes\Immutable;
+use WendellAdriel\Lift\Lift;
+
+final class Product extends Model
+{
+    use Lift;
+
+    #[Immutable]
+    #[Fillable]
+    public string $name;
+
+    #[Fillable]
+    #[Cast('float')]
+    public float $price;
+}
+```
+
+Example:
+
+```php
+$product = Product::create([
+    'name' => 'Product Name',
+    'price' => 10.0,
+]);
+
+$product->name = 'New Product Name';
+$product->save(); // Will throw an ImmutablePropertyException
+```
+
+### Watch
+
+By default, **Eloquent** already fires events when updating models, but it is a generic event. With the `Watch` attribute
+you can set a specific event to be fired when a specific **public property** is updated. The event will receive as a parameter
+the updated model instance.
+
+```php
+use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Model;
+use Tests\Datasets\PriceChangedEvent;
+use Tests\Datasets\RandomNumberChangedEvent;
+use WendellAdriel\Lift\Attributes\Cast;
+use WendellAdriel\Lift\Attributes\Fillable;
+use WendellAdriel\Lift\Attributes\Watch;
+use WendellAdriel\Lift\Lift;
+
+final class Product extends Model
+{
+    use Lift;
+
+    #[Fillable]
+    public string $name;
+
+    #[Watch(PriceChangedEvent::class)]
+    #[Fillable]
+    #[Cast('float')]
+    public float $price;
+
+    #[Fillable]
+    #[Cast('int')]
+    public int $random_number;
+
+    #[Fillable]
+    #[Cast('immutable_datetime')]
+    public CarbonImmutable $expires_at;
+}
+```
+
+```php
+final class PriceChangedEvent
+{
+    use Dispatchable, InteractsWithSockets, SerializesModels;
+
+    public function __construct(
+        public Product $product,
+    ) {
+    }
+}
+```
+
+### Relationships
+
+With **Lift**, you can configure all of your Model **relationships** using **Attributes**. It works the same way when defining
+them with methods, so all of them accept the same parameters as the methods.
+
+#### BelongsTo
+
+```php
+#[BelongsTo(User::class)]
+final class Post extends Model
+{
+    use Lift;
+    // ...
+}
+```
+
+#### BelongsToMany
+
+```php
+#[BelongsToMany(Role::class)]
+final class User extends Model
+{
+    use Lift;
+    // ...
+}
+```
+
+```php
+#[BelongsToMany(User::class)]
+final class Role extends Model
+{
+    use Lift;
+    // ...
+}
+```
+
+#### HasMany
+
+```php
+#[HasMany(Post::class)]
+final class User extends Model
+{
+    use Lift;
+    // ...
+}
+```
+
+#### HasManyThrough
+
+```php
+#[HasMany(User::class)]
+#[HasManyThrough(Post::class, User::class)]
+final class Country extends Model
+{
+    use Lift;
+    // ...
+}
+```
+
+```php
+#[HasMany(Post::class)]
+final class User extends Model
+{
+    use Lift;
+    // ...
+}
+```
+
+```php
+#[BelongsTo(User::class)]
+final class Post extends Model
+{
+    use Lift;
+    // ...
+}
+```
+
+#### HasOne
+
+```php
+#[HasOne(Phone::class)]
+final class User extends Model
+{
+    use Lift;
+    // ...
+}
+```
+
+#### HasOneThrough
+
+```php
+#[HasOneThrough(Manufacturer::class, Computer::class)]
+#[HasOne(Computer::class)]
+final class Seller extends Model
+{
+    use Lift;
+    // ...
+}
+```
+
+```php
+#[HasOne(Manufacturer::class)]
+final class Computer extends Model
+{
+    use Lift;
+    // ...
+}
+```
+
+#### MorphMany/MorphTo
+
+```php
+#[MorphMany(Image::class, 'imageable')]
+final class Post extends Model
+{
+    use Lift;
+    // ...
+}
+```
+
+```php
+#[MorphTo('imageable')]
+final class Image extends Model
+{
+    use Lift;
+    // ...
+}
+```
+
+#### MorphOne/MorphTo
+
+```php
+#[MorphOne(Image::class, 'imageable')]
+final class User extends Model
+{
+    use Lift;
+    // ...
+}
+```
+
+```php
+#[MorphTo('imageable')]
+final class Image extends Model
+{
+    use Lift;
+    // ...
+}
+```
+
+#### MorphToMany/MorphedByMany
+
+```php
+#[MorphToMany(Tag::class, 'taggable')]
+final class Post extends Model
+{
+    use Lift;
+    // ...
+}
+```
+
+```php
+#[MorphedByMany(Post::class, 'taggable')]
+final class Tag extends Model
+{
+    use Lift;
+    // ...
+}
+```
+
 ## Methods
 
 When using the `Lift` trait, your model will have some new methods available.
+
+### customColumns
+
+The `customColumns` method returns an array with all the **public properties** that have a custom column name set.
+
+```php
+$productCustomColumns = Product::customColumns();
+
+// WILL RETURN
+[
+    'product_name' => 'name',
+]
+```
+
+### defaultValues
+
+The `defaultValues` method returns an array with all the **public properties** that have a default value set.
+
+If the default value is a function, the function name will be returned instead of the function result since this is
+a static call.
+
+```php
+$productDefaultValues = Product::defaultValues();
+
+// WILL RETURN
+[
+    'price' => 0.0,
+    'promotional_price' => 'generatePromotionalPrice',
+]
+```
+
+### immutableProperties
+
+The `immutableProperties` method returns an array with all the **public properties** that are immutable.
+
+```php
+$productImmutableProperties = Product::immutableProperties();
+
+// WILL RETURN
+[
+    'name',
+]
+```
 
 ### validationRules
 
@@ -370,6 +782,172 @@ $productRules = Product::validationMessages();
     'random_number' => [],
     'expires_at' => [],
 ]
+```
+
+### watchedProperties
+
+The `watchedProperties` method returns an array with all the **public properties** that have a custom event set.
+
+```php
+$productWatchedProperties = Product::watchedProperties();
+
+// WILL RETURN
+[
+    'price' => PriceChangedEvent::class,
+]
+```
+
+## Commands
+
+### lift:migration
+
+> ⚠️ **This is an experimental feature, keep that in mind when using it**
+
+The `lift:migration` command allows you to generate a migration file based on your models. By default it uses the `App\Models`
+namespace, but you can change it using the `--namespace` option.
+
+All the created migration files will be placed inside the `database/migrations` folder.
+
+**Examples:**
+
+The command below will generate a migration file for the `App\Models\User` model.
+
+```bash
+php artisan lift:migration User
+```
+
+The command below will generate a migration file for the `App\Models\Auth\User` model.
+
+```bash
+php artisan lift:migration Auth\User
+```
+
+The command below will generate a migration file for the `App\Custom\Models\User` model.
+
+```bash
+php artisan lift:migration User --namespace=App\Custom\Models
+```
+
+#### Create Table Migration
+
+When the table for your model is not yet created in the database, the `lift:migration` command will generate a migration
+file to create the table.
+
+```php
+// User.php
+
+final class User extends Model
+{
+    use Lift, SoftDeletes;
+
+    public int $id;
+
+    public string $name;
+
+    public string $email;
+
+    public string $password;
+
+    public CarbonImmutable $created_at;
+
+    public DateTime $updated_at;
+
+    public ?bool $active;
+
+    public $test;
+}
+
+// Migration file generated
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('email');
+            $table->string('password');
+            $table->boolean('active')->nullable();
+            $table->string('test');
+            $table->timestamps();
+            $table->softDeletes();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('users');
+    }
+};
+```
+
+#### Update Table Migration
+
+When the table for your model is already created in the database, the `lift:migration` command will generate a migration
+file to update the table based in the differences between the model and the database table.
+
+```php
+// User.php
+
+final class User extends Model
+{
+    use Lift, SoftDeletes;
+
+    public int $id;
+
+    public string $name;
+
+    public string $username;
+
+    public string $email;
+
+    public string $password;
+
+    public ?bool $active;
+}
+
+// Migration file generated
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('username')->after('name');
+            $table->dropColumn('created_at');
+            $table->dropColumn('updated_at');
+            $table->dropColumn('test');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        // Nothing to do here
+    }
+};
 ```
 
 ## Credits

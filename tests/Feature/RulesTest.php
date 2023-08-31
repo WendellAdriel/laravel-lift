@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Validation\ValidationException;
-use WendellAdriel\Lift\Tests\Datasets\User;
+use Tests\Datasets\User;
 
 describe('Create model', function () {
     it('throws validation error if model data is invalid', function () {

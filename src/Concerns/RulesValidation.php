@@ -23,9 +23,7 @@ trait RulesValidation
         if (is_null(self::$modelRules)) {
             self::$modelRules = [];
             self::$modelMessages = [];
-
-            $model = new static();
-            self::buildValidationRules($model);
+            self::buildValidationRules(new static());
         }
 
         return self::$modelRules;
@@ -36,9 +34,7 @@ trait RulesValidation
         if (is_null(self::$modelMessages)) {
             self::$modelRules = [];
             self::$modelMessages = [];
-
-            $model = new static();
-            self::buildValidationRules($model);
+            self::buildValidationRules(new static());
         }
 
         return self::$modelMessages;

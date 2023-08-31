@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Validation\ValidationException;
-use WendellAdriel\Lift\Tests\Datasets\ProductConfig;
+use Tests\Datasets\ProductConfig;
 
 it('can set all configurations with the Config attribute', function () {
     $product = ProductConfig::create([
