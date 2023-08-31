@@ -28,7 +28,7 @@ trait AttributesGuard
 
     private static function buildImmutableProperties(Model $model): void
     {
-        $properties = self::getPropertiesWithAtributes($model);
+        $properties = self::getPropertiesWithAttributes($model);
 
         $immutableColumns = self::getPropertiesForAttributes($properties, [Immutable::class]);
         $immutableColumns->each(fn ($property) => self::$immutableProperties[] = $property->name);

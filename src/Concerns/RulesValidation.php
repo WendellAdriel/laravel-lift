@@ -66,7 +66,7 @@ trait RulesValidation
 
     private static function buildValidationRules(Model $model): void
     {
-        $properties = self::getPropertiesWithAtributes($model);
+        $properties = self::getPropertiesWithAttributes($model);
 
         $validatedProperties = self::getPropertiesForAttributes($properties, [Rules::class]);
         $validatedProperties->each(function ($property) {

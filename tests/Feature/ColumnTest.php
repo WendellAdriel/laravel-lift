@@ -167,7 +167,7 @@ describe('updates model with custom columns', function () {
     });
 });
 
-it('retrives model with all custom columns and properties set', function () {
+it('retrieves model with all custom columns and properties set', function () {
     UserColumn::create([
         'name' => 'John Doe',
         'user_email' => 'john.doe@example.com',

@@ -16,7 +16,7 @@ describe('CREATE TABLE', function () {
 });
 
 describe('UPDATE TABLE', function () {
-    it('generates a migration file for a model adding and droping columns', function () {
+    it('generates a migration file for a model adding and dropping columns', function () {
         $migrationClass = database_path('migrations/' . date('Y_m_d_His') . '_update_users_migrated_table.php');
 
         $this->artisan('lift:migration UserMigratedUpdateTable --namespace=Tests\\\Datasets')
