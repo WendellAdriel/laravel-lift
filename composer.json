@@ -18,7 +18,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\": "tests/"
+            "WendellAdriel\\Lift\\Tests\\": "tests/"
         }
     },
     "support": {
