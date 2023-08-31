@@ -94,6 +94,8 @@ final class LiftMigration extends Command
      */
     private function buildMigrationCalls(Model $model, array $modelProperties): array
     {
+        $modelHasTimestamps = $model->usesTimestamps();
+        $modelHasSoftDeletes = in_array(SoftDeletes::class, class_uses($model));
         $result = [];
 
         foreach ($modelProperties as $property => $type) {
@@ -109,8 +111,22 @@ final class LiftMigration extends Command
                 continue;
             }
 
+            if ($this->isDateType($type)) { // @phpstan-ignore-line
+                if (
+                    $modelHasTimestamps &&
+                    ($property === $model->getCreatedAtColumn() || $property === $model->getUpdatedAtColumn())
+                ) {
+                    continue;
+                }
+
+                if ($modelHasSoftDeletes && $property === $model->getDeletedAtColumn()) { // @phpstan-ignore-line
+                    continue;
+                }
+
+                $result[] = $this->generateMigrationCall('timestamp', $type, $property); // @phpstan-ignore-line
+            }
+
             $result[] = match (true) {
-                $this->isDateType($type) => $this->generateMigrationCall('timestamp', $type, $property), // @phpstan-ignore-line
                 $type->getName() === 'bool' => $this->generateMigrationCall('boolean', $type, $property), // @phpstan-ignore-line
                 $type->getName() === 'int' => $this->generateMigrationCall('integer', $type, $property), // @phpstan-ignore-line
                 $type->getName() === 'float' => $this->generateMigrationCall('float', $type, $property), // @phpstan-ignore-line
@@ -121,11 +137,11 @@ final class LiftMigration extends Command
             };
         }
 
-        if ($model->usesTimestamps()) {
+        if ($modelHasTimestamps) {
             $result[] = '$table->timestamps();';
         }
 
-        if (in_array(SoftDeletes::class, class_uses($model))) {
+        if ($modelHasSoftDeletes) {
             $result[] = '$table->softDeletes();';
         }
 
