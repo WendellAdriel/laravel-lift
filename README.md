@@ -932,7 +932,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users_migrated', function (Blueprint $table) {
+        Schema::table('users', function (Blueprint $table) {
             $table->string('username')->after('name');
             $table->dropColumn('created_at');
             $table->dropColumn('updated_at');
