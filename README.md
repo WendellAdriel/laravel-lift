@@ -702,6 +702,20 @@ final class Tag extends Model
 }
 ```
 
+### Query Builder
+
+By default, **Eloquent** has a `newEloquentBuilder` method that returns the same query builder class for each type of model in your application.
+With **Lift**, you can override it in your application models and return our dedicated query builder.
+
+```php
+#[QueryBuilder(UserQueryBuilder::class)]
+final class User extends Model
+{
+    use Lift;
+    // ...
+}
+```
+
 ## Methods
 
 When using the `Lift` trait, your model will have some new methods available.
