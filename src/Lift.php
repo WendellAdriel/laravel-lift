@@ -14,6 +14,7 @@ use WendellAdriel\Lift\Concerns\AttributesGuard;
 use WendellAdriel\Lift\Concerns\CastValues;
 use WendellAdriel\Lift\Concerns\CustomPrimary;
 use WendellAdriel\Lift\Concerns\DatabaseConfigurations;
+use WendellAdriel\Lift\Concerns\HasQueryBuilder;
 use WendellAdriel\Lift\Concerns\ManageRelations;
 use WendellAdriel\Lift\Concerns\RulesValidation;
 use WendellAdriel\Lift\Concerns\WatchProperties;
@@ -26,6 +27,7 @@ trait Lift
         CastValues,
         CustomPrimary,
         DatabaseConfigurations,
+        HasQueryBuilder,
         ManageRelations,
         RulesValidation,
         WatchProperties;
