@@ -29,7 +29,13 @@ uses(
 |
 */
 
-expect()->extend('toBeOne', fn () => $this->toBe(1));
+expect()->extend('toBeFileWithContent', function (string $fileContent) {
+    test()->assertFileExists($this->value);
+
+    expect(file_get_contents($this->value))->toBe($fileContent);
+
+    return $this;
+});
 
 /*
 |--------------------------------------------------------------------------
