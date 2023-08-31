@@ -168,4 +168,9 @@ abstract class TestCase extends BaseTestCase
             $table->timestamps();
         });
     }
+
+    protected function getPackageProviders($app)
+    {
+        return ['WendellAdriel\Lift\Providers\LiftServiceProvider'];
+    }
 }
