@@ -18,6 +18,7 @@
     <a href="#installation">Installation</a> |
     <a href="#attributes">Attributes</a> |
     <a href="#method">Methods</a> |
+    <a href="#commands">Commands</a> |
     <a href="#credits">Credits</a> |
     <a href="#contributing">Contributing</a>
 </p>
@@ -794,6 +795,37 @@ $productWatchedProperties = Product::watchedProperties();
 [
     'price' => PriceChangedEvent::class,
 ]
+```
+
+## Commands
+
+### lift:migration
+
+> ⚠️ **This is an experimental feature still, and currently it allows to generate only create table statements**
+
+The `lift:migration` command allows you to generate a migration file based on your models. By default it uses the `App\Models`
+namespace, but you can change it using the `--namespace` option.
+
+All the created migration files will be placed inside the `database/migrations` folder.
+
+**Examples:**
+
+The command below will generate a migration file for the `App\Models\User` model.
+
+```bash
+php artisan lift:migration User
+```
+
+The command below will generate a migration file for the `App\Models\Auth\User` model.
+
+```bash
+php artisan lift:migration Auth\User
+```
+
+The command below will generate a migration file for the `App\Custom\Models\User` model.
+
+```bash
+php artisan lift:migration User --namespace=App\Custom\Models
 ```
 
 ## Credits
