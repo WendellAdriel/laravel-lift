@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Schema;
 use ReflectionClass;
 use ReflectionNamedType;
 use ReflectionProperty;
@@ -96,9 +97,21 @@ final class LiftMigration extends Command
     {
         $modelHasTimestamps = $model->usesTimestamps();
         $modelHasSoftDeletes = in_array(SoftDeletes::class, class_uses($model));
+        $modelColumns = array_keys($modelProperties);
+
+        $tableExists = Schema::hasTable($model->getTable());
+        $tableColumns = $tableExists ? Schema::getColumnListing($model->getTable()) : [];
+
         $result = [];
 
         foreach ($modelProperties as $property => $type) {
+            if (
+                in_array($property, $modelColumns) &&
+                in_array($property, $tableColumns)
+            ) {
+                continue;
+            }
+
             if ($property === $model->getKeyName()) {
                 $result[] = $this->buildPrimaryKeyMigrationCall($property, $type);
 
@@ -123,26 +136,41 @@ final class LiftMigration extends Command
                     continue;
                 }
 
-                $result[] = $this->generateMigrationCall('timestamp', $type, $property); // @phpstan-ignore-line
+                $result[] = $this->generateMigrationCall('timestamp', $type, $property, $tableExists, $modelColumns); // @phpstan-ignore-line
             }
 
             $result[] = match (true) {
-                $type->getName() === 'bool' => $this->generateMigrationCall('boolean', $type, $property), // @phpstan-ignore-line
-                $type->getName() === 'int' => $this->generateMigrationCall('integer', $type, $property), // @phpstan-ignore-line
-                $type->getName() === 'float' => $this->generateMigrationCall('float', $type, $property), // @phpstan-ignore-line
-                $type->getName() === 'string' => $this->generateMigrationCall('string', $type, $property), // @phpstan-ignore-line
-                $type->getName() === 'array' => $this->generateMigrationCall('json', $type, $property), // @phpstan-ignore-line
-                $type->getName() === 'object' => $this->generateMigrationCall('json', $type, $property), // @phpstan-ignore-line
-                default => $this->generateMigrationCall('string', $type, $property), // @phpstan-ignore-line
+                $type->getName() === 'bool' => $this->generateMigrationCall('boolean', $type, $property, $tableExists, $modelColumns), // @phpstan-ignore-line
+                $type->getName() === 'int' => $this->generateMigrationCall('integer', $type, $property, $tableExists, $modelColumns), // @phpstan-ignore-line
+                $type->getName() === 'float' => $this->generateMigrationCall('float', $type, $property, $tableExists, $modelColumns), // @phpstan-ignore-line
+                $type->getName() === 'string' => $this->generateMigrationCall('string', $type, $property, $tableExists, $modelColumns), // @phpstan-ignore-line
+                $type->getName() === 'array' => $this->generateMigrationCall('json', $type, $property, $tableExists, $modelColumns), // @phpstan-ignore-line
+                $type->getName() === 'object' => $this->generateMigrationCall('json', $type, $property, $tableExists, $modelColumns), // @phpstan-ignore-line
+                default => $this->generateMigrationCall('string', $type, $property, $tableExists, $modelColumns), // @phpstan-ignore-line
             };
         }
 
-        if ($modelHasTimestamps) {
+        if (
+            $modelHasTimestamps &&
+            ! in_array($model->getCreatedAtColumn(), $tableColumns) &&
+            ! in_array($model->getUpdatedAtColumn(), $tableColumns)
+        ) {
             $result[] = '$table->timestamps();';
         }
 
-        if ($modelHasSoftDeletes) {
+        if (
+            $modelHasSoftDeletes &&
+            ! in_array($model->getDeletedAtColumn(), $tableColumns) // @phpstan-ignore-line
+        ) {
             $result[] = '$table->softDeletes();';
+        }
+
+        if ($tableExists) {
+            foreach ($tableColumns as $column) {
+                if (! in_array($column, $modelColumns)) {
+                    $result[] = "\$table->dropColumn('{$column}');";
+                }
+            }
         }
 
         return $result;
@@ -160,11 +188,29 @@ final class LiftMigration extends Command
         return in_array($type->getName(), ['Carbon\Carbon', 'Carbon\CarbonImmutable', 'DateTime']);
     }
 
-    private function generateMigrationCall(string $method, ReflectionNamedType $type, string $property): string
-    {
+    /**
+     * @param  array<string>  $modelColumns
+     */
+    private function generateMigrationCall(
+        string $method,
+        ReflectionNamedType $type,
+        string $property,
+        bool $tableExists,
+        array $modelColumns
+    ): string {
         $result = "\$table->{$method}('{$property}')";
         if ($type->allowsNull()) {
             $result .= '->nullable()';
+        }
+
+        if (! $tableExists) {
+            return "{$result};";
+        }
+
+        $previousColumn = array_search($property, $modelColumns, true) - 1; // @phpstan-ignore-line
+        $previousColumn = $previousColumn >= 0 ? $modelColumns[$previousColumn] : null;
+        if (! blank($previousColumn)) {
+            $result .= "->after('{$previousColumn}')";
         }
 
         return "{$result};";
@@ -175,7 +221,7 @@ final class LiftMigration extends Command
      */
     private function generateMigrationFile(string $table, array $migrationCalls): string
     {
-        $stub = $this->getStub();
+        $stub = $this->getStub($table);
         $migrationCalls = implode("\n            ", $migrationCalls);
         $migrationContent = str_replace(['{{TABLE_NAME}}', '{{FIELDS_LIST}}'], [$table, $migrationCalls], $stub);
         $migrationPath = $this->buildMigrationFilePath($table);
@@ -184,15 +230,18 @@ final class LiftMigration extends Command
         return $migrationPath;
     }
 
-    private function getStub(): string
+    private function getStub(string $table): string
     {
-        return (string) file_get_contents(__DIR__ . '/../stubs/MigrationCreate.stub');
+        $stubFile = Schema::hasTable($table) ? 'MigrationUpdate' : 'MigrationCreate';
+
+        return (string) file_get_contents(__DIR__ . "/../stubs/{$stubFile}.stub");
     }
 
     private function buildMigrationFilePath(string $table): string
     {
         $timestamp = Carbon::now()->format('Y_m_d_His');
+        $migrationType = Schema::hasTable($table) ? 'update' : 'create';
 
-        return $this->laravel->databasePath("migrations/{$timestamp}_create_{$table}_table.php");
+        return $this->laravel->databasePath("migrations/{$timestamp}_{$migrationType}_{$table}_table.php");
     }
 }
