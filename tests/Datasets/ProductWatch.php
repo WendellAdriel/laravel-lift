@@ -2,12 +2,10 @@
 
 declare(strict_types=1);
 
-namespace WendellAdriel\Lift\Tests\Datasets;
+namespace Tests\Datasets;
 
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
-use Tests\Datasets\PriceChangedEvent;
-use Tests\Datasets\RandomNumberChangedEvent;
 use WendellAdriel\Lift\Attributes\Cast;
 use WendellAdriel\Lift\Attributes\Config;
 use WendellAdriel\Lift\Attributes\DB;

@@ -5,7 +5,7 @@ declare(strict_types=1);
 it('generates a migration file for a model', function () {
     $migrationClass = database_path('migrations/' . date('Y_m_d_His') . '_create_users_migration_table.php');
 
-    $this->artisan('lift:migration UserMigration --namespace=WendellAdriel\\\Lift\\\Tests\\\Datasets')
+    $this->artisan('lift:migration UserMigration --namespace=Tests\\\Datasets')
         ->assertExitCode(0);
 
     expect($migrationClass)->toBeFileWithContent(UserMigration());

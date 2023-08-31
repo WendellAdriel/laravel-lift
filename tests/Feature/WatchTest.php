@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\Event;
 use Tests\Datasets\PriceChangedEvent;
+use Tests\Datasets\ProductWatch;
 use Tests\Datasets\RandomNumberChangedEvent;
-use WendellAdriel\Lift\Tests\Datasets\ProductWatch;
 
 it('returns the list of watched properties for the model', function () {
     expect(ProductWatch::watchedProperties())->toBe([

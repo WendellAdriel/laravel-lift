@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use WendellAdriel\Lift\Tests\Datasets\ProductHidden;
+use Tests\Datasets\ProductHidden;
 
 it('set properties to hidden', function () {
     $product = ProductHidden::create([

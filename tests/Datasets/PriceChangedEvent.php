@@ -7,7 +7,6 @@ namespace Tests\Datasets;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use WendellAdriel\Lift\Tests\Datasets\ProductWatch;
 
 final class PriceChangedEvent
 {

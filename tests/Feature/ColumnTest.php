@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use WendellAdriel\Lift\Tests\Datasets\UserColumn;
+use Tests\Datasets\UserColumn;
 
 it('returns model custom columns', function () {
     expect(UserColumn::customColumns())->toBe([

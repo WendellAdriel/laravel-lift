@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use WendellAdriel\Lift\Tests\Datasets\User;
-use WendellAdriel\Lift\Tests\Datasets\UserCustomDB;
+use Tests\Datasets\User;
+use Tests\Datasets\UserCustomDB;
 
 it('gets the default values for database configurations if not set', function () {
     $user = new User();

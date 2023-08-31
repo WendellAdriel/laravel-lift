@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use WendellAdriel\Lift\Tests\Datasets\Movie;
-use WendellAdriel\Lift\Tests\Datasets\User;
-use WendellAdriel\Lift\Tests\Datasets\UserCustom;
-use WendellAdriel\Lift\Tests\Datasets\UserUuid;
+use Tests\Datasets\Movie;
+use Tests\Datasets\User;
+use Tests\Datasets\UserCustom;
+use Tests\Datasets\UserUuid;
 
 it('returns the default values for primary key when not set', function () {
     $user = new User();

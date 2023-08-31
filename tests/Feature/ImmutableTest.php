@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
+use Tests\Datasets\ProductImmutable;
 use WendellAdriel\Lift\Exceptions\ImmutablePropertyException;
-use WendellAdriel\Lift\Tests\Datasets\ProductImmutable;
 
 it('returns the list of immutable properties for the model', function () {
     expect(ProductImmutable::immutableProperties())->toBe([

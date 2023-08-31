@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace WendellAdriel\Lift\Tests\Datasets;
+namespace Tests\Datasets;
 
 use WendellAdriel\Lift\Attributes\Relations\BelongsTo;
 

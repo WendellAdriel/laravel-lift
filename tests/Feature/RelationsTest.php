@@ -2,22 +2,22 @@
 
 declare(strict_types=1);
 
-use WendellAdriel\Lift\Tests\Datasets\Book;
-use WendellAdriel\Lift\Tests\Datasets\BookCase;
-use WendellAdriel\Lift\Tests\Datasets\Computer;
-use WendellAdriel\Lift\Tests\Datasets\Country;
-use WendellAdriel\Lift\Tests\Datasets\Image;
-use WendellAdriel\Lift\Tests\Datasets\Library;
-use WendellAdriel\Lift\Tests\Datasets\LibraryBook;
-use WendellAdriel\Lift\Tests\Datasets\Manufacturer;
-use WendellAdriel\Lift\Tests\Datasets\Phone;
-use WendellAdriel\Lift\Tests\Datasets\Post;
-use WendellAdriel\Lift\Tests\Datasets\Price;
-use WendellAdriel\Lift\Tests\Datasets\Role;
-use WendellAdriel\Lift\Tests\Datasets\Seller;
-use WendellAdriel\Lift\Tests\Datasets\Tag;
-use WendellAdriel\Lift\Tests\Datasets\User;
-use WendellAdriel\Lift\Tests\Datasets\WorkBook;
+use Tests\Datasets\Book;
+use Tests\Datasets\BookCase;
+use Tests\Datasets\Computer;
+use Tests\Datasets\Country;
+use Tests\Datasets\Image;
+use Tests\Datasets\Library;
+use Tests\Datasets\LibraryBook;
+use Tests\Datasets\Manufacturer;
+use Tests\Datasets\Phone;
+use Tests\Datasets\Post;
+use Tests\Datasets\Price;
+use Tests\Datasets\Role;
+use Tests\Datasets\Seller;
+use Tests\Datasets\Tag;
+use Tests\Datasets\User;
+use Tests\Datasets\WorkBook;
 
 it('loads BelongsTo relation', function () {
     $user = User::create([
