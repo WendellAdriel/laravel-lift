@@ -170,7 +170,11 @@ final class Product extends Model
 }
 ```
 
-### Rules
+### Validation
+
+**Lift** provides three attributes to help you validate your model's **public properties**.
+
+#### Rules
 
 > ⚠️ **The rules will be validated only when you save your model (create or update)**
 
@@ -236,6 +240,120 @@ final class Product extends Model
     #[Rules(['required', 'string'], ['required' => 'The Product name can not be empty'])]
     #[Fillable]
     public string $name;
+}
+```
+
+#### CreateRules
+
+> ⚠️ **The rules will be validated only when you create your model**
+
+The `CreateRules` attribute works the same way as the `Rules` attribute, but the rules will be validated only when you
+create your model.
+
+In the example below the `name` property will be validated with the set rules for both when creating and updating the model.
+The `email` and `password` properties will be validated only when creating the model.
+
+```php
+use Illuminate\Database\Eloquent\Model;
+use WendellAdriel\Lift\Attributes\CreateRules;
+use WendellAdriel\Lift\Attributes\Fillable;
+use WendellAdriel\Lift\Attributes\PrimaryKey;
+use WendellAdriel\Lift\Attributes\Rules;
+use WendellAdriel\Lift\Lift;
+
+class User extends Model
+{
+    use Lift;
+
+    #[PrimaryKey]
+    public int $id;
+
+    #[Fillable]
+    #[Rules(rules: ['required', 'string'], messages: ['required' => 'The user name cannot be empty'])]
+    public string $name;
+
+    #[Fillable]
+    #[CreateRules(rules: ['required', 'email'], messages: ['required' => 'The user email cannot be empty'])]
+    public string $email;
+
+    #[Fillable]
+    #[CreateRules(['required', 'string', 'min:8'])]
+    public string $password;
+}
+```
+
+#### UpdateRules
+
+> ⚠️ **The rules will be validated only when you update your model**
+
+The `UpdateRules` attribute works the same way as the `Rules` attribute, but the rules will be validated only when you
+update your model.
+
+In the example below the `name` property will be validated with the set rules for both when creating and updating the model.
+The `email` and `password` properties will be validated only when updating the model.
+
+```php
+use Illuminate\Database\Eloquent\Model;
+use WendellAdriel\Lift\Attributes\Fillable;
+use WendellAdriel\Lift\Attributes\PrimaryKey;
+use WendellAdriel\Lift\Attributes\Rules;
+use WendellAdriel\Lift\Attributes\UpdateRules;
+use WendellAdriel\Lift\Lift;
+
+class User extends Model
+{
+    use Lift;
+
+    #[PrimaryKey]
+    public int $id;
+
+    #[Fillable]
+    #[Rules(rules: ['required', 'string'], messages: ['required' => 'The user name cannot be empty'])]
+    public string $name;
+
+    #[Fillable]
+    #[UpdateRules(rules: ['required', 'email'], messages: ['required' => 'The user email cannot be empty'])]
+    public string $email;
+
+    #[Fillable]
+    #[UpdateRules(['required', 'string', 'min:8'])]
+    public string $password;
+}
+```
+
+#### Mixing Rules
+
+You can also mix the three validation attributes to set different rules for creating and updating your model.
+
+```php
+use Illuminate\Database\Eloquent\Model;
+use WendellAdriel\Lift\Attributes\CreateRules;
+use WendellAdriel\Lift\Attributes\Fillable;
+use WendellAdriel\Lift\Attributes\PrimaryKey;
+use WendellAdriel\Lift\Attributes\Rules;
+use WendellAdriel\Lift\Attributes\UpdateRules;
+use WendellAdriel\Lift\Lift;
+
+class User extends Model
+{
+    use Lift;
+
+    #[PrimaryKey]
+    public int $id;
+
+    #[Fillable]
+    #[Rules(rules: ['required', 'string'], messages: ['required' => 'The user name cannot be empty'])]
+    public string $name;
+
+    #[Fillable]
+    #[CreateRules(rules: ['required', 'email'], messages: ['required' => 'The user email cannot be empty'])]
+    #[UpdateRules(['sometimes', 'email'])]
+    public string $email;
+
+    #[Fillable]
+    #[CreateRules(['required', 'string', 'min:8'])]
+    #[UpdateRules(rules: ['sometimes', 'string', 'min:8'], messages: ['min' => 'The password must be at least 8 characters long'])]
+    public string $password;
 }
 ```
 
@@ -766,6 +884,34 @@ $productRules = Product::validationRules();
 ]
 ```
 
+### createValidationRules
+
+The `createValidationRules` method returns an array with all the create action validation rules for your model's **public properties**.
+
+```php
+$productRules = Product::createValidationRules();
+
+// WILL RETURN
+[
+    'name' => ['required', 'string'],
+    'price' => ['required', 'numeric'],
+]
+```
+
+### updateValidationRules
+
+The `updateValidationRules` method returns an array with all the update action validation rules for your model's **public properties**.
+
+```php
+$productRules = Product::updateValidationRules();
+
+// WILL RETURN
+[
+    'name' => ['required', 'string'],
+    'price' => ['required', 'numeric'],
+]
+```
+
 ### validationMessages
 
 The `validationMessages` method returns an array with all the validation messages for your model's **public properties**.
@@ -781,6 +927,38 @@ $productRules = Product::validationMessages();
     'price' => [],
     'random_number' => [],
     'expires_at' => [],
+]
+```
+
+### createValidationMessages
+
+The `createValidationMessages` method returns an array with all the validation create action messages for your model's **public properties**.
+
+```php
+$productRules = Product::createValidationMessages();
+
+// WILL RETURN
+[
+    'name' => [
+        'required' => 'The PRODUCT NAME field cannot be empty.',
+    ],
+    'price' => [],
+]
+```
+
+### updateValidationMessages
+
+The `updateValidationMessages` method returns an array with all the validation update action messages for your model's **public properties**.
+
+```php
+$productRules = Product::updateValidationMessages();
+
+// WILL RETURN
+[
+    'name' => [
+        'required' => 'The PRODUCT NAME field cannot be empty.',
+    ],
+    'price' => [],
 ]
 ```
 
