@@ -91,7 +91,7 @@ trait DatabaseConfigurations
                 (! isset($model->{$property}) || blank($model->{$property})) &&
                 isset($defaultValues[$property])
             ) {
-                $model->{$property} = method_exists($model, $defaultValues[$property])
+                $model->{$property} = is_string($defaultValues[$property]) && method_exists($model, $defaultValues[$property])
                     ? $model->{$defaultValues[$property]}()
                     : $defaultValues[$property];
             }

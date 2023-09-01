@@ -14,6 +14,7 @@ it('returns model custom columns', function () {
 it('returns model default values', function () {
     expect(UserColumn::defaultValues())->toBe([
         'name' => 'John Doe',
+        'active' => false,
         'user_password' => 'generatePassword',
     ]);
 });
