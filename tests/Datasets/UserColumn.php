@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Datasets;
 
 use Illuminate\Database\Eloquent\Model;
+use WendellAdriel\Lift\Attributes\Cast;
 use WendellAdriel\Lift\Attributes\Column;
 use WendellAdriel\Lift\Attributes\Config;
 use WendellAdriel\Lift\Attributes\DB;
@@ -35,6 +36,11 @@ class UserColumn extends Model
     #[Fillable]
     #[Config(column: 'password', default: 'generatePassword')]
     public string $user_password;
+
+    #[Fillable]
+    #[Cast('boolean')]
+    #[Column(default: false)]
+    public bool $active;
 
     public function generatePassword(): string
     {
