@@ -243,11 +243,11 @@ final class Product extends Model
 }
 ```
 
-#### CreatedRules
+#### CreateRules
 
 > ⚠️ **The rules will be validated only when you create your model**
 
-The `CreatedRules` attribute works the same way as the `Rules` attribute, but the rules will be validated only when you
+The `CreateRules` attribute works the same way as the `Rules` attribute, but the rules will be validated only when you
 create your model.
 
 In the example below the `name` property will be validated with the set rules for both when creating and updating the model.
@@ -282,11 +282,11 @@ class User extends Model
 }
 ```
 
-#### UpdatedRules
+#### UpdateRules
 
 > ⚠️ **The rules will be validated only when you update your model**
 
-The `UpdatedRules` attribute works the same way as the `Rules` attribute, but the rules will be validated only when you
+The `UpdateRules` attribute works the same way as the `Rules` attribute, but the rules will be validated only when you
 update your model.
 
 In the example below the `name` property will be validated with the set rules for both when creating and updating the model.
