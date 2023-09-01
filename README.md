@@ -884,6 +884,34 @@ $productRules = Product::validationRules();
 ]
 ```
 
+### createValidationRules
+
+The `createValidationRules` method returns an array with all the create action validation rules for your model's **public properties**.
+
+```php
+$productRules = Product::createValidationRules();
+
+// WILL RETURN
+[
+    'name' => ['required', 'string'],
+    'price' => ['required', 'numeric'],
+]
+```
+
+### updateValidationRules
+
+The `updateValidationRules` method returns an array with all the update action validation rules for your model's **public properties**.
+
+```php
+$productRules = Product::updateValidationRules();
+
+// WILL RETURN
+[
+    'name' => ['required', 'string'],
+    'price' => ['required', 'numeric'],
+]
+```
+
 ### validationMessages
 
 The `validationMessages` method returns an array with all the validation messages for your model's **public properties**.
@@ -899,6 +927,38 @@ $productRules = Product::validationMessages();
     'price' => [],
     'random_number' => [],
     'expires_at' => [],
+]
+```
+
+### createValidationMessages
+
+The `createValidationMessages` method returns an array with all the validation create action messages for your model's **public properties**.
+
+```php
+$productRules = Product::createValidationMessages();
+
+// WILL RETURN
+[
+    'name' => [
+        'required' => 'The PRODUCT NAME field cannot be empty.',
+    ],
+    'price' => [],
+]
+```
+
+### updateValidationMessages
+
+The `updateValidationMessages` method returns an array with all the validation update action messages for your model's **public properties**.
+
+```php
+$productRules = Product::updateValidationMessages();
+
+// WILL RETURN
+[
+    'name' => [
+        'required' => 'The PRODUCT NAME field cannot be empty.',
+    ],
+    'price' => [],
 ]
 ```
 
