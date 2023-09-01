@@ -40,7 +40,7 @@ trait DatabaseConfigurations
 
     private static function buildCustomColumns(Model $model): void
     {
-        $properties = self::getPropertiesWithAtributes($model);
+        $properties = self::getPropertiesWithAttributes($model);
 
         $customColumns = self::getPropertiesForAttributes($properties, [Column::class]);
         $customColumns->each(function ($property) {

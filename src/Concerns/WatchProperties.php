@@ -26,7 +26,7 @@ trait WatchProperties
 
     private static function buildWatchedProperties(Model $model): void
     {
-        $properties = self::getPropertiesWithAtributes($model);
+        $properties = self::getPropertiesWithAttributes($model);
 
         $watchedColumns = self::getPropertiesForAttributes($properties, [Watch::class]);
         $watchedColumns->each(function ($property) {

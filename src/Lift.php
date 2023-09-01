@@ -47,7 +47,7 @@ trait Lift
                 }
             }
 
-            $properties = self::getPropertiesWithAtributes($model);
+            $properties = self::getPropertiesWithAttributes($model);
             self::applyValidations($properties);
             self::castValues($model, $properties);
 
@@ -94,7 +94,7 @@ trait Lift
         $this->applyDatabaseConfigurations();
         self::buildRelations($this);
 
-        $properties = self::getPropertiesWithAtributes($this);
+        $properties = self::getPropertiesWithAttributes($this);
         $this->applyPrimaryKey($properties);
         $this->applyAttributesGuard($properties);
     }
@@ -127,7 +127,7 @@ trait Lift
         ];
     }
 
-    private static function getPropertiesWithAtributes(Model $model): Collection
+    private static function getPropertiesWithAttributes(Model $model): Collection
     {
         $publicProperties = self::getModelPublicProperties($model);
         $customColumns = self::customColumns();
@@ -203,7 +203,7 @@ trait Lift
 
     private static function fillProperties(Model $model): void
     {
-        self::castValues($model, self::getPropertiesWithAtributes($model));
+        self::castValues($model, self::getPropertiesWithAttributes($model));
 
         foreach ($model->getAttributes() as $key => $value) {
             $model->{$key} = $model->hasCast($key) ? $model->castAttribute($key, $value) : $value;
