@@ -75,7 +75,7 @@ trait DatabaseConfigurations
         });
     }
 
-    private static function syncCostumColumns(Model $model): void
+    private static function syncCustomColumns(Model $model): void
     {
         $publicProperties = self::getModelPublicProperties($model);
         $defaultValues = self::defaultValues();

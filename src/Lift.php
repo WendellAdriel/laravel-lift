@@ -36,7 +36,7 @@ trait Lift
     public static function bootLift(): void
     {
         static::saving(function (Model $model) {
-            self::syncCostumColumns($model);
+            self::syncCustomColumns($model);
 
             if (! blank($model->getKey())) {
                 $immutableProperties = self::immutableProperties();
