@@ -1,0 +1,29 @@
+{
+    "$schema": "https://laravel-ide.com/schema/laravel-ide-v2.json",
+    "completions": [
+        {
+            "complete": "validationRule",
+            "condition": [
+                {
+                    "newClassFqn": ["WendellAdriel\\Lift\\Attributes\\Rules", "WendellAdriel\\Lift\\Attributes\\CreateRules", "WendellAdriel\\Lift\\Attributes\\UpdateRules"],
+                    "parameters": [1],
+                    "place": "arrayValue"
+                },
+                {
+                    "newClassFqn": ["WendellAdriel\\Lift\\Attributes\\Rules", "WendellAdriel\\Lift\\Attributes\\CreateRules", "WendellAdriel\\Lift\\Attributes\\UpdateRules"],
+                    "parameters": [2],
+                    "place": "arrayKey"
+                }
+            ]
+        },
+        {
+            "complete": "eloquentCasts",
+            "condition": [
+                {
+                    "newClassFqn": ["WendellAdriel\\Lift\\Attributes\\Cast"],
+                    "parameters": [1]
+                }
+            ]
+        }
+    ]
+}
