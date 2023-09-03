@@ -660,6 +660,8 @@ them with methods, so all of them accept the same parameters as the methods.
 #### BelongsTo
 
 ```php
+use WendellAdriel\Lift\Attributes\Relations\BelongsTo;
+
 #[BelongsTo(User::class)]
 final class Post extends Model
 {
@@ -671,6 +673,8 @@ final class Post extends Model
 #### BelongsToMany
 
 ```php
+use WendellAdriel\Lift\Attributes\Relations\BelongsToMany;
+
 #[BelongsToMany(Role::class)]
 final class User extends Model
 {
@@ -680,6 +684,8 @@ final class User extends Model
 ```
 
 ```php
+use WendellAdriel\Lift\Attributes\Relations\BelongsToMany;
+
 #[BelongsToMany(User::class)]
 final class Role extends Model
 {
@@ -691,6 +697,8 @@ final class Role extends Model
 #### HasMany
 
 ```php
+use WendellAdriel\Lift\Attributes\Relations\HasMany;
+
 #[HasMany(Post::class)]
 final class User extends Model
 {
@@ -702,6 +710,9 @@ final class User extends Model
 #### HasManyThrough
 
 ```php
+use WendellAdriel\Lift\Attributes\Relations\HasMany;
+use WendellAdriel\Lift\Attributes\Relations\HasManyThrough;
+
 #[HasMany(User::class)]
 #[HasManyThrough(Post::class, User::class)]
 final class Country extends Model
@@ -712,6 +723,8 @@ final class Country extends Model
 ```
 
 ```php
+use WendellAdriel\Lift\Attributes\Relations\HasMany;
+
 #[HasMany(Post::class)]
 final class User extends Model
 {
@@ -721,6 +734,8 @@ final class User extends Model
 ```
 
 ```php
+use WendellAdriel\Lift\Attributes\Relations\BelongsTo;
+
 #[BelongsTo(User::class)]
 final class Post extends Model
 {
@@ -732,6 +747,8 @@ final class Post extends Model
 #### HasOne
 
 ```php
+use WendellAdriel\Lift\Attributes\Relations\HasOne;
+
 #[HasOne(Phone::class)]
 final class User extends Model
 {
@@ -743,6 +760,9 @@ final class User extends Model
 #### HasOneThrough
 
 ```php
+use WendellAdriel\Lift\Attributes\Relations\HasOne;
+use WendellAdriel\Lift\Attributes\Relations\HasOneThrough;
+
 #[HasOneThrough(Manufacturer::class, Computer::class)]
 #[HasOne(Computer::class)]
 final class Seller extends Model
@@ -753,6 +773,8 @@ final class Seller extends Model
 ```
 
 ```php
+use WendellAdriel\Lift\Attributes\Relations\HasOne;
+
 #[HasOne(Manufacturer::class)]
 final class Computer extends Model
 {
@@ -764,6 +786,8 @@ final class Computer extends Model
 #### MorphMany/MorphTo
 
 ```php
+use WendellAdriel\Lift\Attributes\Relations\MorphMany;
+
 #[MorphMany(Image::class, 'imageable')]
 final class Post extends Model
 {
@@ -773,6 +797,8 @@ final class Post extends Model
 ```
 
 ```php
+use WendellAdriel\Lift\Attributes\Relations\MorphTo;
+
 #[MorphTo('imageable')]
 final class Image extends Model
 {
@@ -784,6 +810,8 @@ final class Image extends Model
 #### MorphOne/MorphTo
 
 ```php
+use WendellAdriel\Lift\Attributes\Relations\MorphOne;
+
 #[MorphOne(Image::class, 'imageable')]
 final class User extends Model
 {
@@ -793,6 +821,8 @@ final class User extends Model
 ```
 
 ```php
+use WendellAdriel\Lift\Attributes\Relations\MorphTo;
+
 #[MorphTo('imageable')]
 final class Image extends Model
 {
@@ -804,6 +834,8 @@ final class Image extends Model
 #### MorphToMany/MorphedByMany
 
 ```php
+use WendellAdriel\Lift\Attributes\Relations\MorphToMany;
+
 #[MorphToMany(Tag::class, 'taggable')]
 final class Post extends Model
 {
@@ -813,6 +845,8 @@ final class Post extends Model
 ```
 
 ```php
+use WendellAdriel\Lift\Attributes\Relations\MorphedByMany;
+
 #[MorphedByMany(Post::class, 'taggable')]
 final class Tag extends Model
 {
