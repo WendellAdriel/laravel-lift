@@ -13,6 +13,16 @@
                     "newClassFqn": ["WendellAdriel\\Lift\\Attributes\\Rules", "WendellAdriel\\Lift\\Attributes\\CreateRules", "WendellAdriel\\Lift\\Attributes\\UpdateRules"],
                     "parameters": [2],
                     "place": "arrayKey"
+                },
+                {
+                    "newClassFqn": ["WendellAdriel\\Lift\\Attributes\\Config"],
+                    "parameterNames": ["rules"],
+                    "place": "arrayValue"
+                },
+                {
+                    "newClassFqn": ["WendellAdriel\\Lift\\Attributes\\Config"],
+                    "parameterNames": ["messages"],
+                    "place": "arrayKey"
                 }
             ]
         },
@@ -21,6 +31,11 @@
             "condition": [
                 {
                     "newClassFqn": ["WendellAdriel\\Lift\\Attributes\\Cast"],
+                    "parameters": [1]
+                },
+                {
+                    "newClassFqn": ["WendellAdriel\\Lift\\Attributes\\Config"],
+                    "parameterNames": ["cast"],
                     "parameters": [1]
                 }
             ]
