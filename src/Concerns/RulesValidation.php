@@ -61,7 +61,7 @@ trait RulesValidation
             self::buildValidationRules(new static());
         }
 
-        return self::$modelMessages;
+        return self::formatValidationMessages(self::$modelMessages);
     }
 
     public static function createValidationMessages(): array
@@ -70,7 +70,7 @@ trait RulesValidation
             self::buildValidationRules(new static());
         }
 
-        return self::$modelCreateMessages;
+        return self::formatValidationMessages(self::$modelCreateMessages);
     }
 
     public static function updateValidationMessages(): array
@@ -79,7 +79,7 @@ trait RulesValidation
             self::buildValidationRules(new static());
         }
 
-        return self::$modelUpdateMessages;
+        return self::formatValidationMessages(self::$modelUpdateMessages);
     }
 
     /**
@@ -206,5 +206,13 @@ trait RulesValidation
             self::$modelUpdateRules[$property->name] = $rulesAttribute->rules;
             self::$modelUpdateMessages[$property->name] = $rulesAttribute->messages;
         });
+    }
+
+    private static function formatValidationMessages(array $messages): array
+    {
+        return collect($messages)
+            ->filter(fn ($messagesList) => ! blank($messagesList))
+            ->map(fn ($messagesList) => collect($messagesList)->map(fn ($message) => __($message))->toArray())
+            ->toArray();
     }
 }

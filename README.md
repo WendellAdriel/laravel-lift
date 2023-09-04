@@ -226,6 +226,7 @@ final class Product extends Model
 ```
 
 You can also pass a second parameter to the `Rules` attribute to set a custom error message for the validation rule.
+The validation messages work with localization.
 
 ```php
 use Illuminate\Database\Eloquent\Model;
@@ -958,9 +959,6 @@ $productRules = Product::validationMessages();
     'name' => [
         'required' => 'The PRODUCT NAME field cannot be empty.',
     ],
-    'price' => [],
-    'random_number' => [],
-    'expires_at' => [],
 ]
 ```
 
@@ -976,7 +974,6 @@ $productRules = Product::createValidationMessages();
     'name' => [
         'required' => 'The PRODUCT NAME field cannot be empty.',
     ],
-    'price' => [],
 ]
 ```
 
@@ -992,7 +989,6 @@ $productRules = Product::updateValidationMessages();
     'name' => [
         'required' => 'The PRODUCT NAME field cannot be empty.',
     ],
-    'price' => [],
 ]
 ```
 
