@@ -856,6 +856,38 @@ final class Tag extends Model
 }
 ```
 
+#### Customizing the Relationship
+
+All the attributes listed above, except the `MorphTo` attribute, accept an additional parameter to customize the relationship
+name.
+
+```php
+use WendellAdriel\Lift\Attributes\Relations\BelongsTo;
+
+#[BelongsTo(User::class, 'author')]
+final class Post extends Model
+{
+    use Lift;
+    // ...
+}
+
+$post->author; // Will return the User model
+```
+
+After the `name` parameter, you can pass the same parameters as you would do when defining the relationship using methods,
+for example to customize the foreign key.
+
+```php
+use WendellAdriel\Lift\Attributes\Relations\BelongsTo;
+
+#[BelongsTo(User::class, 'author', 'custom_id', 'id')]
+final class Post extends Model
+{
+    use Lift;
+    // ...
+}
+```
+
 ## Methods
 
 When using the `Lift` trait, your model will have some new methods available.

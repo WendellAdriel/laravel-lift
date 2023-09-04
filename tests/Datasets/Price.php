@@ -10,7 +10,7 @@ use WendellAdriel\Lift\Attributes\Relations\BelongsTo;
 use WendellAdriel\Lift\Attributes\Rules;
 use WendellAdriel\Lift\Lift;
 
-#[BelongsTo(Book::class, 'custom_id', 'id')]
+#[BelongsTo(Book::class, null, 'custom_id', 'id')]
 class Price extends Model
 {
     use Lift;

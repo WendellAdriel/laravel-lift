@@ -31,13 +31,13 @@ it('loads BelongsTo relation', function () {
         'content' => fake()->paragraph,
     ]);
 
-    $post->user()->associate($user);
+    $post->author()->associate($user);
     $post->save();
-    expect($post->user->id)->toBe($user->id)
+    expect($post->author->id)->toBe($user->id)
         ->and($post->user_id)->toBe($user->id);
 
     $post = Post::query()->find($post->id);
-    expect($post->user->id)->toBe($user->id)
+    expect($post->author->id)->toBe($user->id)
         ->and($post->user_id)->toBe($user->id);
 
     $postWithoutUser = Post::create([
@@ -45,10 +45,10 @@ it('loads BelongsTo relation', function () {
         'content' => fake()->paragraph,
     ]);
 
-    expect($postWithoutUser->user)->toBeNull();
+    expect($postWithoutUser->author)->toBeNull();
 
     $postWithoutUser = Post::query()->find($postWithoutUser->id);
-    expect($postWithoutUser->user)->toBeNull();
+    expect($postWithoutUser->author)->toBeNull();
 });
 
 it('loads BelongsToMany relation', function () {
@@ -59,16 +59,16 @@ it('loads BelongsToMany relation', function () {
     ]);
 
     $role = Role::create();
-    $user->roles()->attach($role);
+    $user->roleList()->attach($role);
 
-    expect($user->roles)->toHaveCount(1)
-        ->and($user->roles->first()->id)->toBe($role->id)
+    expect($user->roleList)->toHaveCount(1)
+        ->and($user->roleList->first()->id)->toBe($role->id)
         ->and($role->users)->toHaveCount(1)
         ->and($role->users->first()->id)->toBe($user->id);
 
     $user = User::query()->find($user->id);
-    expect($user->roles)->toHaveCount(1)
-        ->and($user->roles->first()->id)->toBe($role->id);
+    expect($user->roleList)->toHaveCount(1)
+        ->and($user->roleList->first()->id)->toBe($role->id);
 
     $role = Role::query()->find($role->id);
     expect($role->users)->toHaveCount(1)
@@ -79,10 +79,10 @@ it('loads BelongsToMany relation', function () {
         'email' => fake()->unique()->safeEmail,
         'password' => 's3Cr3T@!!!',
     ]);
-    expect($userWithoutRoles->roles)->toHaveCount(0);
+    expect($userWithoutRoles->roleList)->toHaveCount(0);
 
     $userWithoutRoles = User::query()->find($userWithoutRoles->id);
-    expect($userWithoutRoles->roles)->toHaveCount(0);
+    expect($userWithoutRoles->roleList)->toHaveCount(0);
 
     $roleWithoutUsers = Role::create();
     expect($roleWithoutUsers->users)->toHaveCount(0);
@@ -102,19 +102,19 @@ it('loads HasMany relation', function () {
         'title' => fake()->sentence,
         'content' => fake()->paragraph,
     ]);
-    $user->posts()->save($post);
+    $user->articles()->save($post);
 
-    expect($user->posts)->toHaveCount(1)
-        ->and($user->posts->first()->id)->toBe($post->id)
-        ->and($post->user->id)->toBe($user->id)
+    expect($user->articles)->toHaveCount(1)
+        ->and($user->articles->first()->id)->toBe($post->id)
+        ->and($post->author->id)->toBe($user->id)
         ->and($post->user_id)->toBe($user->id);
 
     $user = User::query()->find($user->id);
-    expect($user->posts)->toHaveCount(1)
-        ->and($user->posts->first()->id)->toBe($post->id);
+    expect($user->articles)->toHaveCount(1)
+        ->and($user->articles->first()->id)->toBe($post->id);
 
     $post = Post::query()->find($post->id);
-    expect($post->user->id)->toBe($user->id)
+    expect($post->author->id)->toBe($user->id)
         ->and($post->user_id)->toBe($user->id);
 
     $userWithoutPosts = User::create([
@@ -123,7 +123,7 @@ it('loads HasMany relation', function () {
         'password' => 's3Cr3T@!!!',
     ]);
 
-    expect($userWithoutPosts->posts)->toHaveCount(0);
+    expect($userWithoutPosts->articles)->toHaveCount(0);
 });
 
 it('loads HasManyThrough relation', function () {
@@ -141,7 +141,7 @@ it('loads HasManyThrough relation', function () {
     ]);
 
     $country->users()->save($user);
-    $user->posts()->save($post);
+    $user->articles()->save($post);
 
     expect($country->posts)->toHaveCount(1)
         ->and($country->posts->first()->id)->toBe($post->id);

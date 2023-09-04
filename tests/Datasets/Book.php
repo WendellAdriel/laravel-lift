@@ -12,7 +12,7 @@ use WendellAdriel\Lift\Attributes\Rules;
 use WendellAdriel\Lift\Lift;
 
 #[BelongsTo(BookCase::class)]
-#[HasMany(Price::class, 'custom_id', 'id')]
+#[HasMany(Price::class, null, 'custom_id', 'id')]
 class Book extends Model
 {
     use Lift;

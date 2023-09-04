@@ -13,8 +13,8 @@ use WendellAdriel\Lift\Attributes\Relations\MorphOne;
 use WendellAdriel\Lift\Attributes\Rules;
 use WendellAdriel\Lift\Lift;
 
-#[BelongsToMany(Role::class)]
-#[HasMany(Post::class)]
+#[BelongsToMany(related: Role::class, name: 'roleList')]
+#[HasMany(related: Post::class, name: 'articles')]
 #[HasMany(WorkBook::class)]
 #[HasOne(Phone::class)]
 #[MorphOne(Image::class, 'imageable')]

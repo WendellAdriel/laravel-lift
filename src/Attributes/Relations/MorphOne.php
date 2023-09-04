@@ -17,7 +17,7 @@ final class MorphOne implements RelationAttribute
     /**
      * @var class-string
      */
-    public string $relationClass;
+    public string $related;
 
     public string $morphName;
 
@@ -26,19 +26,22 @@ final class MorphOne implements RelationAttribute
      */
     public array $arguments = [];
 
+    private ?string $name;
+
     /**
-     * @param  class-string  $relationClass
+     * @param  class-string  $related
      * @param  array<string>  ...$arguments
      */
-    public function __construct(string $relationClass, string $morphName, string ...$arguments)
+    public function __construct(string $related, string $morphName, ?string $name = null, string ...$arguments)
     {
-        $this->relationClass = $relationClass;
+        $this->related = $related;
         $this->morphName = $morphName;
-        $this->arguments = [$relationClass, $morphName, ...$arguments];
+        $this->name = $name;
+        $this->arguments = [$related, $morphName, ...$arguments];
     }
 
     public function relationName(): string
     {
-        return Str::singular(Str::camel(class_basename($this->relationClass)));
+        return $this->name ?? Str::singular(Str::camel(class_basename($this->related)));
     }
 }
