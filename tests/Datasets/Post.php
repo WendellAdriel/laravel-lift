@@ -12,7 +12,7 @@ use WendellAdriel\Lift\Attributes\Relations\MorphMany;
 use WendellAdriel\Lift\Attributes\Relations\MorphToMany;
 use WendellAdriel\Lift\Lift;
 
-#[BelongsTo(User::class)]
+#[BelongsTo(related: User::class, name: 'author')]
 #[MorphMany(Image::class, 'imageable')]
 #[MorphToMany(Tag::class, 'taggable')]
 class Post extends Model

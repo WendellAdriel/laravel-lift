@@ -52,7 +52,7 @@ trait ManageRelations
             );
 
             if ($relation instanceof BelongsTo) {
-                self::$relationsConfig[$model::class][$relation->relationClass ?? $relation->morphName] = $relation;
+                self::$relationsConfig[$model::class][$relation->related ?? $relation->morphName] = $relation;
             }
         }
     }

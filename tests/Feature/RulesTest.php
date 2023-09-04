@@ -6,6 +6,25 @@ use Illuminate\Validation\ValidationException;
 use Tests\Datasets\User;
 use Tests\Datasets\UserRules;
 
+it('throws validation errors for locale', function () {
+    file_put_contents(
+        base_path('lang/pt.json'),
+        json_encode([
+            'validation.required' => 'O campo :attribute é obrigatório',
+        ])
+    );
+    $this->app->setLocale('pt');
+
+    User::create([
+        'name' => fake()->name,
+        'email' => fake()->unique()->safeEmail,
+    ]);
+
+    $this->assertSessionHasErrors([
+        'name' => 'O campo password é obrigatório',
+    ]);
+})->throws(ValidationException::class);
+
 describe('Create model', function () {
     it('throws validation error if model data is invalid', function () {
         User::create([
@@ -216,8 +235,6 @@ describe('Gets model validation rules and messages statically', function () {
             'name' => [
                 'required' => 'The user name cannot be empty',
             ],
-            'email' => [],
-            'password' => [],
         ]);
     });
 
@@ -226,7 +243,6 @@ describe('Gets model validation rules and messages statically', function () {
             'email' => [
                 'required' => 'The user email cannot be empty',
             ],
-            'password' => [],
         ]);
 
         expect(UserRules::validationMessages())->toBe([
@@ -238,7 +254,6 @@ describe('Gets model validation rules and messages statically', function () {
 
     it('gets update validation messages', function () {
         expect(UserRules::updateValidationMessages())->toBe([
-            'email' => [],
             'password' => [
                 'min' => 'The password must be at least 8 characters long',
             ],
