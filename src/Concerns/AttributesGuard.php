@@ -58,11 +58,11 @@ trait AttributesGuard
         $this->mergeFillable($fillableProperties->map(fn ($property) => $property->name)->values()->toArray());
 
         $hiddenProperties = self::getPropertiesForAttributes($properties, [Hidden::class]);
-        $this->setHidden($hiddenProperties->map(fn ($property) => $property->name)->values()->toArray());
+        $this->makeHidden($hiddenProperties->map(fn ($property) => $property->name)->values()->toArray());
 
         $configProperties = self::getPropertiesForAttributes($properties, [Config::class]);
         $this->mergeFillable($this->buildLiftList($configProperties, 'fillable'));
-        $this->setHidden([
+        $this->makeHidden([
             ...$this->getHidden(),
             ...$this->buildLiftList($configProperties, 'hidden'),
         ]);

@@ -25,13 +25,21 @@ class ProductHidden extends Model
     #[Cast('int')]
     public int $random_number;
 
+    #[Cast('int')]
+    public int $another_random_number;
+
     #[Cast('immutable_datetime')]
     public CarbonImmutable $expires_at;
+
+    protected $hidden = [
+        'another_random_number',
+    ];
 
     protected $fillable = [
         'name',
         'price',
         'random_number',
+        'another_random_number',
         'expires_at',
     ];
 }
