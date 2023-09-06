@@ -25,7 +25,7 @@ class Product extends Model
     public CarbonImmutable $expires_at;
 
     #[Cast('array')]
-    public array $json_column;
+    public ?array $json_column;
 
     protected $fillable = [
         'name',
