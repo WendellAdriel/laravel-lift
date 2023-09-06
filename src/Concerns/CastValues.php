@@ -12,45 +12,86 @@ use WendellAdriel\Lift\Support\PropertyInfo;
 
 trait CastValues
 {
-    /**
-     * @param  Collection<PropertyInfo>  $properties
-     */
-    private static function castValues(Model $model, Collection $properties): void
+    private static ?array $modelCastableProperties = null;
+
+    public static function castAndCreate(array $properties): self
     {
-        $casts = self::castValuesForCastAttribute($properties);
-        $casts = array_merge($casts, self::castValuesForLiftAttribute($properties));
+        $model = new static();
+
+        $model->castAndFill($properties);
+        $model->save();
+
+        return $model;
+    }
+
+    /**
+     * @param  array<string,mixed>  $properties
+     */
+    public function castAndFill(array $properties): self
+    {
+        foreach ($properties as $key => $value) {
+            $this->{$key} = $this->hasCast($key)
+                ? $this->castAttribute($key, $this->getValueForCast($key, $value))
+                : $value;
+        }
+
+        return $this;
+    }
+
+    public function castAndSet(string $property, mixed $value): self
+    {
+        $this->{$property} = $this->hasCast($property) ? $this->castAttribute($property, $value) : $value;
+
+        return $this;
+    }
+
+    public function castAndUpdate(array $properties): self
+    {
+        $this->castAndFill($properties);
+        $this->save();
+
+        return $this;
+    }
+
+    private static function castValues(Model $model): void
+    {
+        $properties = self::getPropertiesWithAttributes($model);
+        $casts = self::castableProperties($properties);
 
         $model->mergeCasts($casts);
+        self::$modelCastableProperties = $model->getCasts();
     }
 
     /**
      * @param  Collection<PropertyInfo>  $properties
      */
-    private static function castValuesForCastAttribute(Collection $properties): array
+    private static function castableProperties(Collection $properties): array
     {
-        $castableProperties = self::getPropertiesForAttributes($properties, [Cast::class]);
-        $casts = [];
+        if (is_null(self::$modelCastableProperties)) {
+            self::buildCastableProperties($properties);
+        }
 
+        return self::$modelCastableProperties;
+    }
+
+    /**
+     * @param  Collection<PropertyInfo>  $properties
+     */
+    private static function buildCastableProperties(Collection $properties): void
+    {
+        self::$modelCastableProperties = [];
+
+        $castableProperties = self::getPropertiesForAttributes($properties, [Cast::class]);
         foreach ($castableProperties as $property) {
             $castAttribute = $property->attributes->first(fn ($attribute) => $attribute->getName() === Cast::class);
             if (blank($castAttribute)) {
                 continue;
             }
 
-            $casts[$property->name] = $castAttribute->getArguments()[0];
+            self::$modelCastableProperties[$property->name] = $castAttribute->getArguments()[0];
         }
 
-        return $casts;
-    }
-
-    /**
-     * @param  Collection<PropertyInfo>  $properties
-     */
-    private static function castValuesForLiftAttribute(Collection $properties): array
-    {
         $castableProperties = self::getPropertiesForAttributes($properties, [Config::class]);
-        $casts = [];
-
         foreach ($castableProperties as $property) {
             $configAttribute = $property->attributes->first(fn ($attribute) => $attribute->getName() === Config::class);
             if (blank($configAttribute)) {
@@ -62,9 +103,17 @@ trait CastValues
                 continue;
             }
 
-            $casts[$property->name] = $configAttribute->cast;
+            self::$modelCastableProperties[$property->name] = $configAttribute->cast;
         }
+    }
 
-        return $casts;
+    private function getValueForCast(string $property, mixed $value): mixed
+    {
+        $castType = self::$modelCastableProperties[$property] ?? null;
+
+        return match ($castType) {
+            'array', 'collection', 'json', 'object' => ! is_string($value) ? json_encode($value) : $value,
+            default => $value,
+        };
     }
 }
