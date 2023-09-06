@@ -10,13 +10,15 @@ it('casts values when creating model', function () {
         'price' => '10.99',
         'random_number' => '123',
         'expires_at' => '2023-12-31 23:59:59',
+        'json_column' => ['foo' => 'bar'],
     ]);
 
     expect($product->name)->toBe('Product 1')
         ->and($product->price)->toBe(10.99)
         ->and($product->random_number)->toBe(123)
         ->and($product->expires_at)->toBeInstanceOf(Carbon\CarbonImmutable::class)
-        ->and($product->expires_at->format('Y-m-d H:i:s'))->toBe('2023-12-31 23:59:59');
+        ->and($product->expires_at->format('Y-m-d H:i:s'))->toBe('2023-12-31 23:59:59')
+        ->and($product->json_column)->toBe(['foo' => 'bar']);
 });
 
 it('casts values when updating model', function () {

@@ -24,10 +24,14 @@ class Product extends Model
     #[Cast('immutable_datetime')]
     public CarbonImmutable $expires_at;
 
+    #[Cast('array')]
+    public array $json_column;
+
     protected $fillable = [
         'name',
         'price',
         'random_number',
         'expires_at',
+        'json_column',
     ];
 }
