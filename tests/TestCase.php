@@ -54,6 +54,7 @@ abstract class TestCase extends BaseTestCase
             $table->float('price');
             $table->integer('random_number');
             $table->integer('another_random_number')->nullable();
+            $table->json('json_column')->nullable();
             $table->timestamp('expires_at');
             $table->timestamps();
         });

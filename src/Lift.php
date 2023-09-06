@@ -54,7 +54,7 @@ trait Lift
                 ? self::applyCreateValidations($properties)
                 : self::applyUpdateValidations($properties);
 
-            self::castValues($model, $properties);
+            self::castValues($model);
 
             $publicProperties = self::getModelPublicProperties($model);
             $customColumns = self::customColumns();
@@ -102,6 +102,7 @@ trait Lift
         $properties = self::getPropertiesWithAttributes($this);
         $this->applyPrimaryKey($properties);
         $this->applyAttributesGuard($properties);
+        self::castValues($this);
     }
 
     public function toArray(): array
@@ -208,7 +209,7 @@ trait Lift
 
     private static function fillProperties(Model $model): void
     {
-        self::castValues($model, self::getPropertiesWithAttributes($model));
+        self::castValues($model);
 
         foreach ($model->getAttributes() as $key => $value) {
             $model->{$key} = $model->hasCast($key) ? $model->castAttribute($key, $value) : $value;
