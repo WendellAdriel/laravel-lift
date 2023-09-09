@@ -12,7 +12,7 @@ use WendellAdriel\Lift\Support\PropertyInfo;
 
 trait CastValues
 {
-    protected static ?array $modelCastableProperties = [];
+    protected static array $modelCastableProperties = [];
 
     public static function castAndCreate(array $properties): self
     {
