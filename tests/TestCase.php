@@ -178,6 +178,13 @@ abstract class TestCase extends BaseTestCase
             $table->string('password');
             $table->timestamps();
         });
+
+        Schema::create('cars', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->softDeletes();
+            $table->timestamps();
+        });
     }
 
     protected function getPackageProviders($app)
