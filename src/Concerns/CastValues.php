@@ -12,7 +12,7 @@ use WendellAdriel\Lift\Support\PropertyInfo;
 
 trait CastValues
 {
-    private static ?array $modelCastableProperties = null;
+    protected static array $modelCastableProperties = [];
 
     public static function castAndCreate(array $properties): self
     {
@@ -59,7 +59,7 @@ trait CastValues
         $casts = self::castableProperties($properties);
 
         $model->mergeCasts($casts);
-        self::$modelCastableProperties = $model->getCasts();
+        self::$modelCastableProperties[static::class] = $model->getCasts();
     }
 
     /**
@@ -67,11 +67,11 @@ trait CastValues
      */
     private static function castableProperties(Collection $properties): array
     {
-        if (is_null(self::$modelCastableProperties)) {
+        if (! isset(self::$modelCastableProperties[static::class])) {
             self::buildCastableProperties($properties);
         }
 
-        return self::$modelCastableProperties;
+        return self::$modelCastableProperties[static::class];
     }
 
     /**
@@ -79,7 +79,7 @@ trait CastValues
      */
     private static function buildCastableProperties(Collection $properties): void
     {
-        self::$modelCastableProperties = [];
+        self::$modelCastableProperties[static::class] = [];
 
         $castableProperties = self::getPropertiesForAttributes($properties, [Cast::class]);
         foreach ($castableProperties as $property) {
@@ -88,7 +88,7 @@ trait CastValues
                 continue;
             }
 
-            self::$modelCastableProperties[$property->name] = $castAttribute->getArguments()[0];
+            self::$modelCastableProperties[static::class][$property->name] = $castAttribute->getArguments()[0];
         }
 
         $castableProperties = self::getPropertiesForAttributes($properties, [Config::class]);
@@ -103,13 +103,13 @@ trait CastValues
                 continue;
             }
 
-            self::$modelCastableProperties[$property->name] = $configAttribute->cast;
+            self::$modelCastableProperties[static::class][$property->name] = $configAttribute->cast;
         }
     }
 
     private function getValueForCast(string $property, mixed $value): mixed
     {
-        $castType = self::$modelCastableProperties[$property] ?? null;
+        $castType = self::$modelCastableProperties[static::class][$property] ?? null;
 
         return match ($castType) {
             'array', 'collection', 'json', 'object' => ! is_string($value) ? json_encode($value) : $value,
