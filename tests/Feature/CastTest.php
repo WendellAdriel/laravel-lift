@@ -148,7 +148,7 @@ it('casts values when retrieving model with custom columns', function () {
         'expires_at' => '2023-12-31 23:59:59',
         'json_column' => ['foo' => 'bar'],
     ]);
-    
+
     $product = Product::query()->first();
 
     expect($product->name)->toBe('Product 1')
