@@ -16,7 +16,9 @@ use WendellAdriel\Lift\Concerns\AttributesGuard;
 use WendellAdriel\Lift\Concerns\CastValues;
 use WendellAdriel\Lift\Concerns\CustomPrimary;
 use WendellAdriel\Lift\Concerns\DatabaseConfigurations;
-use WendellAdriel\Lift\Concerns\EventsHandler;
+use WendellAdriel\Lift\Concerns\Events\ListenerHandler;
+use WendellAdriel\Lift\Concerns\Events\RegisterDispatchedEvents;
+use WendellAdriel\Lift\Concerns\Events\RegisterObservers;
 use WendellAdriel\Lift\Concerns\ManageRelations;
 use WendellAdriel\Lift\Concerns\RulesValidation;
 use WendellAdriel\Lift\Concerns\WatchProperties;
@@ -30,7 +32,9 @@ trait Lift
         CastValues,
         CustomPrimary,
         DatabaseConfigurations,
-        EventsHandler,
+        ListenerHandler,
+        RegisterObservers,
+        RegisterDispatchedEvents,
         ManageRelations,
         RulesValidation,
         WatchProperties;
@@ -40,6 +44,7 @@ trait Lift
      */
     public static function bootLift(): void
     {
+        static::registerObservers();
         static::saving(function (Model $model) {
             self::syncCustomColumns($model);
 
@@ -108,6 +113,7 @@ trait Lift
         static::updated(fn (Model $model) => self::handleEvent($model, 'updated'));
         static::deleting(fn (Model $model) => self::handleEvent($model, 'deleting'));
         static::deleted(fn (Model $model) => self::handleEvent($model, 'deleted'));
+        static::replicating(fn (Model $model) => self::handleEvent($model, 'replicating'));
 
         $traitsUsed = class_uses_recursive(new static());
         if (in_array(SoftDeletes::class, $traitsUsed)) {
@@ -115,13 +121,13 @@ trait Lift
             static::forceDeleted(fn (Model $model) => self::handleEvent($model, 'forceDeleted'));
             static::restoring(fn (Model $model) => self::handleEvent($model, 'restoring'));
             static::restored(fn (Model $model) => self::handleEvent($model, 'restored'));
-            static::replicating(fn (Model $model) => self::handleEvent($model, 'replicating'));
         }
     }
 
     public function syncOriginal(): void
     {
         parent::syncOriginal();
+        $this->registerDispatchedEvents();
         $this->applyDatabaseConfigurations();
         self::buildRelations($this);
 
@@ -275,6 +281,15 @@ trait Lift
     private static function getMethodForAttribute(Collection $methods, string $attributeClass): ?MethodInfo
     {
         return $methods->first(
+            fn ($method) => $method->attributes->contains(
+                fn ($attribute) => $attribute->getName() === $attributeClass
+            )
+        );
+    }
+
+    private static function getMethodsForAttribute(Collection $methods, string $attributeClass): Collection
+    {
+        return $methods->filter(
             fn ($method) => $method->attributes->contains(
                 fn ($attribute) => $attribute->getName() === $attributeClass
             )

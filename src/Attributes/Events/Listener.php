@@ -7,6 +7,9 @@ namespace WendellAdriel\Lift\Attributes\Events;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_METHOD)]
-final class Deleted
+final class Listener
 {
+    public function __construct(public string $event = '')
+    {
+    }
 }

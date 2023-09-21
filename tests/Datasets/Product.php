@@ -6,20 +6,17 @@ namespace Tests\Datasets;
 
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
+use Tests\Support\Events\ProductObserver;
+use Tests\Support\Events\ProductSaved;
 use WendellAdriel\Lift\Attributes\Cast;
-use WendellAdriel\Lift\Attributes\Events\Created;
-use WendellAdriel\Lift\Attributes\Events\Creating;
-use WendellAdriel\Lift\Attributes\Events\Deleted;
-use WendellAdriel\Lift\Attributes\Events\Deleting;
-use WendellAdriel\Lift\Attributes\Events\Replicating;
-use WendellAdriel\Lift\Attributes\Events\Retrieved;
-use WendellAdriel\Lift\Attributes\Events\Saved;
-use WendellAdriel\Lift\Attributes\Events\Saving;
-use WendellAdriel\Lift\Attributes\Events\Updated;
-use WendellAdriel\Lift\Attributes\Events\Updating;
+use WendellAdriel\Lift\Attributes\Events\Dispatches;
+use WendellAdriel\Lift\Attributes\Events\Listener;
+use WendellAdriel\Lift\Attributes\Events\Observer;
 use WendellAdriel\Lift\Lift;
 
+#[Observer(ProductObserver::class)]
+#[Dispatches('saved', ProductSaved::class)]
 class Product extends Model
 {
     use Lift;
@@ -46,63 +43,69 @@ class Product extends Model
         'json_column',
     ];
 
-    #[Retrieved]
+    #[Listener]
+    public function blabla(Product $product): void
+    {
+        throw new \Exception("this function musn't be called");
+    }
+
+    #[Listener]
     public function onRetrieved(Product $product): void
     {
-        Log::info('onRetrieved has been called');
+        Cache::set("onRetrieved", true);
     }
 
-    #[Creating]
-    public function onCreating(Product $product): void
+    #[Listener('creating')]
+    public function onWhatever(Product $product): void
     {
-        Log::info('onCreating has been called');
+        Cache::set("onCreating", true);
     }
 
-    #[Created]
+    #[Listener]
     public function onCreated(Product $product): void
     {
-        Log::info('onCreated has been called');
+        Cache::set('onCreated', true);
     }
 
-    #[Updating]
+    #[Listener]
     public function onUpdating(Product $product): void
     {
-        Log::info('onUpdating has been called');
+        Cache::set('onUpdating', true);
     }
 
-    #[Updated]
+    #[Listener]
     public function onUpdated(Product $product): void
     {
-        Log::info('onUpdated has been called');
+        Cache::set('onUpdated', true);
     }
 
-    #[Saving]
+    #[Listener]
     public function onSaving(Product $product): void
     {
-        Log::info('onSaving has been called');
+        Cache::set('onSaving', true);
     }
 
-    #[Saved]
+    #[Listener]
     public function onSaved(Product $product): void
     {
-        Log::info('onSaved has been called');
+        Cache::set('onSaved', true);
     }
 
-    #[Deleting]
+    #[Listener]
     public function onDeleting(Product $product): void
     {
-        Log::info('onDeleting has been called');
+        Cache::set('onDeleting', true);
     }
 
-    #[Deleted]
+    #[Listener]
     public function onDeleted(Product $product): void
     {
-        Log::info('onDeleted has been called');
+        Cache::set('onDeleted', true);
     }
 
-    #[Replicating]
+    #[Listener('replicating')]
     public function onReplicating(Product $product): void
     {
-        Log::info('onReplicating has been called');
+        Cache::set('onReplicating', true);
     }
 }
