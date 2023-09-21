@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Datasets;
 
 use Carbon\CarbonImmutable;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Tests\Support\Events\ProductObserver;
@@ -48,19 +49,19 @@ class Product extends Model
     #[Listener]
     public function blabla(Product $product): void
     {
-        throw new \Exception("this function musn't be called");
+        throw new Exception("this function musn't be called");
     }
 
     #[Listener]
     public function onRetrieved(Product $product): void
     {
-        Cache::set("onRetrieved", true);
+        Cache::set('onRetrieved', true);
     }
 
     #[Listener('creating')]
     public function onWhatever(Product $product): void
     {
-        Cache::set("onCreating", true);
+        Cache::set('onCreating', true);
     }
 
     #[Listener]
@@ -99,7 +100,7 @@ class Product extends Model
         Cache::set('onDeleting', true);
     }
 
-    #[Listener]
+    #[Listener(queue: true)]
     public function onDeleted(Product $product): void
     {
         Cache::set('onDeleted', true);

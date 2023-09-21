@@ -26,14 +26,14 @@ trait RegisterObservers
 
         $classReflection = new ReflectionClass($model);
         self::$modelObservers = collect($classReflection->getAttributes(Observer::class))
-            ->map(fn($attr) => $attr->newInstance()->observer)
+            ->map(fn ($attr) => $attr->newInstance()->observer)
             ->toArray();
 
     }
 
     private static function registerObservers(): void
     {
-        foreach (self::modelObservers() as $observer){
+        foreach (self::modelObservers() as $observer) {
             self::observe($observer);
         }
     }

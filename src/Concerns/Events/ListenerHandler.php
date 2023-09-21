@@ -12,6 +12,7 @@ use WendellAdriel\Lift\Exceptions\EventDoesNotExistException;
 trait ListenerHandler
 {
     use Events;
+
     private static ?array $modelEventMethods = null;
 
     /**
@@ -38,12 +39,12 @@ trait ListenerHandler
         $methods = self::getMethodsForAttribute($methods, Listener::class);
 
         foreach ($methods as $method) {
-            $attr = $method->attributes->first(fn($attr) => $attr->getName() == Listener::class)->newInstance();
-            if (!empty($attr->event)){
+            $attr = $method->attributes->first(fn ($attr) => $attr->getName() === Listener::class)->newInstance();
+            if (! empty($attr->event)) {
                 self::eventExists($attr->event);
                 self::$modelEventMethods[$attr->event] = $method;
-            } else if (str_starts_with($method->name,'on')) {
-                $event = Str::lcfirst(substr($method->name,2));
+            } elseif (str_starts_with($method->name, 'on')) {
+                $event = Str::lcfirst(substr($method->name, 2));
                 self::eventExists($event);
                 self::$modelEventMethods[$event] = $method;
             }
@@ -53,8 +54,15 @@ trait ListenerHandler
 
     private static function handleEvent(?Model $model, string $event): void
     {
-        if (array_key_exists($event,self::eventHandlerMethods())){
-            self::eventHandlerMethods()[$event]?->method->invoke($model, $model);
+        if (array_key_exists($event, self::eventHandlerMethods())) {
+            $eventHandler = self::eventHandlerMethods()[$event];
+            $attr = $eventHandler->attributes->first(fn ($attr) => $attr->getName() === Listener::class)->newInstance();
+            $method = $eventHandler->method;
+            if (! $attr->queue) {
+                $method->invoke($model, $model);
+            } else {
+                dispatch(fn () => $method->invoke($model, $model));
+            }
         }
     }
 }

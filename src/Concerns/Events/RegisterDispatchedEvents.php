@@ -13,6 +13,7 @@ use WendellAdriel\Lift\Exceptions\EventDoesNotExistException;
 trait RegisterDispatchedEvents
 {
     use Events;
+
     private static ?array $modelDispatchEvents = null;
 
     /**
@@ -35,20 +36,21 @@ trait RegisterDispatchedEvents
 
         $classReflection = new ReflectionClass($model);
         self::$modelDispatchEvents = collect($classReflection->getAttributes(Dispatches::class))
-            ->map(fn($attr) => $attr->newInstance())
+            ->map(fn ($attr) => $attr->newInstance())
             ->map(function ($attrInstance) {
-                if (!empty($attrInstance->event)){
+                if (! empty($attrInstance->event)) {
                     return $attrInstance;
                 }
                 $shortName = (new ReflectionClass($attrInstance->eventClass))->getShortName();
-                $event = collect(self::$possibleEvents)->first(fn($event) => Str::contains($shortName, Str::ucfirst($event)));
-                if (is_null($event)){
+                $event = collect(self::$possibleEvents)->first(fn ($event) => Str::contains($shortName, Str::ucfirst($event)));
+                if (is_null($event)) {
                     throw new EventDoesNotExistException("no valid event found in: {$shortName}");
                 }
                 $attrInstance->event = $event;
+
                 return $attrInstance;
             })
-            ->flatMap(fn($attr) => [$attr->event => $attr->eventClass])
+            ->flatMap(fn ($attr) => [$attr->event => $attr->eventClass])
             ->toArray();
 
     }

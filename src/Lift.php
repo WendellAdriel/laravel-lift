@@ -33,9 +33,9 @@ trait Lift
         CustomPrimary,
         DatabaseConfigurations,
         ListenerHandler,
-        RegisterObservers,
-        RegisterDispatchedEvents,
         ManageRelations,
+        RegisterDispatchedEvents,
+        RegisterObservers,
         RulesValidation,
         WatchProperties;
 

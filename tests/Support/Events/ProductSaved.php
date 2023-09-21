@@ -1,14 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Support\Events;
+
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Tests\Datasets\Product;
 
-class ProductSaved {
+class ProductSaved
+{
     use Dispatchable, InteractsWithSockets, SerializesModels;
-
 
     public Product $product;
 
