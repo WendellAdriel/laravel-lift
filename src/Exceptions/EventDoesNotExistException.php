@@ -10,6 +10,6 @@ final class EventDoesNotExistException extends Exception
 {
     public function __construct(string $event)
     {
-        parent::__construct("Cannot register listener for unknown event: {$event}");
+        parent::__construct("Cannot register listener / event for unknown: {$event}");
     }
 }

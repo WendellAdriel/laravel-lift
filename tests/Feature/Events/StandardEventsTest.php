@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Event;
 use Tests\Datasets\Product;
 use Tests\Datasets\ProductConfig;
 use Tests\Support\Events\ProductSaved;
+use Tests\Support\Events\ProductSaving;
 
 it('onRetrieved method gets called', function () {
 
@@ -38,7 +39,8 @@ it('cause events on a model without event listeners', function () {
 
 it('creation event handlers get called', function () {
     Event::fake([
-        ProductSaved::class,
+        ProductSaving::class,
+        ProductSaved::class
     ]);
     Product::castAndCreate([
         'name' => 'Product 1',
@@ -54,6 +56,7 @@ it('creation event handlers get called', function () {
     $this->assertTrue(Cache::has("onSaving"));
     $this->assertTrue(Cache::has("onSaved"));
     Event::assertDispatched(ProductSaved::class);
+    Event::assertDispatched(ProductSaving::class);
 });
 
 it('update event handlers get called', function () {

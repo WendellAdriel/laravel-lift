@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace WendellAdriel\Lift\Concerns\Events;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 use ReflectionClass;
 use WendellAdriel\Lift\Attributes\Events\Dispatches;
 use WendellAdriel\Lift\Exceptions\EventDoesNotExistException;
@@ -35,6 +36,18 @@ trait RegisterDispatchedEvents
         $classReflection = new ReflectionClass($model);
         self::$modelDispatchEvents = collect($classReflection->getAttributes(Dispatches::class))
             ->map(fn($attr) => $attr->newInstance())
+            ->map(function ($attrInstance) {
+                if (!empty($attrInstance->event)){
+                    return $attrInstance;
+                }
+                $shortName = (new ReflectionClass($attrInstance->eventClass))->getShortName();
+                $event = collect(self::$possibleEvents)->first(fn($event) => Str::contains($shortName, Str::ucfirst($event)));
+                if (is_null($event)){
+                    throw new EventDoesNotExistException("no valid event found in: {$shortName}");
+                }
+                $attrInstance->event = $event;
+                return $attrInstance;
+            })
             ->flatMap(fn($attr) => [$attr->event => $attr->eventClass])
             ->toArray();
 

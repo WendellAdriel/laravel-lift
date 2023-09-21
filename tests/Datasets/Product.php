@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Tests\Support\Events\ProductObserver;
 use Tests\Support\Events\ProductSaved;
+use Tests\Support\Events\ProductSaving;
 use WendellAdriel\Lift\Attributes\Cast;
 use WendellAdriel\Lift\Attributes\Events\Dispatches;
 use WendellAdriel\Lift\Attributes\Events\Listener;
@@ -16,7 +17,8 @@ use WendellAdriel\Lift\Attributes\Events\Observer;
 use WendellAdriel\Lift\Lift;
 
 #[Observer(ProductObserver::class)]
-#[Dispatches('saved', ProductSaved::class)]
+#[Dispatches(ProductSaving::class)]
+#[Dispatches(ProductSaved::class, 'saved')]
 class Product extends Model
 {
     use Lift;
