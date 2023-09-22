@@ -7,6 +7,7 @@ namespace WendellAdriel\Lift\Concerns;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use WendellAdriel\Lift\Attributes\Cast;
+use WendellAdriel\Lift\Attributes\Column;
 use WendellAdriel\Lift\Attributes\Config;
 use WendellAdriel\Lift\Support\PropertyInfo;
 
@@ -88,6 +89,26 @@ trait CastValues
                 continue;
             }
 
+            $configAttribute = $property->attributes->first(fn ($attribute) => $attribute->getName() === Config::class);
+            if (filled($configAttribute)) {
+                $configAttribute = $configAttribute->newInstance();
+                if (filled($configAttribute->column)) {
+                    self::$modelCastableProperties[static::class][$configAttribute->column] = $castAttribute->getArguments()[0];
+
+                    continue;
+                }
+            }
+
+            $columnAttribute = $property->attributes->first(fn ($attribute) => $attribute->getName() === Column::class);
+            if (filled($columnAttribute)) {
+                $columnAttribute = $columnAttribute->newInstance();
+                if (filled($columnAttribute->name)) {
+                    self::$modelCastableProperties[static::class][$columnAttribute->name] = $castAttribute->getArguments()[0];
+
+                    continue;
+                }
+            }
+
             self::$modelCastableProperties[static::class][$property->name] = $castAttribute->getArguments()[0];
         }
 
@@ -101,6 +122,22 @@ trait CastValues
             $configAttribute = $configAttribute->newInstance();
             if (blank($configAttribute->cast)) {
                 continue;
+            }
+
+            if (filled($configAttribute->column)) {
+                self::$modelCastableProperties[static::class][$configAttribute->column] = $configAttribute->cast;
+
+                continue;
+            }
+
+            $columnAttribute = $property->attributes->first(fn ($attribute) => $attribute->getName() === Column::class);
+            if (filled($columnAttribute)) {
+                $columnAttribute = $columnAttribute->newInstance();
+                if (filled($columnAttribute->name)) {
+                    self::$modelCastableProperties[static::class][$columnAttribute->name] = $configAttribute->cast;
+
+                    continue;
+                }
             }
 
             self::$modelCastableProperties[static::class][$property->name] = $configAttribute->cast;
