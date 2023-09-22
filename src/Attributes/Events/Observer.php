@@ -9,7 +9,8 @@ use Attribute;
 #[Attribute(Attribute::TARGET_CLASS | Attribute::IS_REPEATABLE)]
 final class Observer
 {
-    public function __construct(public string $observer)
-    {
+    public function __construct(
+        public string $observer
+    ) {
     }
 }

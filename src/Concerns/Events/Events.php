@@ -9,9 +9,20 @@ use WendellAdriel\Lift\Exceptions\EventDoesNotExistException;
 trait Events
 {
     private static array $possibleEvents = [
-        'retrieved', 'creating', 'created', 'updating', 'updated',
-        'saving', 'saved', 'restoring', 'restored', 'replicating',
-        'deleting', 'deleted', 'forceDeleting', 'forceDeleted',
+        'retrieved',
+        'creating',
+        'created',
+        'updating',
+        'updated',
+        'saving',
+        'saved',
+        'restoring',
+        'restored',
+        'replicating',
+        'deleting',
+        'deleted',
+        'forceDeleting',
+        'forceDeleted',
     ];
 
     /**

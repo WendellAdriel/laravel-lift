@@ -12,8 +12,6 @@ it('force deletion event handlers get called', function () {
 
     $this->assertTrue(Cache::has('onForceDeleting'));
     $this->assertTrue(Cache::has('onForceDeleted'));
-
-    $this->assertTrue(true);
 });
 
 it('restore event handlers get called', function () {
@@ -25,6 +23,4 @@ it('restore event handlers get called', function () {
 
     $this->assertTrue(Cache::has('onRestoring'));
     $this->assertTrue(Cache::has('onRestored'));
-
-    $this->assertTrue(true);
 });

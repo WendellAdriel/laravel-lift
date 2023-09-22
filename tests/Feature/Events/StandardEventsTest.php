@@ -31,11 +31,11 @@ it('cause events on a model without event listeners', function () {
         'expires_at' => '2023-12-31 23:59:59',
     ]);
 
-    $this->assertTrue(! Cache::has('onCreating'));
-    $this->assertTrue(! Cache::has('onCreated'));
-    $this->assertTrue(! Cache::has('created_observer'));
-    $this->assertTrue(! Cache::has('onSaving'));
-    $this->assertTrue(! Cache::has('onSaved'));
+    $this->assertFalse(Cache::has('onCreating'));
+    $this->assertFalse(Cache::has('onCreated'));
+    $this->assertFalse(Cache::has('created_observer'));
+    $this->assertFalse(Cache::has('onSaving'));
+    $this->assertFalse(Cache::has('onSaved'));
 });
 
 it('creation event handlers get called', function () {

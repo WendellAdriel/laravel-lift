@@ -43,7 +43,10 @@ trait ListenerHandler
             if (! empty($attr->event)) {
                 self::eventExists($attr->event);
                 self::$modelEventMethods[$attr->event] = $method;
-            } elseif (str_starts_with($method->name, 'on')) {
+
+                continue;
+            }
+            if (str_starts_with($method->name, 'on')) {
                 $event = Str::lcfirst(substr($method->name, 2));
                 self::eventExists($event);
                 self::$modelEventMethods[$event] = $method;
@@ -60,9 +63,10 @@ trait ListenerHandler
             $method = $eventHandler->method;
             if (! $attr->queue) {
                 $method->invoke($model, $model);
-            } else {
-                dispatch(fn () => $method->invoke($model, $model));
+
+                return;
             }
+            dispatch(fn () => $method->invoke($model, $model));
         }
     }
 }
