@@ -5,19 +5,25 @@ declare(strict_types=1);
 namespace WendellAdriel\Lift;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 use ReflectionClass;
 use ReflectionException;
+use ReflectionMethod;
 use ReflectionProperty;
 use WendellAdriel\Lift\Concerns\AttributesGuard;
 use WendellAdriel\Lift\Concerns\CastValues;
 use WendellAdriel\Lift\Concerns\CustomPrimary;
 use WendellAdriel\Lift\Concerns\DatabaseConfigurations;
+use WendellAdriel\Lift\Concerns\Events\ListenerHandler;
+use WendellAdriel\Lift\Concerns\Events\RegisterDispatchedEvents;
+use WendellAdriel\Lift\Concerns\Events\RegisterObservers;
 use WendellAdriel\Lift\Concerns\ManageRelations;
 use WendellAdriel\Lift\Concerns\RulesValidation;
 use WendellAdriel\Lift\Concerns\WatchProperties;
 use WendellAdriel\Lift\Exceptions\ImmutablePropertyException;
+use WendellAdriel\Lift\Support\MethodInfo;
 use WendellAdriel\Lift\Support\PropertyInfo;
 
 trait Lift
@@ -26,7 +32,10 @@ trait Lift
         CastValues,
         CustomPrimary,
         DatabaseConfigurations,
+        ListenerHandler,
         ManageRelations,
+        RegisterDispatchedEvents,
+        RegisterObservers,
         RulesValidation,
         WatchProperties;
 
@@ -35,6 +44,7 @@ trait Lift
      */
     public static function bootLift(): void
     {
+        static::registerObservers();
         static::saving(function (Model $model) {
             self::syncCustomColumns($model);
 
@@ -77,6 +87,7 @@ trait Lift
             }
 
             self::handleRelationsKeys($model);
+            self::handleEvent($model, 'saving');
         });
 
         static::saved(function (Model $model) {
@@ -88,14 +99,35 @@ trait Lift
             }
 
             $model->dispatchEvents = [];
+            self::handleEvent($model, 'saved');
         });
 
-        static::retrieved(fn (Model $model) => self::fillProperties($model));
+        static::retrieved(function (Model $model) {
+            self::fillProperties($model);
+            self::handleEvent($model, 'retrieved');
+        });
+
+        static::creating(fn (Model $model) => self::handleEvent($model, 'creating'));
+        static::created(fn (Model $model) => self::handleEvent($model, 'created'));
+        static::updating(fn (Model $model) => self::handleEvent($model, 'updating'));
+        static::updated(fn (Model $model) => self::handleEvent($model, 'updated'));
+        static::deleting(fn (Model $model) => self::handleEvent($model, 'deleting'));
+        static::deleted(fn (Model $model) => self::handleEvent($model, 'deleted'));
+        static::replicating(fn (Model $model) => self::handleEvent($model, 'replicating'));
+
+        $traitsUsed = class_uses_recursive(new static());
+        if (in_array(SoftDeletes::class, $traitsUsed)) {
+            static::forceDeleting(fn (Model $model) => self::handleEvent($model, 'forceDeleting'));
+            static::forceDeleted(fn (Model $model) => self::handleEvent($model, 'forceDeleted'));
+            static::restoring(fn (Model $model) => self::handleEvent($model, 'restoring'));
+            static::restored(fn (Model $model) => self::handleEvent($model, 'restored'));
+        }
     }
 
     public function syncOriginal(): void
     {
         parent::syncOriginal();
+        $this->registerDispatchedEvents();
         $this->applyDatabaseConfigurations();
         self::buildRelations($this);
 
@@ -165,6 +197,32 @@ trait Lift
         return collect($result);
     }
 
+    private static function getMethodsWithAttributes(Model $model): Collection
+    {
+        $publicMethods = self::getModelPublicMethods($model);
+        $result = [];
+
+        foreach ($publicMethods as $method) {
+            try {
+
+                $reflectionMethod = new ReflectionMethod($model, $method);
+                $attributes = $reflectionMethod->getAttributes();
+
+                if (count($attributes) > 0) {
+                    $result[] = new MethodInfo(
+                        name: $method,
+                        method: $reflectionMethod,
+                        attributes: collect($attributes),
+                    );
+                }
+            } catch (ReflectionException) {
+                continue;
+            }
+        }
+
+        return collect($result);
+    }
+
     private static function getModelPublicProperties(Model $model): array
     {
         $reflectionClass = new ReflectionClass($model);
@@ -180,6 +238,18 @@ trait Lift
         return $properties;
     }
 
+    private static function getModelPublicMethods(Model $model): array
+    {
+        $reflectionClass = new ReflectionClass($model);
+        $methods = [];
+
+        foreach ($reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
+            $methods[] = $method->getName();
+        }
+
+        return $methods;
+    }
+
     /**
      * @param  Collection<PropertyInfo>  $properties
      * @param  array<string>  $attributes
@@ -190,6 +260,38 @@ trait Lift
         return $properties->filter(
             fn ($property) => $property->attributes->contains(
                 fn ($attribute) => in_array($attribute->getName(), $attributes)
+            )
+        );
+    }
+
+    /**
+     * @param  Collection<MethodInfo>  $methods
+     * @param  array<string>  $attributes
+     * @return Collection<MethodInfo>
+     */
+    private static function getMethodsForAttributes(Collection $methods, array $attributes): Collection
+    {
+        return $methods->filter(
+            fn ($method) => $method->attributes->contains(
+                fn ($attribute) => in_array($attribute->getName(), $attributes)
+            )
+        );
+    }
+
+    private static function getMethodForAttribute(Collection $methods, string $attributeClass): ?MethodInfo
+    {
+        return $methods->first(
+            fn ($method) => $method->attributes->contains(
+                fn ($attribute) => $attribute->getName() === $attributeClass
+            )
+        );
+    }
+
+    private static function getMethodsForAttribute(Collection $methods, string $attributeClass): Collection
+    {
+        return $methods->filter(
+            fn ($method) => $method->attributes->contains(
+                fn ($attribute) => $attribute->getName() === $attributeClass
             )
         );
     }
