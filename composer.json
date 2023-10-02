@@ -49,7 +49,7 @@
         "lint": "pint",
         "test:lint": "pint --test",
         "test:unit": "./vendor/bin/pest --order-by random",
-        "test:static": "phpstan analyse",
+        "test:static": "phpstan analyse --memory-limit 1G",
         "test": [
             "@test:lint",
             "@test:unit",

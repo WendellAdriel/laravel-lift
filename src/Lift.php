@@ -150,6 +150,37 @@ trait Lift
         return $result;
     }
 
+    public function setCreatedAt($value)
+    {
+        $createdAtColumn = $this->getCreatedAtColumn();
+
+        $this->{$createdAtColumn} = $value;
+        $this->setAttribute($createdAtColumn, $value);
+
+        return $this;
+    }
+
+    public function setUpdatedAt($value)
+    {
+        $updatedAtColumn = $this->getUpdatedAtColumn();
+
+        $this->{$updatedAtColumn} = $value;
+        $this->setAttribute($updatedAtColumn, $value);
+
+        return $this;
+    }
+
+    public function setUniqueIds()
+    {
+        foreach ($this->uniqueIds() as $column) {
+            if (empty($this->{$column})) {
+                $uniqueId = $this->newUniqueId();
+                $this->{$column} = $uniqueId;
+                $this->setAttribute($column, $uniqueId);
+            }
+        }
+    }
+
     protected static function ignoredProperties(): array
     {
         return [
