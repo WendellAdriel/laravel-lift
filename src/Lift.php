@@ -170,6 +170,17 @@ trait Lift
         return $this;
     }
 
+    public function setUniqueIds()
+    {
+        foreach ($this->uniqueIds() as $column) {
+            if (empty($this->{$column})) {
+                $uniqueId = $this->newUniqueId();
+                $this->{$column} = $uniqueId;
+                $this->setAttribute($column, $uniqueId);
+            }
+        }
+    }
+
     protected static function ignoredProperties(): array
     {
         return [

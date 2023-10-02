@@ -185,6 +185,16 @@ abstract class TestCase extends BaseTestCase
             $table->softDeletes();
             $table->timestamps();
         });
+
+        Schema::create('crews', function (Blueprint $table) {
+            $table->ulid('id')->primary();
+            $table->timestamps();
+        });
+
+        Schema::create('games', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->timestamps();
+        });
     }
 
     protected function getPackageProviders($app)

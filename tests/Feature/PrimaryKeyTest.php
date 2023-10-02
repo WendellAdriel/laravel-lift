@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Tests\Datasets\Crew;
+use Tests\Datasets\Game;
 use Tests\Datasets\Movie;
 use Tests\Datasets\User;
 use Tests\Datasets\UserCustom;
@@ -180,4 +182,18 @@ describe('custom primary key with custom column name', function () {
 
         expect($movie->id)->toBe('123e4567-e89b-12d3-a456-426614174000');
     });
+});
+
+it('sets default ULID primary key column', function () {
+    $crew = new Crew();
+    $crew->save();
+
+    expect($crew->id)->not->toBeNull();
+});
+
+it('sets default UUID primary key column', function () {
+    $game = new Game();
+    $game->save();
+
+    expect($game->id)->not->toBeNull();
 });
