@@ -11,8 +11,8 @@ use WendellAdriel\Lift\Lift;
 
 final class Game extends Model
 {
-    use Lift;
     use HasUuids;
+    use Lift;
 
     #[PrimaryKey(type: 'string', incrementing: false)]
     public string $id;

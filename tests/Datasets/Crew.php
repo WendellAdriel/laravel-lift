@@ -11,8 +11,8 @@ use WendellAdriel\Lift\Lift;
 
 final class Crew extends Model
 {
-    use Lift;
     use HasUlids;
+    use Lift;
 
     #[PrimaryKey(type: 'string', incrementing: false)]
     public string $id;
