@@ -7,13 +7,14 @@ namespace Tests\Datasets;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use WendellAdriel\Lift\Attributes\Cast;
+use WendellAdriel\Lift\Attributes\Column;
 use WendellAdriel\Lift\Attributes\DB;
 use WendellAdriel\Lift\Attributes\PrimaryKey;
 use WendellAdriel\Lift\Attributes\Rules;
 use WendellAdriel\Lift\Lift;
 
 #[DB(table: 'users_null')]
-class UserNull extends Model
+class UserNullCustom extends Model
 {
     use Lift;
 
@@ -27,7 +28,8 @@ class UserNull extends Model
     public string $email;
 
     #[Cast('datetime')]
-    public ?Carbon $email_verified_at;
+    #[Column(name: 'email_verified_at')]
+    public ?Carbon $email_verified_at_custom;
 
     #[Rules(['required', 'string', 'min:8'])]
     public string $password;
@@ -36,6 +38,6 @@ class UserNull extends Model
         'name',
         'email',
         'password',
-        'email_verified_at',
+        'email_verified_at_custom',
     ];
 }

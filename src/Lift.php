@@ -206,11 +206,12 @@ trait Lift
             try {
                 $modelProp = $customColumns[$prop] ?? $prop;
 
-                if (! blank($model->getKey()) && ! $model->isDirty($prop) && isset($model->{$prop})) {
+                $reflectionProperty = new ReflectionProperty($model, $prop);
+
+                if (! blank($model->getKey()) && ! $model->isDirty($prop) && $reflectionProperty->isInitialized($model)) {
                     $model->setAttribute($modelProp, $model->{$prop});
                 }
 
-                $reflectionProperty = new ReflectionProperty($model, $prop);
                 $attributes = $reflectionProperty->getAttributes();
 
                 if (count($attributes) > 0) {
