@@ -48,6 +48,15 @@ abstract class TestCase extends BaseTestCase
             $table->timestamps();
         });
 
+        Schema::create('users_null', function (Blueprint $table) {
+            $table->integer('id')->primary();
+            $table->string('name');
+            $table->string('email');
+            $table->dateTime('email_verified_at')->nullable();
+            $table->string('password');
+            $table->timestamps();
+        });
+
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('name');
