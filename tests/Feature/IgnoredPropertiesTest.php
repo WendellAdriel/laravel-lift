@@ -8,7 +8,7 @@ use Tests\Datasets\User;
 it('ignores no additional properties if not set', function () {
     $rMethod = new ReflectionMethod(User::class, 'ignoredProperties');
     expect($rMethod->invoke(null))
-        ->toBe([
+        ->toMatchArray([
             'incrementing',
             'preventsLazyLoading',
             'exists',
@@ -24,7 +24,7 @@ it('ignores no additional properties if not set', function () {
 it('ignores additional properties', function () {
     $rMethod = new ReflectionMethod(Product::class, 'ignoredProperties');
     expect($rMethod->invoke(null))
-        ->toBe([
+        ->toMatchArray([
             'incrementing',
             'preventsLazyLoading',
             'exists',

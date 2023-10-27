@@ -9,6 +9,7 @@ use Attribute;
 #[Attribute(Attribute::TARGET_CLASS | Attribute::IS_REPEATABLE)]
 final class IgnoreProperties
 {
+    /** @var string[] */
     public array $ignoredProperties;
 
     public function __construct(
