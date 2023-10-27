@@ -8,10 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
+use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
 use ReflectionProperty;
+use WendellAdriel\Lift\Attributes\IgnoreProperties;
 use WendellAdriel\Lift\Concerns\AttributesGuard;
 use WendellAdriel\Lift\Concerns\CastValues;
 use WendellAdriel\Lift\Concerns\CustomPrimary;
@@ -183,6 +185,10 @@ trait Lift
 
     protected static function ignoredProperties(): array
     {
+        $reflectionClass = new ReflectionClass(self::class);
+        $ignoredProperties = collect($reflectionClass->getAttributes(IgnoreProperties::class))
+            ->flatMap(fn (ReflectionAttribute $attribute) => $attribute->getArguments());
+
         return [
             'incrementing',
             'preventsLazyLoading',
@@ -193,6 +199,7 @@ trait Lift
             'manyMethods',
             'timestamps',
             'usesUniqueIds',
+            ...$ignoredProperties,
         ];
     }
 

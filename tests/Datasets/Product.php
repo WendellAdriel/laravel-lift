@@ -15,11 +15,14 @@ use WendellAdriel\Lift\Attributes\Cast;
 use WendellAdriel\Lift\Attributes\Events\Dispatches;
 use WendellAdriel\Lift\Attributes\Events\Listener;
 use WendellAdriel\Lift\Attributes\Events\Observer;
+use WendellAdriel\Lift\Attributes\IgnoreProperties;
 use WendellAdriel\Lift\Lift;
 
 #[Observer(ProductObserver::class)]
 #[Dispatches(ProductSaving::class)]
 #[Dispatches(ProductSaved::class, 'saved')]
+#[IgnoreProperties('hash', 'hash2')]
+#[IgnoreProperties('hash3')]
 class Product extends Model
 {
     use Lift;
@@ -37,6 +40,12 @@ class Product extends Model
 
     #[Cast('array')]
     public ?array $json_column;
+
+    public string $hash;
+
+    public string $hash2;
+
+    public string $hash3;
 
     protected $fillable = [
         'name',
