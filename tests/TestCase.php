@@ -204,6 +204,12 @@ abstract class TestCase extends BaseTestCase
             $table->uuid('id')->primary();
             $table->timestamps();
         });
+
+        Schema::create('category_refresheds', function (Blueprint $table) {
+            $table->id();
+            $table->integer('sort')->default(9999);
+            $table->timestamps();
+        });
     }
 
     protected function getPackageProviders($app)

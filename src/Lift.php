@@ -183,6 +183,14 @@ trait Lift
         }
     }
 
+    public function refresh(): static
+    {
+        parent::refresh();
+        static::fillProperties($this);
+
+        return $this;
+    }
+
     protected static function ignoredProperties(): array
     {
         $reflectionClass = new ReflectionClass(self::class);
