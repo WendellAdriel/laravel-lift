@@ -24,6 +24,7 @@ use WendellAdriel\Lift\Concerns\Events\RegisterObservers;
 use WendellAdriel\Lift\Concerns\ManageRelations;
 use WendellAdriel\Lift\Concerns\RulesValidation;
 use WendellAdriel\Lift\Concerns\WatchProperties;
+use WendellAdriel\Lift\Exceptions\EventDoesNotExistException;
 use WendellAdriel\Lift\Exceptions\ImmutablePropertyException;
 use WendellAdriel\Lift\Support\MethodInfo;
 use WendellAdriel\Lift\Support\PropertyInfo;
@@ -126,6 +127,9 @@ trait Lift
         }
     }
 
+    /**
+     * @throws EventDoesNotExistException
+     */
     public function syncOriginal(): void
     {
         parent::syncOriginal();
