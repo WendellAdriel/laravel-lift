@@ -189,6 +189,7 @@ trait Lift
     }
 
     /**
+     * @return array<string>
      * @throws ReflectionException
      */
     protected static function ignoredProperties(): array
@@ -211,6 +212,7 @@ trait Lift
     }
 
     /**
+     * @return Collection<PropertyInfo>
      * @throws ReflectionException
      */
     private static function getPropertiesWithAttributes(Model $model): Collection
@@ -240,6 +242,7 @@ trait Lift
     }
 
     /**
+     * @return Collection<MethodInfo>
      * @throws ReflectionException
      */
     private static function getMethodsWithAttributes(Model $model): Collection
@@ -292,6 +295,7 @@ trait Lift
     }
 
     /**
+     * @return array<string>
      * @throws ReflectionException
      */
     private static function getModelPublicMethods(Model $model): array
@@ -336,6 +340,9 @@ trait Lift
         );
     }
 
+    /**
+     * @param  Collection<MethodInfo>  $methods
+     */
     private static function getMethodForAttribute(Collection $methods, string $attributeClass): ?MethodInfo
     {
         return $methods->first(
@@ -345,6 +352,10 @@ trait Lift
         );
     }
 
+    /**
+     * @param  Collection<MethodInfo>  $methods
+     * @return Collection<MethodInfo>
+     */
     private static function getMethodsForAttribute(Collection $methods, string $attributeClass): Collection
     {
         return $methods->filter(
