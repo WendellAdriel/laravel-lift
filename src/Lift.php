@@ -190,6 +190,7 @@ trait Lift
 
     /**
      * @return array<string>
+     *
      * @throws ReflectionException
      */
     protected static function ignoredProperties(): array
@@ -213,6 +214,7 @@ trait Lift
 
     /**
      * @return Collection<PropertyInfo>
+     *
      * @throws ReflectionException
      */
     private static function getPropertiesWithAttributes(Model $model): Collection
@@ -243,6 +245,7 @@ trait Lift
 
     /**
      * @return Collection<MethodInfo>
+     *
      * @throws ReflectionException
      */
     private static function getMethodsWithAttributes(Model $model): Collection
@@ -263,14 +266,16 @@ trait Lift
     {
         static $cache = [];
         $key = is_string($objectOrClass) ? $objectOrClass : get_class($objectOrClass);
-        if (!isset($cache[$key])) {
+        if (! isset($cache[$key])) {
             $cache[$key] = new ReflectionClass($objectOrClass);
         }
+
         return $cache[$key];
     }
 
     /**
      * @return array<string>
+     *
      * @throws ReflectionException
      */
     private static function getModelPublicProperties(Model $model): array
@@ -280,6 +285,7 @@ trait Lift
 
     /**
      * @return array<ReflectionProperty>
+     *
      * @throws ReflectionException
      */
     private static function getModelPublicReflectionProperties(Model $model): array
@@ -296,6 +302,7 @@ trait Lift
 
     /**
      * @return array<string>
+     *
      * @throws ReflectionException
      */
     private static function getModelPublicMethods(Model $model): array
@@ -305,6 +312,7 @@ trait Lift
 
     /**
      * @return array<ReflectionMethod>
+     *
      * @throws ReflectionException
      */
     private static function getModelPublicReflectionMethods(Model $model): array
