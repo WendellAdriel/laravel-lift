@@ -10,7 +10,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 use ReflectionAttribute;
 use ReflectionClass;
-use ReflectionException;
 use ReflectionMethod;
 use ReflectionProperty;
 use WendellAdriel\Lift\Attributes\IgnoreProperties;
@@ -205,61 +204,39 @@ trait Lift
 
     private static function getPropertiesWithAttributes(Model $model): Collection
     {
-        $publicProperties = self::getModelPublicProperties($model);
         $customColumns = self::customColumns();
-        $result = [];
 
-        foreach ($publicProperties as $prop) {
-            try {
-                $modelProp = $customColumns[$prop] ?? $prop;
+        return collect(static::getModelPublicReflectionProperties($model))
+            ->map(function (ReflectionProperty $reflectionProperty) use ($model, $customColumns): ?PropertyInfo {
+                $propName = $reflectionProperty->getName();
+                $modelProp = $customColumns[$propName] ?? $propName;
 
-                $reflectionProperty = new ReflectionProperty($model, $prop);
-
-                if (! blank($model->getKey()) && ! $model->isDirty($prop) && $reflectionProperty->isInitialized($model)) {
-                    $model->setAttribute($modelProp, $model->{$prop});
+                if (! blank($model->getKey()) && ! $model->isDirty($propName) && $reflectionProperty->isInitialized($model)) {
+                    $model->setAttribute($modelProp, $model->{$propName});
                 }
 
-                $attributes = $reflectionProperty->getAttributes();
-
-                if (count($attributes) > 0) {
-                    $result[] = new PropertyInfo(
-                        name: $prop,
+                if ($attributes = $reflectionProperty->getAttributes()) {
+                    return new PropertyInfo(
+                        name: $propName,
                         value: $model->getAttribute($modelProp) ?? null,
                         attributes: collect($attributes),
                     );
                 }
-            } catch (ReflectionException) {
-                continue;
-            }
-        }
 
-        return collect($result);
+                return null;
+            })
+            ->filter();
     }
 
     private static function getMethodsWithAttributes(Model $model): Collection
     {
-        $publicMethods = self::getModelPublicMethods($model);
-        $result = [];
-
-        foreach ($publicMethods as $method) {
-            try {
-
-                $reflectionMethod = new ReflectionMethod($model, $method);
-                $attributes = $reflectionMethod->getAttributes();
-
-                if (count($attributes) > 0) {
-                    $result[] = new MethodInfo(
-                        name: $method,
-                        method: $reflectionMethod,
-                        attributes: collect($attributes),
-                    );
-                }
-            } catch (ReflectionException) {
-                continue;
-            }
-        }
-
-        return collect($result);
+        return collect(static::getModelPublicReflectionMethods($model))
+            ->filter(fn (ReflectionMethod $reflectionMethod): bool => (bool) $reflectionMethod->getAttributes())
+            ->map(fn (ReflectionMethod $reflectionMethod): MethodInfo => new MethodInfo(
+                name: $reflectionMethod->getName(),
+                method: $reflectionMethod,
+                attributes: collect($reflectionMethod->getAttributes()),
+            ));
     }
 
     /**
