@@ -279,14 +279,15 @@ trait Lift
 
     private static function getModelPublicMethods(Model $model): array
     {
-        $reflectionClass = new ReflectionClass($model);
-        $methods = [];
+        return array_column(static::getModelPublicReflectionMethods($model), 'name');
+    }
 
-        foreach ($reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
-            $methods[] = $method->getName();
-        }
-
-        return $methods;
+    /**
+     * @return array<ReflectionMethod>
+     */
+    private static function getModelPublicReflectionMethods(Model $model): array
+    {
+        return (new ReflectionClass($model))->getMethods(ReflectionMethod::IS_PUBLIC);
     }
 
     /**
