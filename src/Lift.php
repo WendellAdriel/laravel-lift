@@ -190,6 +190,8 @@ trait Lift
         foreach ($attributes as $key => $value) {
             $this->{$key} = $this->hasCast($key) ? $this->castAttribute($key, $value) : $value;
         }
+
+        return $this;
     }
 
     protected static function ignoredProperties(): array
