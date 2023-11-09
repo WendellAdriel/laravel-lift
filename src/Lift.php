@@ -157,7 +157,7 @@ trait Lift
         return $result;
     }
 
-    public function setCreatedAt($value)
+    public function setCreatedAt($value): static
     {
         $createdAtColumn = $this->getCreatedAtColumn();
 
@@ -167,7 +167,7 @@ trait Lift
         return $this;
     }
 
-    public function setUpdatedAt($value)
+    public function setUpdatedAt($value): static
     {
         $updatedAtColumn = $this->getUpdatedAtColumn();
 
@@ -177,7 +177,7 @@ trait Lift
         return $this;
     }
 
-    public function setUniqueIds()
+    public function setUniqueIds(): void
     {
         foreach ($this->uniqueIds() as $column) {
             if (empty($this->{$column})) {
