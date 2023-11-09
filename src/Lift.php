@@ -187,25 +187,9 @@ trait Lift
 
     public function refresh(): static
     {
-        if (! $this->exists) {
-            return $this;
-        }
+        parent::refresh();
 
-        $this->setRawAttributes(
-            $this->setKeysForSelectQuery($this->newQueryWithoutScopes())
-                ->useWritePdo()
-                ->firstOrFail()
-                ->attributes
-        );
-
-        $this->load(collect($this->relations)->reject(function ($relation) {
-            return $relation instanceof Pivot
-                || (is_object($relation) && in_array(AsPivot::class, class_uses_recursive($relation), true));
-        })->keys()->all());
-
-        parent::syncOriginal();
-
-        foreach ($this->getAttributes() as $key => $value) {
+        foreach ($this->getOriginal() as $key => $value) {
             $this->{$key} = $this->hasCast($key) ? $this->castAttribute($key, $value) : $value;
         }
 
