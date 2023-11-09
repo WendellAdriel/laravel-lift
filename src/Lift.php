@@ -262,19 +262,25 @@ trait Lift
         return collect($result);
     }
 
+    /**
+     * @return array<string>
+     */
     private static function getModelPublicProperties(Model $model): array
     {
-        $reflectionClass = new ReflectionClass($model);
-        $properties = [];
+        return array_column(static::getModelPublicReflectionProperties($model), 'name');
+    }
 
-        foreach ($reflectionClass->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
-            if (in_array($property->getName(), self::ignoredProperties())) {
-                continue;
-            }
-            $properties[] = $property->getName();
-        }
+    /**
+     * @return array<ReflectionProperty>
+     */
+    private static function getModelPublicReflectionProperties(Model $model): array
+    {
+        $properties = (new ReflectionClass($model))->getProperties(ReflectionProperty::IS_PUBLIC);
 
-        return $properties;
+        return array_values(array_diff_key(
+            array_combine(array_column($properties, 'name'), $properties),
+            array_flip(static::ignoredProperties())
+        ));
     }
 
     private static function getModelPublicMethods(Model $model): array
