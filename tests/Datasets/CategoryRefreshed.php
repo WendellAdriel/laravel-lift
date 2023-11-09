@@ -18,7 +18,4 @@ class CategoryRefreshed extends Model
 
     #[Fillable]
     public string $title;
-
-    #[Fillable]
-    public int $sort;
 }

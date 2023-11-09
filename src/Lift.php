@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace WendellAdriel\Lift;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
@@ -185,8 +187,27 @@ trait Lift
 
     public function refresh(): static
     {
-        parent::refresh();
-        static::fillProperties($this);
+        if (! $this->exists) {
+            return $this;
+        }
+
+        $this->setRawAttributes(
+            $this->setKeysForSelectQuery($this->newQueryWithoutScopes())
+                ->useWritePdo()
+                ->firstOrFail()
+                ->attributes
+        );
+
+        $this->load(collect($this->relations)->reject(function ($relation) {
+            return $relation instanceof Pivot
+                || (is_object($relation) && in_array(AsPivot::class, class_uses_recursive($relation), true));
+        })->keys()->all());
+
+        parent::syncOriginal();
+
+        foreach ($this->getAttributes() as $key => $value) {
+            $this->{$key} = $this->hasCast($key) ? $this->castAttribute($key, $value) : $value;
+        }
 
         return $this;
     }
