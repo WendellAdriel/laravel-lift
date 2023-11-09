@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace WendellAdriel\Lift;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
-use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
@@ -185,15 +183,13 @@ trait Lift
         }
     }
 
-    public function refresh(): static
+    public function setRawAttributes(array $attributes, $sync = false)
     {
-        parent::refresh();
+        parent::setRawAttributes($attributes, $sync);
 
-        foreach ($this->getOriginal() as $key => $value) {
+        foreach ($attributes as $key => $value) {
             $this->{$key} = $this->hasCast($key) ? $this->castAttribute($key, $value) : $value;
         }
-
-        return $this;
     }
 
     protected static function ignoredProperties(): array
