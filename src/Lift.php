@@ -183,6 +183,17 @@ trait Lift
         }
     }
 
+    public function setRawAttributes(array $attributes, $sync = false)
+    {
+        parent::setRawAttributes($attributes, $sync);
+
+        foreach ($attributes as $key => $value) {
+            $this->{$key} = $this->hasCast($key) ? $this->castAttribute($key, $value) : $value;
+        }
+
+        return $this;
+    }
+
     protected static function ignoredProperties(): array
     {
         $reflectionClass = new ReflectionClass(self::class);
