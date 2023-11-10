@@ -193,6 +193,17 @@ trait Lift
      *
      * @throws ReflectionException
      */
+    public function setRawAttributes(array $attributes, $sync = false)
+    {
+        parent::setRawAttributes($attributes, $sync);
+
+        foreach ($attributes as $key => $value) {
+            $this->{$key} = $this->hasCast($key) ? $this->castAttribute($key, $value) : $value;
+        }
+
+        return $this;
+    }
+
     protected static function ignoredProperties(): array
     {
         $ignoredProperties = collect(static::getReflectionClass(static::class)->getAttributes(IgnoreProperties::class))
