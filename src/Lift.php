@@ -281,12 +281,14 @@ trait Lift
      */
     private static function getModelPublicReflectionProperties(Model $model): array
     {
-        $properties = (new ReflectionClass($model))->getProperties(ReflectionProperty::IS_PUBLIC);
-
-        return array_values(array_diff_key(
-            array_combine(array_column($properties, 'name'), $properties),
+        $properties = static::getReflectionClass($model)->getProperties(ReflectionProperty::IS_PUBLIC);
+        $propertyNameMap = array_combine(array_column($properties, 'name'), $properties);
+        $relevantProperties = array_diff_key(
+            $propertyNameMap,
             array_flip(static::ignoredProperties())
-        ));
+        );
+
+        return array_values($relevantProperties);
     }
 
     /**
