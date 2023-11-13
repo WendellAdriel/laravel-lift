@@ -24,10 +24,12 @@ use WendellAdriel\Lift\Concerns\Events\RegisterObservers;
 use WendellAdriel\Lift\Concerns\ManageRelations;
 use WendellAdriel\Lift\Concerns\RulesValidation;
 use WendellAdriel\Lift\Concerns\WatchProperties;
+use WendellAdriel\Lift\Exceptions\EventDoesNotExistException;
 use WendellAdriel\Lift\Exceptions\ImmutablePropertyException;
 use WendellAdriel\Lift\Support\MethodInfo;
 use WendellAdriel\Lift\Support\PropertyInfo;
 
+/** @mixin Model */
 trait Lift
 {
     use AttributesGuard,
@@ -42,7 +44,7 @@ trait Lift
         WatchProperties;
 
     /**
-     * @throws ImmutablePropertyException|ValidationException
+     * @throws ImmutablePropertyException|ValidationException|ReflectionException
      */
     public static function bootLift(): void
     {
@@ -126,6 +128,9 @@ trait Lift
         }
     }
 
+    /**
+     * @throws EventDoesNotExistException|ReflectionException
+     */
     public function syncOriginal(): void
     {
         parent::syncOriginal();
@@ -152,7 +157,7 @@ trait Lift
         return $result;
     }
 
-    public function setCreatedAt($value)
+    public function setCreatedAt($value): static
     {
         $createdAtColumn = $this->getCreatedAtColumn();
 
@@ -162,7 +167,7 @@ trait Lift
         return $this;
     }
 
-    public function setUpdatedAt($value)
+    public function setUpdatedAt($value): static
     {
         $updatedAtColumn = $this->getUpdatedAtColumn();
 
@@ -172,7 +177,7 @@ trait Lift
         return $this;
     }
 
-    public function setUniqueIds()
+    public function setUniqueIds(): void
     {
         foreach ($this->uniqueIds() as $column) {
             if (empty($this->{$column})) {
@@ -183,6 +188,11 @@ trait Lift
         }
     }
 
+    /**
+     * @return array<string>
+     *
+     * @throws ReflectionException
+     */
     public function setRawAttributes(array $attributes, $sync = false)
     {
         parent::setRawAttributes($attributes, $sync);
@@ -196,8 +206,7 @@ trait Lift
 
     protected static function ignoredProperties(): array
     {
-        $reflectionClass = new ReflectionClass(self::class);
-        $ignoredProperties = collect($reflectionClass->getAttributes(IgnoreProperties::class))
+        $ignoredProperties = collect(static::getReflectionClass(static::class)->getAttributes(IgnoreProperties::class))
             ->flatMap(fn (ReflectionAttribute $attribute) => $attribute->getArguments());
 
         return [
@@ -214,90 +223,112 @@ trait Lift
         ];
     }
 
+    /**
+     * @return Collection<PropertyInfo>
+     *
+     * @throws ReflectionException
+     */
     private static function getPropertiesWithAttributes(Model $model): Collection
     {
-        $publicProperties = self::getModelPublicProperties($model);
         $customColumns = self::customColumns();
-        $result = [];
 
-        foreach ($publicProperties as $prop) {
-            try {
-                $modelProp = $customColumns[$prop] ?? $prop;
+        return collect(static::getModelPublicReflectionProperties($model))
+            ->map(function (ReflectionProperty $reflectionProperty) use ($model, $customColumns): ?PropertyInfo {
+                $propName = $reflectionProperty->getName();
+                $modelProp = $customColumns[$propName] ?? $propName;
 
-                $reflectionProperty = new ReflectionProperty($model, $prop);
-
-                if (! blank($model->getKey()) && ! $model->isDirty($prop) && $reflectionProperty->isInitialized($model)) {
-                    $model->setAttribute($modelProp, $model->{$prop});
+                if (! blank($model->getKey()) && ! $model->isDirty($propName) && $reflectionProperty->isInitialized($model)) {
+                    $model->setAttribute($modelProp, $model->{$propName});
                 }
 
-                $attributes = $reflectionProperty->getAttributes();
-
-                if (count($attributes) > 0) {
-                    $result[] = new PropertyInfo(
-                        name: $prop,
+                if ($attributes = $reflectionProperty->getAttributes()) {
+                    return new PropertyInfo(
+                        name: $propName,
                         value: $model->getAttribute($modelProp) ?? null,
                         attributes: collect($attributes),
                     );
                 }
-            } catch (ReflectionException) {
-                continue;
-            }
-        }
 
-        return collect($result);
+                return null;
+            })
+            ->filter();
     }
 
+    /**
+     * @return Collection<MethodInfo>
+     *
+     * @throws ReflectionException
+     */
     private static function getMethodsWithAttributes(Model $model): Collection
     {
-        $publicMethods = self::getModelPublicMethods($model);
-        $result = [];
-
-        foreach ($publicMethods as $method) {
-            try {
-
-                $reflectionMethod = new ReflectionMethod($model, $method);
-                $attributes = $reflectionMethod->getAttributes();
-
-                if (count($attributes) > 0) {
-                    $result[] = new MethodInfo(
-                        name: $method,
-                        method: $reflectionMethod,
-                        attributes: collect($attributes),
-                    );
-                }
-            } catch (ReflectionException) {
-                continue;
-            }
-        }
-
-        return collect($result);
+        return collect(static::getModelPublicReflectionMethods($model))
+            ->filter(fn (ReflectionMethod $reflectionMethod): bool => (bool) $reflectionMethod->getAttributes())
+            ->map(fn (ReflectionMethod $reflectionMethod): MethodInfo => new MethodInfo(
+                name: $reflectionMethod->getName(),
+                method: $reflectionMethod,
+                attributes: collect($reflectionMethod->getAttributes()),
+            ));
     }
 
+    /**
+     * @throws ReflectionException
+     */
+    private static function getReflectionClass(object|string $objectOrClass): ReflectionClass
+    {
+        static $cache = [];
+        $key = is_string($objectOrClass) ? $objectOrClass : get_class($objectOrClass);
+        if (! isset($cache[$key])) {
+            $cache[$key] = new ReflectionClass($objectOrClass);
+        }
+
+        return $cache[$key];
+    }
+
+    /**
+     * @return array<string>
+     *
+     * @throws ReflectionException
+     */
     private static function getModelPublicProperties(Model $model): array
     {
-        $reflectionClass = new ReflectionClass($model);
-        $properties = [];
-
-        foreach ($reflectionClass->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
-            if (in_array($property->getName(), self::ignoredProperties())) {
-                continue;
-            }
-            $properties[] = $property->getName();
-        }
-
-        return $properties;
+        return array_column(static::getModelPublicReflectionProperties($model), 'name');
     }
 
+    /**
+     * @return array<ReflectionProperty>
+     *
+     * @throws ReflectionException
+     */
+    private static function getModelPublicReflectionProperties(Model $model): array
+    {
+        $properties = static::getReflectionClass($model)->getProperties(ReflectionProperty::IS_PUBLIC);
+        $propertyNameMap = array_combine(array_column($properties, 'name'), $properties);
+        $relevantProperties = array_diff_key(
+            $propertyNameMap,
+            array_flip(static::ignoredProperties())
+        );
+
+        return array_values($relevantProperties);
+    }
+
+    /**
+     * @return array<string>
+     *
+     * @throws ReflectionException
+     */
     private static function getModelPublicMethods(Model $model): array
     {
-        $reflectionClass = new ReflectionClass($model);
-        $methods = [];
+        return array_column(static::getModelPublicReflectionMethods($model), 'name');
+    }
 
-        foreach ($reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
-            $methods[] = $method->getName();
-        }
-
-        return $methods;
+    /**
+     * @return array<ReflectionMethod>
+     *
+     * @throws ReflectionException
+     */
+    private static function getModelPublicReflectionMethods(Model $model): array
+    {
+        return static::getReflectionClass($model)->getMethods(ReflectionMethod::IS_PUBLIC);
     }
 
     /**
@@ -328,6 +359,9 @@ trait Lift
         );
     }
 
+    /**
+     * @param  Collection<MethodInfo>  $methods
+     */
     private static function getMethodForAttribute(Collection $methods, string $attributeClass): ?MethodInfo
     {
         return $methods->first(
@@ -337,6 +371,10 @@ trait Lift
         );
     }
 
+    /**
+     * @param  Collection<MethodInfo>  $methods
+     * @return Collection<MethodInfo>
+     */
     private static function getMethodsForAttribute(Collection $methods, string $attributeClass): Collection
     {
         return $methods->filter(
