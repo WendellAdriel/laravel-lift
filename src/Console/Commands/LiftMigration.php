@@ -24,8 +24,6 @@ final class LiftMigration extends Command
     protected $signature = 'lift:migration {model}
                             {--namespace=App\\Models\\}';
 
-    protected static $defaultName = 'lift:migration'; // @phpstan-ignore-line
-
     protected $description = 'Create migration files based on Lift models';
 
     public function handle(): int
