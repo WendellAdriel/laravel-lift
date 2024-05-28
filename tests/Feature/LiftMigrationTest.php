@@ -13,6 +13,17 @@ describe('CREATE TABLE', function () {
 
         unlink($migrationClass);
     });
+
+    it('generates a migration file for a model if namespace ends with slash', function () {
+        $migrationClass = database_path('migrations/' . date('Y_m_d_His') . '_create_users_migration_table.php');
+
+        $this->artisan('lift:migration UserMigration --namespace=Tests\\\Datasets\\')
+            ->assertExitCode(0);
+
+        expect($migrationClass)->toBeFileWithContent(UserMigrationCreate());
+
+        unlink($migrationClass);
+    });
 });
 
 describe('UPDATE TABLE', function () {
@@ -20,6 +31,17 @@ describe('UPDATE TABLE', function () {
         $migrationClass = database_path('migrations/' . date('Y_m_d_His') . '_update_users_migrated_table.php');
 
         $this->artisan('lift:migration UserMigratedUpdateTable --namespace=Tests\\\Datasets')
+            ->assertExitCode(0);
+
+        expect($migrationClass)->toBeFileWithContent(UserMigrationAddColumns());
+
+        unlink($migrationClass);
+    });
+
+    it('generates a migration file for a model adding and dropping columns if namespace ends with slash', function () {
+        $migrationClass = database_path('migrations/' . date('Y_m_d_His') . '_update_users_migrated_table.php');
+
+        $this->artisan('lift:migration UserMigratedUpdateTable --namespace=Tests\\\Datasets\\')
             ->assertExitCode(0);
 
         expect($migrationClass)->toBeFileWithContent(UserMigrationAddColumns());
