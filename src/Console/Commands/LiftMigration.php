@@ -29,7 +29,7 @@ final class LiftMigration extends Command
     public function handle(): int
     {
         try {
-            $class = $this->option('namespace') . '\\' . $this->argument('model'); // @phpstan-ignore-line
+            $class = rtrim($this->option('namespace'), '\\') . '\\' . $this->argument('model'); // @phpstan-ignore-line
 
             if (! class_exists($class)) {
                 $this->error("Model {$class} not found.");
