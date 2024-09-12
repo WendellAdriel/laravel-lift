@@ -38,7 +38,7 @@ class UserColumn extends Model
     public string $user_password;
 
     #[Fillable]
-    #[Cast('boolean')]
+    #[Cast(type: 'boolean')]
     #[Column(default: false)]
     public bool $active;
 

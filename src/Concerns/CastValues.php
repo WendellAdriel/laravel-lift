@@ -89,11 +89,16 @@ trait CastValues
                 continue;
             }
 
+            $castAttribute = $castAttribute->newInstance();
+            if (blank($castAttribute->type)) {
+                continue;
+            }
+
             $configAttribute = $property->attributes->first(fn ($attribute) => $attribute->getName() === Config::class);
             if (filled($configAttribute)) {
                 $configAttribute = $configAttribute->newInstance();
                 if (filled($configAttribute->column)) {
-                    self::$modelCastableProperties[static::class][$configAttribute->column] = $castAttribute->getArguments()[0];
+                    self::$modelCastableProperties[static::class][$configAttribute->column] = $castAttribute->type;
 
                     continue;
                 }
@@ -103,13 +108,13 @@ trait CastValues
             if (filled($columnAttribute)) {
                 $columnAttribute = $columnAttribute->newInstance();
                 if (filled($columnAttribute->name)) {
-                    self::$modelCastableProperties[static::class][$columnAttribute->name] = $castAttribute->getArguments()[0];
+                    self::$modelCastableProperties[static::class][$columnAttribute->name] = $castAttribute->type;
 
                     continue;
                 }
             }
 
-            self::$modelCastableProperties[static::class][$property->name] = $castAttribute->getArguments()[0];
+            self::$modelCastableProperties[static::class][$property->name] = $castAttribute->type;
         }
 
         $castableProperties = self::getPropertiesForAttributes($properties, [Config::class]);
