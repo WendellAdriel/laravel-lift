@@ -13,6 +13,5 @@ final class DB
         public ?string $connection = null,
         public ?string $table = null,
         public bool $timestamps = true,
-    ) {
-    }
+    ) {}
 }

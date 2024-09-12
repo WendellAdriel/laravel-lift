@@ -14,6 +14,5 @@ final class RandomNumberChangedEvent
 
     public function __construct(
         public ProductWatch $product,
-    ) {
-    }
+    ) {}
 }

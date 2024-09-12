@@ -1,3 +1,5 @@
+* text=auto eol=lf
+
 /.github                export-ignore
 /art                    export-ignore
 /tests                  export-ignore

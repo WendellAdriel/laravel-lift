@@ -12,6 +12,5 @@ final class Dispatches
     public function __construct(
         public string $eventClass,
         public string $event = ''
-    ) {
-    }
+    ) {}
 }
