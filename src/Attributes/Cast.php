@@ -9,7 +9,5 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Cast
 {
-    public function __construct(public string $type)
-    {
-    }
+    public function __construct(public string $type) {}
 }

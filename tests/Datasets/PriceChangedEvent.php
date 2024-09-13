@@ -14,6 +14,5 @@ final class PriceChangedEvent
 
     public function __construct(
         public ProductWatch $product,
-    ) {
-    }
+    ) {}
 }

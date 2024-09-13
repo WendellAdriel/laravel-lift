@@ -12,6 +12,5 @@ final class Column
     public function __construct(
         public ?string $name = null,
         public mixed $default = null,
-    ) {
-    }
+    ) {}
 }

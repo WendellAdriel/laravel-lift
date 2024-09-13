@@ -18,6 +18,5 @@ final class CreateRules
          * @var array<string, string>
          */
         public array $messages = [],
-    ) {
-    }
+    ) {}
 }

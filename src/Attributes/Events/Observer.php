@@ -11,6 +11,5 @@ final class Observer
 {
     public function __construct(
         public string $observer
-    ) {
-    }
+    ) {}
 }

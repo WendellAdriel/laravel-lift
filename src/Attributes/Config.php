@@ -25,6 +25,5 @@ final class Config
          * @var array<string, string>
          */
         public array $messages = [],
-    ) {
-    }
+    ) {}
 }

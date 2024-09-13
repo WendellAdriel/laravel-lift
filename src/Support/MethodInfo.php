@@ -17,6 +17,5 @@ final class MethodInfo
          * @var Collection<ReflectionAttribute>
          */
         public readonly Collection $attributes
-    ) {
-    }
+    ) {}
 }

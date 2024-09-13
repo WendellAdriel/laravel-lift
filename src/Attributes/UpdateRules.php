@@ -18,6 +18,5 @@ final class UpdateRules
          * @var array<string, string>
          */
         public array $messages = [],
-    ) {
-    }
+    ) {}
 }

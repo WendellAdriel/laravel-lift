@@ -7,6 +7,4 @@ namespace Tests\Datasets;
 use WendellAdriel\Lift\Attributes\Relations\BelongsTo;
 
 #[BelongsTo(Library::class)]
-class LibraryBook extends Book
-{
-}
+class LibraryBook extends Book {}

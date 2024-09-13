@@ -7,6 +7,4 @@ namespace WendellAdriel\Lift\Attributes;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-final class Hidden
-{
-}
+final class Hidden {}

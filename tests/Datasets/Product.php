@@ -29,16 +29,16 @@ class Product extends Model
 
     public string $name;
 
-    #[Cast('float')]
+    #[Cast(type: 'float')]
     public float $price;
 
-    #[Cast('int')]
+    #[Cast(type: 'int')]
     public int $random_number;
 
-    #[Cast('immutable_datetime')]
+    #[Cast(type: 'immutable_datetime')]
     public CarbonImmutable $expires_at;
 
-    #[Cast('array')]
+    #[Cast(type: 'array')]
     public ?array $json_column;
 
     public string $hash;

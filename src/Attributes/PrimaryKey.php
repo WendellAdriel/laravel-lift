@@ -12,6 +12,5 @@ final class PrimaryKey
     public function __construct(
         public string $type = 'int',
         public bool $incrementing = true,
-    ) {
-    }
+    ) {}
 }

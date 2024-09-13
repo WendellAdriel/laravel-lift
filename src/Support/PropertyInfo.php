@@ -16,6 +16,5 @@ final class PropertyInfo
          * @var Collection<ReflectionAttribute>
          */
         public readonly Collection $attributes,
-    ) {
-    }
+    ) {}
 }

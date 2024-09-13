@@ -116,13 +116,13 @@ final class LiftMigration extends Command
                 continue;
             }
 
-            if (blank($type)) {
+            if ($type === null) {
                 $result[] = "\$table->string('{$property}');";
 
                 continue;
             }
 
-            if ($this->isDateType($type)) { // @phpstan-ignore-line
+            if ($this->isDateType($type)) {
                 if (
                     $modelHasTimestamps &&
                     ($property === $model->getCreatedAtColumn() || $property === $model->getUpdatedAtColumn())
@@ -134,17 +134,17 @@ final class LiftMigration extends Command
                     continue;
                 }
 
-                $result[] = $this->generateMigrationCall('timestamp', $type, $property, $tableExists, $modelColumns); // @phpstan-ignore-line
+                $result[] = $this->generateMigrationCall('timestamp', $type, $property, $tableExists, $modelColumns);
             }
 
             $result[] = match (true) {
-                $type->getName() === 'bool' => $this->generateMigrationCall('boolean', $type, $property, $tableExists, $modelColumns), // @phpstan-ignore-line
-                $type->getName() === 'int' => $this->generateMigrationCall('integer', $type, $property, $tableExists, $modelColumns), // @phpstan-ignore-line
-                $type->getName() === 'float' => $this->generateMigrationCall('float', $type, $property, $tableExists, $modelColumns), // @phpstan-ignore-line
-                $type->getName() === 'string' => $this->generateMigrationCall('string', $type, $property, $tableExists, $modelColumns), // @phpstan-ignore-line
-                $type->getName() === 'array' => $this->generateMigrationCall('json', $type, $property, $tableExists, $modelColumns), // @phpstan-ignore-line
-                $type->getName() === 'object' => $this->generateMigrationCall('json', $type, $property, $tableExists, $modelColumns), // @phpstan-ignore-line
-                default => $this->generateMigrationCall('string', $type, $property, $tableExists, $modelColumns), // @phpstan-ignore-line
+                $type->getName() === 'bool' => $this->generateMigrationCall('boolean', $type, $property, $tableExists, $modelColumns),
+                $type->getName() === 'int' => $this->generateMigrationCall('integer', $type, $property, $tableExists, $modelColumns),
+                $type->getName() === 'float' => $this->generateMigrationCall('float', $type, $property, $tableExists, $modelColumns),
+                $type->getName() === 'string' => $this->generateMigrationCall('string', $type, $property, $tableExists, $modelColumns),
+                $type->getName() === 'array' => $this->generateMigrationCall('json', $type, $property, $tableExists, $modelColumns),
+                $type->getName() === 'object' => $this->generateMigrationCall('json', $type, $property, $tableExists, $modelColumns),
+                default => $this->generateMigrationCall('string', $type, $property, $tableExists, $modelColumns),
             };
         }
 
@@ -176,7 +176,7 @@ final class LiftMigration extends Command
 
     private function buildPrimaryKeyMigrationCall(string $property, ?ReflectionNamedType $type): string
     {
-        return ! blank($type) && $type->getName() === 'int' // @phpstan-ignore-line
+        return $type !== null && $type->getName() === 'int'
             ? '$table->id();'
             : "\$table->string('{$property}')->primary();";
     }

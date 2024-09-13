@@ -11,6 +11,5 @@ final class Watch
 {
     public function __construct(
         public string $event,
-    ) {
-    }
+    ) {}
 }
