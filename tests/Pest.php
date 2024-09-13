@@ -29,7 +29,7 @@ uses(Tests\TestCase::class)->in('Feature');
 expect()->extend('toBeFileWithContent', function (string $fileContent) {
     test()->assertFileExists($this->value);
 
-    expect(file_get_contents($this->value))->toBe($fileContent);
+    expect(str_replace(PHP_EOL, "\n", file_get_contents($this->value)))->toBe($fileContent);
 
     return $this;
 });
