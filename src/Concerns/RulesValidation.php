@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace WendellAdriel\Lift\Concerns;
 
+use BackedEnum;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use UnitEnum;
 use WendellAdriel\Lift\Attributes\Config;
 use WendellAdriel\Lift\Attributes\CreateRules;
 use WendellAdriel\Lift\Attributes\Rules;
@@ -83,6 +85,32 @@ trait RulesValidation
     }
 
     /**
+     * Return a scalar value for the given value that might be an enum.
+     *
+     * @internal
+     *
+     * @template TValue
+     * @template TDefault
+     *
+     * @param  TValue  $value
+     * @param  TDefault|callable(TValue): TDefault  $default
+     * @return ($value is empty ? TDefault : mixed)
+     */
+    private static function enumValue($value, $default = null)
+    {
+        if (function_exists('Illuminate\Support\enum_value')) {
+            return \Illuminate\Support\enum_value($value, $default);
+        }
+
+        return transform($value, fn ($value) => match (true) {
+            $value instanceof BackedEnum => $value->value,
+            $value instanceof UnitEnum => $value->name,
+
+            default => $value,
+        }, $default ?? $value);
+    }
+
+    /**
      * @param  Collection<PropertyInfo>  $properties
      *
      * @throws ValidationException
@@ -90,10 +118,10 @@ trait RulesValidation
     private static function applyValidations(Collection $properties): void
     {
         $validatedProperties = self::getPropertiesForAttributes($properties, [Rules::class]);
-        $data = $validatedProperties->mapWithKeys(fn ($property) => [$property->name => $property->value]);
+        $data = $validatedProperties->mapWithKeys(fn ($property) => [$property->name => static::enumValue($property->value)]);
 
         $configProperties = self::getPropertiesForAttributes($properties, [Config::class]);
-        $data = $data->merge($configProperties->mapWithKeys(fn ($property) => [$property->name => $property->value]));
+        $data = $data->merge($configProperties->mapWithKeys(fn ($property) => [$property->name => static::enumValue($property->value)]));
 
         $validator = Validator::make(
             data: $data->toArray(),
@@ -114,7 +142,7 @@ trait RulesValidation
     private static function applyCreateValidations(Collection $properties): void
     {
         $validatedProperties = self::getPropertiesForAttributes($properties, [CreateRules::class]);
-        $data = $validatedProperties->mapWithKeys(fn ($property) => [$property->name => $property->value]);
+        $data = $validatedProperties->mapWithKeys(fn ($property) => [$property->name => static::enumValue($property->value)]);
 
         $validator = Validator::make(
             data: $data->toArray(),
@@ -135,7 +163,7 @@ trait RulesValidation
     private static function applyUpdateValidations(Collection $properties): void
     {
         $validatedProperties = self::getPropertiesForAttributes($properties, [UpdateRules::class]);
-        $data = $validatedProperties->mapWithKeys(fn ($property) => [$property->name => $property->value]);
+        $data = $validatedProperties->mapWithKeys(fn (PropertyInfo $property) => [$property->name => static::enumValue($property->value)]);
 
         $validator = Validator::make(
             data: $data->toArray(),

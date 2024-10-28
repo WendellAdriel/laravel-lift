@@ -210,6 +210,12 @@ abstract class TestCase extends BaseTestCase
             $table->string('title');
             $table->timestamps();
         });
+
+        Schema::create('articles', function (Blueprint $table) {
+            $table->id('id');
+            $table->enum('status', ['draft', 'published', 'archived']);
+            $table->timestamps();
+        });
     }
 
     protected function getPackageProviders($app)

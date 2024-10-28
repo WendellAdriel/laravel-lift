@@ -158,3 +158,17 @@ it('casts values when retrieving model with custom columns', function () {
         ->and($product->expires_at->format('Y-m-d H:i:s'))->toBe('2023-12-31 23:59:59')
         ->and($product->json_column)->toBe(['foo' => 'bar']);
 });
+
+it('casts values when creating model with enum cast', closure: function () {
+    $article = \Tests\Datasets\Article::castAndCreate([
+        'status' => \Tests\Datasets\Enums\ArticleStatusEnum::ARCHIVED,
+    ]);
+
+    expect($article->status)->toBe(\Tests\Datasets\Enums\ArticleStatusEnum::ARCHIVED);
+
+    $this->assertDatabaseHas(\Tests\Datasets\Article::class, [
+        'status' => \Tests\Datasets\Enums\ArticleStatusEnum::ARCHIVED,
+        'id' => $article->id,
+    ]);
+    $this->assertSame(\Tests\Datasets\Enums\ArticleStatusEnum::ARCHIVED, $article->status);
+});
