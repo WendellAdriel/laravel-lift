@@ -340,7 +340,7 @@ trait Lift
     {
         return $properties->filter(
             fn ($property) => $property->attributes->contains(
-                fn ($attribute) => in_array($attribute->getName(), $attributes)
+                fn ($attribute) => in_array($attribute->getName(), $attributes, true)
             )
         );
     }
