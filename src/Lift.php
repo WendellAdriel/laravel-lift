@@ -50,10 +50,10 @@ trait Lift
     {
         static::registerObservers();
         static::saving(function (Model $model) {
-            self::syncCustomColumns($model);
+            static::syncCustomColumns($model);
 
             if (! blank($model->getKey())) {
-                $immutableProperties = self::immutableProperties();
+                $immutableProperties = static::immutableProperties();
                 foreach ($immutableProperties as $prop) {
                     if ($model->getAttribute($prop) !== $model->{$prop}) {
                         throw new ImmutablePropertyException($prop);
@@ -61,17 +61,17 @@ trait Lift
                 }
             }
 
-            $properties = self::getPropertiesWithAttributes($model);
+            $properties = static::getPropertiesWithAttributes($model);
 
-            self::applyValidations($properties);
+            static::applyValidations($properties);
             blank($model->getKey())
-                ? self::applyCreateValidations($properties)
-                : self::applyUpdateValidations($properties);
+                ? static::applyCreateValidations($properties)
+                : static::applyUpdateValidations($properties);
 
-            self::castValues($model);
+            static::castValues($model);
 
-            $publicProperties = self::getModelPublicProperties($model);
-            $customColumns = self::customColumns();
+            $publicProperties = static::getModelPublicProperties($model);
+            $customColumns = static::customColumns();
             foreach ($publicProperties as $prop) {
                 $modelProp = $customColumns[$prop] ?? $prop;
                 if (isset($model->{$prop}) && is_null($model->getAttribute($modelProp))) {
@@ -81,7 +81,7 @@ trait Lift
 
             if (! blank($model->getKey())) {
                 $model->dispatchEvents = [];
-                $watchedProperties = self::watchedProperties();
+                $watchedProperties = static::watchedProperties();
 
                 foreach ($watchedProperties as $prop => $event) {
                     if ($model->isDirty($prop)) {
@@ -90,41 +90,42 @@ trait Lift
                 }
             }
 
-            self::handleRelationsKeys($model);
-            self::handleEvent($model, 'saving');
+            static::handleRelationsKeys($model);
+            static::handleEvent($model, 'saving');
         });
 
         static::saved(function (Model $model) {
-            self::fillProperties($model);
+            static::fillProperties($model);
 
             foreach ($model->dispatchEvents as $prop) {
-                $event = self::watchedProperties()[$prop];
+                $event = static::watchedProperties()[$prop];
                 event(new $event($model));
             }
 
             $model->dispatchEvents = [];
-            self::handleEvent($model, 'saved');
+            static::handleEvent($model, 'saved');
+            static::resetValidations();
         });
 
         static::retrieved(function (Model $model) {
-            self::fillProperties($model);
-            self::handleEvent($model, 'retrieved');
+            static::fillProperties($model);
+            static::handleEvent($model, 'retrieved');
         });
 
-        static::creating(fn (Model $model) => self::handleEvent($model, 'creating'));
-        static::created(fn (Model $model) => self::handleEvent($model, 'created'));
-        static::updating(fn (Model $model) => self::handleEvent($model, 'updating'));
-        static::updated(fn (Model $model) => self::handleEvent($model, 'updated'));
-        static::deleting(fn (Model $model) => self::handleEvent($model, 'deleting'));
-        static::deleted(fn (Model $model) => self::handleEvent($model, 'deleted'));
-        static::replicating(fn (Model $model) => self::handleEvent($model, 'replicating'));
+        static::creating(fn (Model $model) => static::handleEvent($model, 'creating'));
+        static::created(fn (Model $model) => static::handleEvent($model, 'created'));
+        static::updating(fn (Model $model) => static::handleEvent($model, 'updating'));
+        static::updated(fn (Model $model) => static::handleEvent($model, 'updated'));
+        static::deleting(fn (Model $model) => static::handleEvent($model, 'deleting'));
+        static::deleted(fn (Model $model) => static::handleEvent($model, 'deleted'));
+        static::replicating(fn (Model $model) => static::handleEvent($model, 'replicating'));
 
         $traitsUsed = class_uses_recursive(new static());
         if (in_array(SoftDeletes::class, $traitsUsed)) {
-            static::forceDeleting(fn (Model $model) => self::handleEvent($model, 'forceDeleting'));
-            static::forceDeleted(fn (Model $model) => self::handleEvent($model, 'forceDeleted'));
-            static::restoring(fn (Model $model) => self::handleEvent($model, 'restoring'));
-            static::restored(fn (Model $model) => self::handleEvent($model, 'restored'));
+            static::forceDeleting(fn (Model $model) => static::handleEvent($model, 'forceDeleting'));
+            static::forceDeleted(fn (Model $model) => static::handleEvent($model, 'forceDeleted'));
+            static::restoring(fn (Model $model) => static::handleEvent($model, 'restoring'));
+            static::restored(fn (Model $model) => static::handleEvent($model, 'restored'));
         }
     }
 
@@ -136,18 +137,18 @@ trait Lift
         parent::syncOriginal();
         $this->registerDispatchedEvents();
         $this->applyDatabaseConfigurations();
-        self::buildRelations($this);
+        static::buildRelations($this);
 
-        $properties = self::getPropertiesWithAttributes($this);
+        $properties = static::getPropertiesWithAttributes($this);
         $this->applyPrimaryKey($properties);
         $this->applyAttributesGuard($properties);
-        self::castValues($this);
+        static::castValues($this);
     }
 
     public function toArray(): array
     {
         $array = parent::toArray();
-        $customColumns = array_flip(self::customColumns());
+        $customColumns = array_flip(static::customColumns());
         $result = [];
 
         foreach ($array as $key => $value) {
@@ -230,7 +231,7 @@ trait Lift
      */
     private static function getPropertiesWithAttributes(Model $model): Collection
     {
-        $customColumns = self::customColumns();
+        $customColumns = static::customColumns();
 
         return collect(static::getModelPublicReflectionProperties($model))
             ->map(function (ReflectionProperty $reflectionProperty) use ($model, $customColumns): ?PropertyInfo {
@@ -399,12 +400,12 @@ trait Lift
 
     private static function fillProperties(Model $model): void
     {
-        self::castValues($model);
+        static::castValues($model);
 
         foreach ($model->getAttributes() as $key => $value) {
             $model->{$key} = $model->hasCast($key) ? $model->castAttribute($key, $value) : $value;
         }
 
-        self::syncColumnsToCustom($model);
+        static::syncColumnsToCustom($model);
     }
 }
