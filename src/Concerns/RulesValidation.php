@@ -111,13 +111,39 @@ trait RulesValidation
     }
 
     /**
+     * Parse rules to get advanced implementation
+     */
+    private static function parseValidationRules(Model $model, array $properties): array
+    {
+        foreach ($properties as $key => $rules) {
+            $properties[$key] = array_map(function ($rule) use ($model) {
+                if (method_exists($model, $rule)) {
+                    $rule = $model->{$rule}($model);
+                }
+
+                return $rule;
+            }, $rules);
+        }
+
+        return $properties;
+    }
+
+    /**
      * @param  Collection<PropertyInfo>  $properties
      *
      * @throws ValidationException
      */
-    private static function applyValidations(Collection $properties): void
+    private static function applyValidations(Model $model, Collection $properties): void
     {
-        $validatedProperties = self::getPropertiesForAttributes($properties, [Rules::class]);
+        self::buildValidationRules(new static());
+
+        $validatedProperties = self::getPropertiesForAttributes(
+            $properties,
+            [
+                Rules::class,
+                blank($model->getKey()) ? CreateRules::class : UpdateRules::class,
+            ]
+        );
         $data = $validatedProperties->mapWithKeys(fn ($property) => [$property->name => static::enumValue($property->value)]);
 
         $configProperties = self::getPropertiesForAttributes($properties, [Config::class]);
@@ -125,8 +151,14 @@ trait RulesValidation
 
         $validator = Validator::make(
             data: $data->toArray(),
-            rules: self::validationRules(),
-            messages: self::validationMessages(),
+            rules: self::parseValidationRules($model, [
+                ...self::validationRules(),
+                ...(blank($model->getKey()) ? self::createValidationRules() : self::updateValidationRules()),
+            ]),
+            messages: [
+                ...self::validationMessages(),
+                ...(blank($model->getKey()) ? self::createValidationMessages() : self::updateValidationMessages()),
+            ],
         );
 
         if ($validator->fails()) {
