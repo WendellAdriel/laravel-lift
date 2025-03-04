@@ -1,3 +1,8 @@
+> [!WARNING]  
+> **This is an experimental package!**
+> 
+> **The package is not being actively maintained, if you want to maintain this package, please reach me out!**
+
 <div align="center">
     <img src="https://github.com/WendellAdriel/laravel-lift/raw/main/art/laravel-lift-banner.png" alt="Lift for Laravel" height="400"/>
     <p>
