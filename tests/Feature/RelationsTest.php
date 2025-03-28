@@ -10,6 +10,7 @@ use Tests\Datasets\Image;
 use Tests\Datasets\Library;
 use Tests\Datasets\LibraryBook;
 use Tests\Datasets\Manufacturer;
+use Tests\Datasets\Organization;
 use Tests\Datasets\Phone;
 use Tests\Datasets\Post;
 use Tests\Datasets\Price;
@@ -18,6 +19,37 @@ use Tests\Datasets\Seller;
 use Tests\Datasets\Tag;
 use Tests\Datasets\User;
 use Tests\Datasets\WorkBook;
+
+it('can get custom pivot columns', function () {
+    $user = User::create([
+        'name' => fake()->name,
+        'email' => fake()->unique()->safeEmail,
+        'password' => 's3Cr3T@!!!',
+    ]);
+
+    $organization = Organization::castAndCreate(['name' => 'Glorp Corp']);
+
+    $user->organizations()->attach($organization, ['is_owner' => true]);
+
+    expect($organization->users[0]->pivot->is_owner)->toBeTrue();
+
+    $organizationWithoutOwner = Organization::castAndCreate(['name' => 'No Owner Org']);
+
+    $user2 = User::create([
+        'name' => fake()->name,
+        'email' => fake()->unique()->safeEmail,
+        'password' => 'password',
+    ]);
+
+    $user2->organizations()->attach($organizationWithoutOwner);
+
+    $user2->belongsToMany(Organization::class)
+        ->wherePivot('is_owner', false);
+
+    expect($organizationWithoutOwner->users()
+        ->wherePivot('is_owner', false)
+        ->first()->pivot->is_owner)->toBeFalse();
+});
 
 it('loads BelongsTo relation', function () {
     $user = User::create([

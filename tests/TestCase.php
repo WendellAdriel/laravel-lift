@@ -216,6 +216,19 @@ abstract class TestCase extends BaseTestCase
             $table->enum('status', ['draft', 'published', 'archived']);
             $table->timestamps();
         });
+
+        Schema::create('organizations', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });
+
+        Schema::create('organization_user', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('organization_id')->constrained();
+            $table->foreignId('user_id')->constrained();
+            $table->boolean('is_owner')->default(false);
+        });
     }
 
     protected function getPackageProviders($app)
