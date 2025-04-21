@@ -38,12 +38,12 @@
         "illuminate/validation": "^12.0"
     },
     "require-dev": {
-        "larastan/larastan": "^3.0",
+        "larastan/larastan": "^3.3",
         "laravel/pint": "^1.18",
-        "orchestra/testbench": "^10.0",
-        "pestphp/pest": "^2.0",
-        "pestphp/pest-plugin-faker": "^2.0",
-        "phpstan/phpstan": "^2.1.11"
+        "orchestra/testbench": "^10.2",
+        "pestphp/pest": "^3.8",
+        "pestphp/pest-plugin-faker": "^3.1",
+        "phpstan/phpstan": "^2.1"
     },
     "scripts": {
         "lint": "pint",
