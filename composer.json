@@ -42,7 +42,7 @@
         "laravel/pint": "^1.18",
         "orchestra/testbench": "^10.2",
         "pestphp/pest": "^3.8",
-        "pestphp/pest-plugin-faker": "^3.1",
+        "pestphp/pest-plugin-faker": "^3.0",
         "phpstan/phpstan": "^2.1"
     },
     "scripts": {
