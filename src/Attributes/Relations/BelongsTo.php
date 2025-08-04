@@ -20,7 +20,7 @@ final class BelongsTo implements RelationAttribute
     public string $related;
 
     /**
-     * @var array<string>
+     * @var array<string|int|null>
      */
     public array $arguments = [];
 
