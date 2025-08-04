@@ -33,15 +33,15 @@
     ],
     "require": {
         "php": "^8.2",
-        "illuminate/database": "^12.0",
-        "illuminate/support": "^12.0",
-        "illuminate/validation": "^12.0"
+        "illuminate/database": "^11.0 || ^12.0",
+        "illuminate/support": "^11.0 || ^12.0",
+        "illuminate/validation": "^11.0 || ^12.0"
     },
     "require-dev": {
-        "larastan/larastan": "^3.3",
-        "laravel/pint": "^1.18",
-        "orchestra/testbench": "^10.2",
-        "pestphp/pest": "^3.8",
+        "larastan/larastan": "^3.0",
+        "laravel/pint": "^1.24",
+        "orchestra/testbench": "^9.0 || ^10.0",
+        "pestphp/pest": "^3.0",
         "pestphp/pest-plugin-faker": "^3.0",
         "phpstan/phpstan": "^2.1"
     },
