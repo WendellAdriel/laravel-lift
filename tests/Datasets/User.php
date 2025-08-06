@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Datasets;
 
 use Illuminate\Database\Eloquent\Model;
+use Tests\Datasets\Pivot\OrganizationUser;
 use WendellAdriel\Lift\Attributes\PrimaryKey;
 use WendellAdriel\Lift\Attributes\Relations\BelongsToMany;
 use WendellAdriel\Lift\Attributes\Relations\HasMany;
@@ -14,6 +15,7 @@ use WendellAdriel\Lift\Attributes\Rules;
 use WendellAdriel\Lift\Lift;
 
 #[BelongsToMany(related: Role::class, name: 'roleList')]
+#[BelongsToMany(related: Organization::class, pivotModel: OrganizationUser::class, pivotColumns: ['is_owner'])]
 #[HasMany(related: Post::class, name: 'articles')]
 #[HasMany(WorkBook::class)]
 #[HasOne(Phone::class)]

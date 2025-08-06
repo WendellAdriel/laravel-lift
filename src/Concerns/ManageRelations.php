@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use ReflectionAttribute;
 use ReflectionClass;
 use WendellAdriel\Lift\Attributes\Relations\BelongsTo;
+use WendellAdriel\Lift\Attributes\Relations\BelongsToMany;
 use WendellAdriel\Lift\Contracts\RelationAttribute;
 
 trait ManageRelations
@@ -46,8 +47,23 @@ trait ManageRelations
                 $relation->relationName(),
                 function (Model $model) use ($relation, $relationArguments, &$relationObject): Relation {
                     $method = lcfirst(class_basename(get_class($relation)));
+                    $relationObject = $model->{$method}(...$relationArguments);
 
-                    return $model->{$method}(...$relationArguments);
+                    if ($relation instanceof BelongsToMany) {
+                        if ($relation->pivotTimestamps) {
+                            $relationObject = $relationObject->withTimestamps();
+                        }
+
+                        if ($relation->pivotModel !== null) {
+                            $relationObject = $relationObject->using($relation->pivotModel());
+                        }
+
+                        if ($relation->pivotColumns !== null) {
+                            $relationObject->withPivot(...$relation->pivotColumns());
+                        }
+                    }
+
+                    return $relationObject;
                 }
             );
 
