@@ -5,6 +5,20 @@ parameters:
 
     level: 9
 
+    ignoreErrors:
+        - '#Trait WendellAdriel\\Lift\\Concerns\\AttributesGuard is used zero times and is not analysed.#'
+        - '#Trait WendellAdriel\\Lift\\Concerns\\CastValues is used zero times and is not analysed.#'
+        - '#Trait WendellAdriel\\Lift\\Concerns\\CustomPrimary is used zero times and is not analysed.#'
+        - '#Trait WendellAdriel\\Lift\\Concerns\\DatabaseConfigurations is used zero times and is not analysed.#'
+        - '#Trait WendellAdriel\\Lift\\Concerns\\Events\\Events is used zero times and is not analysed.#'
+        - '#Trait WendellAdriel\\Lift\\Concerns\\Events\\ListenerHandler is used zero times and is not analysed.#'
+        - '#Trait WendellAdriel\\Lift\\Concerns\\Events\\RegisterDispatchedEvents is used zero times and is not analysed.#'
+        - '#Trait WendellAdriel\\Lift\\Concerns\\Events\\RegisterObservers is used zero times and is not analysed.#'
+        - '#Trait WendellAdriel\\Lift\\Concerns\\ManageRelations is used zero times and is not analysed.#'
+        - '#Trait WendellAdriel\\Lift\\Concerns\\RulesValidation is used zero times and is not analysed.#'
+        - '#Trait WendellAdriel\\Lift\\Concerns\\WatchProperties is used zero times and is not analysed.#'
+        - '#Trait WendellAdriel\\Lift\\Lift is used zero times and is not analysed.#'
+
     excludePaths:
         - src/Support/PropertyInfo.php
         - src/Support/MethodInfo.php
