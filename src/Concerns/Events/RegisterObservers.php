@@ -30,8 +30,18 @@ trait RegisterObservers
 
     private static function registerObservers(): void
     {
+        $events = [
+            'retrieved', 'creating', 'created', 'updating', 'updated',
+            'saving', 'saved', 'restoring', 'restored', 'replicating',
+            'deleting', 'deleted', 'forceDeleting', 'forceDeleted',
+        ];
+
         foreach (self::modelObservers() as $observer) {
-            self::observe($observer);
+            foreach ($events as $event) {
+                if (method_exists($observer, $event)) {
+                    static::registerModelEvent($event, $observer . '@' . $event);
+                }
+            }
         }
     }
 }
