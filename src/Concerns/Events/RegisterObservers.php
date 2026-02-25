@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace WendellAdriel\Lift\Concerns\Events;
 
-use Illuminate\Database\Eloquent\Model;
 use ReflectionClass;
 use WendellAdriel\Lift\Attributes\Events\Observer;
 
@@ -15,20 +14,18 @@ trait RegisterObservers
     private static function modelObservers(): array
     {
         if (is_null(self::$modelObservers)) {
-            self::buildModelObservers(new static());
+            self::buildModelObservers();
         }
 
         return self::$modelObservers;
     }
 
-    private static function buildModelObservers(Model $model): void
+    private static function buildModelObservers(): void
     {
-
-        $classReflection = new ReflectionClass($model);
+        $classReflection = new ReflectionClass(static::class);
         self::$modelObservers = collect($classReflection->getAttributes(Observer::class))
             ->map(fn ($attr) => $attr->newInstance()->observer)
             ->toArray();
-
     }
 
     private static function registerObservers(): void
