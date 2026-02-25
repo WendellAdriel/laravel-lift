@@ -119,7 +119,7 @@ trait Lift
         static::deleted(fn (Model $model) => self::handleEvent($model, 'deleted'));
         static::replicating(fn (Model $model) => self::handleEvent($model, 'replicating'));
 
-        $traitsUsed = class_uses_recursive(new static());
+        $traitsUsed = class_uses_recursive(static::class);
         if (in_array(SoftDeletes::class, $traitsUsed)) {
             static::forceDeleting(fn (Model $model) => self::handleEvent($model, 'forceDeleting'));
             static::forceDeleted(fn (Model $model) => self::handleEvent($model, 'forceDeleted'));

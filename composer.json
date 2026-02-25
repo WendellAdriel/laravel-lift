@@ -33,16 +33,16 @@
     ],
     "require": {
         "php": "^8.2",
-        "illuminate/database": "^11.0 || ^12.0",
-        "illuminate/support": "^11.0 || ^12.0",
-        "illuminate/validation": "^11.0 || ^12.0"
+        "illuminate/database": "^11.0|^12.0|^13.0",
+        "illuminate/support": "^11.0|^12.0|^13.0",
+        "illuminate/validation": "^11.0|^12.0|^13.0"
     },
     "require-dev": {
-        "larastan/larastan": "^3.0",
-        "laravel/pint": "^1.24",
-        "orchestra/testbench": "^9.0 || ^10.0",
-        "pestphp/pest": "^3.0",
-        "pestphp/pest-plugin-faker": "^3.0",
+        "larastan/larastan": "^3.9",
+        "laravel/pint": "^1.27",
+        "orchestra/testbench": "^9.0|^10.0|^11.0",
+        "pestphp/pest": "^3.0|^4.0",
+        "pestphp/pest-plugin-faker": "^3.0|^4.0",
         "phpstan/phpstan": "^2.1"
     },
     "scripts": {
@@ -68,6 +68,6 @@
             "pestphp/pest-plugin": true
         }
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "prefer-stable": true
 }
