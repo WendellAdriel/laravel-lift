@@ -2,7 +2,7 @@
 > **This is an experimental package!**
 
 <div align="center">
-    <img src="https://github.com/WendellAdriel/laravel-lift/raw/main/art/laravel-lift-banner.png" alt="Lift for Laravel" height="400"/>
+    <img src="https://github.com/wendelladriel/laravel-lift/raw/main/art/laravel-lift-banner.png" alt="Lift for Laravel" height="400"/>
     <p>
         <h1>🏋️ Lift for Laravel</h1>
         Take your Eloquent Models to the next level
@@ -10,44 +10,68 @@
 </div>
 
 <p align="center">
-    <a href="https://packagist.org/packages/WendellAdriel/laravel-lift"><img src="https://img.shields.io/packagist/v/WendellAdriel/laravel-lift.svg?style=flat-square" alt="Packagist"></a>
-    <a href="https://packagist.org/packages/WendellAdriel/laravel-lift"><img src="https://img.shields.io/packagist/php-v/WendellAdriel/laravel-lift.svg?style=flat-square" alt="PHP from Packagist"></a>
-    <a href="https://packagist.org/packages/wendelladriel/laravel-lift"><img src="https://badge.laravel.cloud/badge/wendelladriel/laravel-lift" alt="Laravel versions"></a>
-    <a href="https://github.com/WendellAdriel/laravel-lift/actions"><img alt="GitHub Workflow Status (main)" src="https://img.shields.io/github/actions/workflow/status/WendellAdriel/laravel-lift/tests.yml?branch=main&label=Tests"> </a>
+    <a href="https://packagist.org/packages/wendelladriel/laravel-lift"><img src="https://img.shields.io/packagist/v/wendelladriel/laravel-lift.svg?style=flat-square" alt="Packagist"></a>
+    <a href="https://packagist.org/packages/wendelladriel/laravel-lift"><img src="https://img.shields.io/packagist/php-v/wendelladriel/laravel-lift.svg?style=flat-square" alt="PHP from Packagist"></a>
+    <a href="https://packagist.org/packages/wendelladriel/laravel-lift"><img src="https://badge.laravel.cloud/badge/wendelladriel/laravel-lift?style=flat" alt="Laravel versions"></a>
+    <a href="https://github.com/wendelladriel/laravel-lift/actions"><img alt="GitHub Workflow Status (main)" src="https://img.shields.io/github/actions/workflow/status/wendelladriel/laravel-lift/tests.yml?branch=main&label=Tests&style=flat-square"></a>
+    <a href="https://packagist.org/packages/wendelladriel/laravel-lift"><img src="https://img.shields.io/packagist/dt/wendelladriel/laravel-lift.svg?style=flat-square" alt="Total Downloads"></a>
 </p>
 
-**Lift** is a package that boosts your Eloquent Models in Laravel.
-
-It lets you create public properties in Eloquent Models that match your table schema. This makes your models easier to
-read and work with in any IDE.
-
-The package intelligently uses PHP 8’s attributes, and gives you complete freedom in setting up your models. For
-instance, you can put validation rules right into your models - a simple and easy-to-understand arrangement compared
-to a separate request class. Plus, all these settings are easily reachable through handy new methods.
-
-With a focus on simplicity, **Lift** depends on **Eloquent Events** to work. This means the package fits easily into your
-project, without needing any major changes (unless you’ve turned off event triggering).
-
-## Documentation
-[![Docs Button]][Docs Link] [![DocsRepo Button]][DocsRepo Link]
-
 ## Installation
+
+You can install the package via composer:
 
 ```bash
 composer require wendelladriel/laravel-lift
 ```
+
+## Usage
+
+Add the `Lift` trait to models that should use typed public properties and Lift attributes:
+
+```php
+use Illuminate\Database\Eloquent\Model;
+use WendellAdriel\Lift\Attributes\Cast;
+use WendellAdriel\Lift\Attributes\Fillable;
+use WendellAdriel\Lift\Attributes\Rules;
+use WendellAdriel\Lift\Lift;
+
+final class Product extends Model
+{
+    use Lift;
+
+    #[Fillable]
+    #[Rules(['required', 'string', 'max:255'])]
+    public string $name;
+
+    #[Fillable]
+    #[Cast('integer')]
+    #[Rules(['required', 'integer', 'min:0'])]
+    public int $stock;
+}
+```
+
+Lift reads those attributes and applies the matching Eloquent configuration through model events. This keeps model behavior close to the property it describes while still using standard Eloquent models.
+
+Access the full documentation [here](https://laravel-lift.wendelladriel.com).
+
+## Changelog
+
+Please see the [changelog](https://laravel-lift.wendelladriel.com/getting-started/changelog) for more information on what has changed recently.
+
+## Contributing
+
+Thank you for considering contributing to Lift! You can read the contribution guide [here](CONTRIBUTING.md).
+
+## Security Vulnerabilities
+
+Please review [our security policy](.github/SECURITY.md) on how to report security vulnerabilities.
 
 ## Credits
 
 - [Wendell Adriel](https://github.com/WendellAdriel)
 - [All Contributors](../../contributors)
 
-## Contributing
+## License
 
-Check the **[Contributing Guide](CONTRIBUTING.md)**.
-
-<!---------------------------------------------------------------------------->
-[Docs Button]: https://img.shields.io/badge/Website-B30E2E?style=for-the-badge&logoColor=white&logo=GitBook
-[Docs Link]: https://wendell-adriel.gitbook.io/laravel-lift/
-[DocsRepo Button]: https://img.shields.io/badge/Repository-3884FF?style=for-the-badge&logoColor=white&logo=GitBook
-[DocsRepo Link]: https://github.com/WendellAdriel/laravel-lift-docs
+Lift is open-sourced software licensed under the [MIT license](LICENSE).

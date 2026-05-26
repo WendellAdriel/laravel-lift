@@ -2,6 +2,9 @@
 
 /.github                export-ignore
 /art                    export-ignore
+/docs                   export-ignore
+/package.json           export-ignore
+/docs/.vitepress/dist   export-ignore
 /tests                  export-ignore
 .editorconfig           export-ignore
 .gitattributes          export-ignore

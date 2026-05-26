@@ -1,7 +1,11 @@
 .DS_Store
 /vendor
+/node_modules
+/package-lock.json
 /.idea
 /.vagrant
 /.phpstorm.*
 composer.lock
 .phpunit.result.cache
+/docs/.vitepress/cache
+/docs/.vitepress/dist
