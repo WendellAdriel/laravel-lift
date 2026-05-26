@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Carbon\CarbonImmutable;
 use Tests\Datasets\ProductFillable;
 use Tests\Datasets\UserGuarded;
 
@@ -16,7 +17,7 @@ it('set fillable properties', function () {
     expect($product->name)->toBe('Product 1')
         ->and($product->price)->toBe(10.99)
         ->and($product->random_number)->toBe(123)
-        ->and($product->expires_at)->toBeInstanceOf(Carbon\CarbonImmutable::class)
+        ->and($product->expires_at)->toBeInstanceOf(CarbonImmutable::class)
         ->and($product->expires_at->format('Y-m-d H:i:s'))->toBe('2023-12-31 23:59:59');
 });
 
