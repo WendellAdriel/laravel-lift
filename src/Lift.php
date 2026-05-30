@@ -63,10 +63,7 @@ trait Lift
 
             $properties = self::getPropertiesWithAttributes($model);
 
-            self::applyValidations($properties);
-            blank($model->getKey())
-                ? self::applyCreateValidations($properties)
-                : self::applyUpdateValidations($properties);
+            self::applyValidations($model, $properties);
 
             self::castValues($model);
 
