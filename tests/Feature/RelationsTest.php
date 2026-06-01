@@ -10,6 +10,7 @@ use Tests\Datasets\Image;
 use Tests\Datasets\Library;
 use Tests\Datasets\LibraryBook;
 use Tests\Datasets\Manufacturer;
+use Tests\Datasets\NullableConfigPost;
 use Tests\Datasets\Organization;
 use Tests\Datasets\Phone;
 use Tests\Datasets\Post;
@@ -81,6 +82,63 @@ it('loads BelongsTo relation', function () {
 
     $postWithoutUser = Post::query()->find($postWithoutUser->id);
     expect($postWithoutUser->author)->toBeNull();
+});
+
+it('treats a fresh nullable config BelongsTo foreign key as null', function () {
+    $post = new NullableConfigPost();
+    $author = null;
+
+    try {
+        $author = $post->author;
+    } catch (Error $error) {
+        expect($error->getMessage())->not->toContain('must not be accessed before initialization');
+
+        throw $error;
+    }
+
+    expect($author)->toBeNull()
+        ->and($post->user_id)->toBeNull()
+        ->and($post->getAttribute('user_id'))->toBeNull();
+});
+
+it('syncs a nullable config BelongsTo foreign key when associating', function () {
+    $user = User::create([
+        'name' => fake()->name,
+        'email' => fake()->unique()->safeEmail,
+        'password' => 's3Cr3T@!!!',
+    ]);
+
+    $post = new NullableConfigPost();
+    $post->title = fake()->sentence;
+    $post->content = fake()->paragraph;
+
+    $post->author()->associate($user);
+
+    expect($post->user_id)->toBe($user->id)
+        ->and($post->getAttribute('user_id'))->toBe($user->id);
+
+    $post->save();
+
+    $this->assertDatabaseHas(NullableConfigPost::class, [
+        'id' => $post->id,
+        'user_id' => $user->id,
+    ]);
+});
+
+it('saves a nullable config BelongsTo foreign key without association', function () {
+    $post = new NullableConfigPost();
+    $post->title = fake()->sentence;
+    $post->content = fake()->paragraph;
+
+    expect($post->save())->toBeTrue()
+        ->and($post->author)->toBeNull()
+        ->and($post->user_id)->toBeNull()
+        ->and($post->getAttribute('user_id'))->toBeNull();
+
+    $this->assertDatabaseHas(NullableConfigPost::class, [
+        'id' => $post->id,
+        'user_id' => null,
+    ]);
 });
 
 it('loads BelongsToMany relation', function () {
