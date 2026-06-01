@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Str;
 use ReflectionAttribute;
 use ReflectionClass;
+use ReflectionException;
 use WendellAdriel\Lift\Attributes\Relations\BelongsTo;
 use WendellAdriel\Lift\Attributes\Relations\BelongsToMany;
 use WendellAdriel\Lift\Contracts\RelationAttribute;
@@ -19,6 +20,17 @@ trait ManageRelations
      * @var array<class-string, RelationAttribute>
      */
     private static ?array $relationsConfig = null;
+
+    public function setAttribute($key, $value)
+    {
+        $model = parent::setAttribute($key, $value);
+
+        if (is_string($key)) {
+            self::syncBelongsToForeignKeyProperty($this, $key);
+        }
+
+        return $model;
+    }
 
     /**
      * @return array<class-string, RelationAttribute>
@@ -47,6 +59,11 @@ trait ManageRelations
                 $relation->relationName(),
                 function (Model $model) use ($relation, $relationArguments, &$relationObject): Relation {
                     $method = lcfirst(class_basename(get_class($relation)));
+
+                    if ($relation instanceof BelongsTo) {
+                        self::syncBelongsToForeignKeyProperty($model, $relationArguments[1], false);
+                    }
+
                     $relationObject = $model->{$method}(...$relationArguments);
 
                     if ($relation instanceof BelongsToMany) {
@@ -79,9 +96,50 @@ trait ManageRelations
             $related = new $relatedClass();
 
             $foreignKey = $relationConfig->relationArguments()[1] ?? Str::snake($relationConfig->relationName()) . '_' . $related->getKeyName();
-            if (! isset($model->{$foreignKey}) || blank($model->{$foreignKey})) {
-                $model->{$foreignKey} = $model->getAttribute($foreignKey);
+            self::syncBelongsToForeignKeyProperty($model, $foreignKey, false);
+        }
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    private static function syncBelongsToForeignKeyProperty(Model $model, string $foreignKey, bool $checkRelation = true): void
+    {
+        if ($checkRelation && ! self::isBelongsToForeignKey($model, $foreignKey)) {
+            return;
+        }
+
+        $classReflection = new ReflectionClass($model);
+        if (! $classReflection->hasProperty($foreignKey)) {
+            return;
+        }
+
+        $property = $classReflection->getProperty($foreignKey);
+        if (! $property->isPublic()) {
+            return;
+        }
+
+        $value = $model->getAttribute($foreignKey);
+        $type = $property->getType();
+        if ($value === null && $type !== null && ! $type->allowsNull()) {
+            return;
+        }
+
+        if ($property->isInitialized($model) && $model->{$foreignKey} === $value) {
+            return;
+        }
+
+        $model->{$foreignKey} = $value;
+    }
+
+    private static function isBelongsToForeignKey(Model $model, string $foreignKey): bool
+    {
+        foreach (self::relationsConfig($model) as $relationConfig) {
+            if (($relationConfig->relationArguments()[1] ?? null) === $foreignKey) {
+                return true;
             }
         }
+
+        return false;
     }
 }
