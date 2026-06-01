@@ -2,6 +2,12 @@
 
 Here's a quick overview of the new features in the latest versions of the package.
 
+## v0.19.0
+
+* Added support for complex validation rules using model methods.
+* Fixed nullable `BelongsTo` foreign keys syncing with their Eloquent attribute values.
+* Fixed fillable mapped columns to support mass assignment using database column names.
+
 ## v0.18.0
 
 * Laravel 13 support.
