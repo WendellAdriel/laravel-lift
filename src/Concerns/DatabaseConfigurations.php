@@ -82,6 +82,10 @@ trait DatabaseConfigurations
         $customColumns = self::customColumns();
 
         foreach ($publicProperties as $property) {
+            if (isset($customColumns[$property]) && $model->isDirty($customColumns[$property]) && ! blank($model->getAttribute($customColumns[$property]))) {
+                $model->{$property} = $model->getAttribute($customColumns[$property]);
+            }
+
             if (! blank($model->getAttribute($property)) && isset($customColumns[$property])) {
                 $model->{$property} = $model->getAttribute($property);
                 unset($model->attributes[$property]);

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Tests\Datasets\UserColumn;
+use Tests\Datasets\UserConfigColumn;
 
 it('returns model custom columns', function () {
     expect(UserColumn::customColumns())->toBe([
@@ -94,6 +95,33 @@ describe('creates new model with custom columns', function () {
         ]);
     });
 
+    it('creates model with create method using mapped database columns', function () {
+        $user = UserColumn::create([
+            'name' => fake()->name,
+            'email' => 'john.doe@example.com',
+            'password' => 's3Cr3T@!!!',
+        ]);
+
+        $this->assertDatabaseCount(UserColumn::class, 1);
+        $this->assertDatabaseHas(UserColumn::class, [
+            'name' => $user->name,
+            'email' => 'john.doe@example.com',
+            'password' => 's3Cr3T@!!!',
+        ]);
+    });
+
+    it('ignores unrelated non-fillable keys when using mapped database columns', function () {
+        $user = new UserColumn();
+        $user->fill([
+            'name' => fake()->name,
+            'email' => 'john.doe@example.com',
+            'password' => 's3Cr3T@!!!',
+            'not_fillable' => 'ignored',
+        ]);
+
+        expect($user->getAttributes())->not->toHaveKey('not_fillable');
+    });
+
     it('creates model with default values', function () {
         UserColumn::create([
             'user_email' => 'john.doe@example.com',
@@ -147,6 +175,27 @@ describe('updates model with custom columns', function () {
         ]);
     });
 
+    it('updates model with fill method using mapped database columns', function () {
+        $user = UserColumn::create([
+            'name' => fake()->name,
+            'user_email' => fake()->unique()->safeEmail,
+            'user_password' => 's3Cr3T@!!!',
+        ]);
+
+        $user->fill([
+            'name' => 'John Doe',
+            'email' => 'john.doe@example.com',
+        ]);
+        $user->save();
+
+        $this->assertDatabaseCount(UserColumn::class, 1);
+        $this->assertDatabaseHas(UserColumn::class, [
+            'name' => 'John Doe',
+            'email' => 'john.doe@example.com',
+            'password' => 's3Cr3T@!!!',
+        ]);
+    });
+
     it('updates model with update method', function () {
         $user = UserColumn::create([
             'name' => fake()->name,
@@ -166,6 +215,41 @@ describe('updates model with custom columns', function () {
             'password' => 's3Cr3T@!!!',
         ]);
     });
+
+    it('updates model with update method using mapped database columns', function () {
+        $user = UserColumn::create([
+            'name' => fake()->name,
+            'user_email' => fake()->unique()->safeEmail,
+            'user_password' => 's3Cr3T@!!!',
+        ]);
+
+        $user->update([
+            'name' => 'John Doe',
+            'email' => 'john.doe@example.com',
+        ]);
+
+        $this->assertDatabaseCount(UserColumn::class, 1);
+        $this->assertDatabaseHas(UserColumn::class, [
+            'name' => 'John Doe',
+            'email' => 'john.doe@example.com',
+            'password' => 's3Cr3T@!!!',
+        ]);
+    });
+});
+
+it('creates model with Config fillable mapped database columns', function () {
+    $user = UserConfigColumn::create([
+        'name' => 'John Doe',
+        'email' => 'john.doe@example.com',
+        'password' => 's3Cr3T@!!!',
+    ]);
+
+    $this->assertDatabaseCount(UserConfigColumn::class, 1);
+    $this->assertDatabaseHas(UserConfigColumn::class, [
+        'name' => $user->name,
+        'email' => 'john.doe@example.com',
+        'password' => 's3Cr3T@!!!',
+    ]);
 });
 
 it('retrieves model with all custom columns and properties set', function () {
