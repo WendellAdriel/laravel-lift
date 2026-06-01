@@ -53,9 +53,13 @@ trait AttributesGuard
     private function applyAttributesGuard(Collection $properties): void
     {
         $this->mergeGuarded(['*']);
+        $customColumns = self::customColumns();
 
         $fillableProperties = self::getPropertiesForAttributes($properties, [Fillable::class]);
-        $this->mergeFillable($fillableProperties->map(fn ($property) => $property->name)->values()->toArray());
+        $this->mergeFillable($fillableProperties
+            ->flatMap(fn ($property) => array_unique([$property->name, $customColumns[$property->name] ?? $property->name]))
+            ->values()
+            ->toArray());
 
         $hiddenProperties = self::getPropertiesForAttributes($properties, [Hidden::class]);
         $this->makeHidden($hiddenProperties->map(fn ($property) => $property->name)->values()->toArray());
@@ -74,7 +78,9 @@ trait AttributesGuard
     private function buildLiftList(Collection $properties, string $attributeProperty): array
     {
         $result = [];
-        $properties->each(function ($property) use (&$result, $attributeProperty) {
+        $customColumns = $attributeProperty === 'fillable' ? self::customColumns() : [];
+
+        $properties->each(function ($property) use (&$result, $attributeProperty, $customColumns) {
             $configAttribute = $property->attributes->first(fn ($attribute) => $attribute->getName() === Config::class);
             if (blank($configAttribute)) {
                 return;
@@ -83,9 +89,13 @@ trait AttributesGuard
             $configAttribute = $configAttribute->newInstance();
             if ($configAttribute->{$attributeProperty}) {
                 $result[] = $property->name;
+
+                if (isset($customColumns[$property->name])) {
+                    $result[] = $customColumns[$property->name];
+                }
             }
         });
 
-        return $result;
+        return array_values(array_unique($result));
     }
 }
