@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 use Illuminate\Validation\ValidationException;
 use Tests\Datasets\User;
+use Tests\Datasets\UserMergedRules;
+use Tests\Datasets\UserMethodContextRules;
+use Tests\Datasets\UserMethodRules;
 use Tests\Datasets\UserRules;
 
 it('throws validation errors for locale', function () {
@@ -197,6 +200,203 @@ describe('UPDATE RULES', function () {
             'password' => 's3Cr3t@!!!123456',
         ]);
     });
+});
+
+describe('Overlapping base and context rules', function () {
+    it('keeps base rules when create rules target the same property', function () {
+        UserMergedRules::create([
+            'name' => '12345',
+            'email' => fake()->unique()->safeEmail,
+            'password' => 's3Cr3t@!!!',
+        ]);
+    })->throws(ValidationException::class);
+
+    it('keeps create rules when base rules target the same property', function () {
+        UserMergedRules::create([
+            'name' => 'abcd',
+            'email' => fake()->unique()->safeEmail,
+            'password' => 's3Cr3t@!!!',
+        ]);
+    })->throws(ValidationException::class);
+
+    it('keeps base rules when update rules target the same property', function () {
+        $user = UserMergedRules::create([
+            'name' => 'abcde',
+            'email' => fake()->unique()->safeEmail,
+            'password' => 's3Cr3t@!!!',
+        ]);
+
+        $user->name = '12345';
+        $user->save();
+    })->throws(ValidationException::class);
+
+    it('keeps update rules when base rules target the same property', function () {
+        $user = UserMergedRules::create([
+            'name' => 'abcde',
+            'email' => fake()->unique()->safeEmail,
+            'password' => 's3Cr3t@!!!',
+        ]);
+
+        $user->name = 'abcdefghijk';
+        $user->save();
+    })->throws(ValidationException::class);
+
+    it('creates a model when merged base and create rules pass', function () {
+        $user = UserMergedRules::create([
+            'name' => 'abcde',
+            'email' => fake()->unique()->safeEmail,
+            'password' => 's3Cr3t@!!!',
+        ]);
+
+        $this->assertDatabaseHas(UserMergedRules::class, [
+            'name' => $user->name,
+        ]);
+    });
+
+    it('updates a model when merged base and update rules pass', function () {
+        $user = UserMergedRules::create([
+            'name' => 'abcde',
+            'email' => fake()->unique()->safeEmail,
+            'password' => 's3Cr3t@!!!',
+        ]);
+
+        $user->name = 'abcdef';
+        $user->save();
+
+        $this->assertDatabaseHas(UserMergedRules::class, [
+            'name' => 'abcdef',
+        ]);
+    });
+
+    it('keeps base and context validation messages for the same property', function () {
+        try {
+            UserMergedRules::create([
+                'name' => '1234',
+                'email' => fake()->unique()->safeEmail,
+                'password' => 's3Cr3t@!!!',
+            ]);
+        } catch (ValidationException $exception) {
+            expect($exception->validator->errors()->get('name'))->toContain(
+                'The name must contain only letters',
+                'The name must have at least 5 characters on create',
+            );
+
+            return;
+        }
+
+        $this->fail('Expected validation to fail for merged base and create messages.');
+    });
+});
+
+describe('Method-backed base validation rules', function () {
+    it('rejects duplicate names when creating a model', function () {
+        UserMethodRules::create([
+            'name' => 'ExistingName',
+            'email' => fake()->unique()->safeEmail,
+            'password' => 's3Cr3t@!!!',
+        ]);
+
+        try {
+            UserMethodRules::create([
+                'name' => 'ExistingName',
+                'email' => fake()->unique()->safeEmail,
+                'password' => 's3Cr3t@!!!',
+            ]);
+        } catch (ValidationException $exception) {
+            expect($exception->validator->errors()->has('name'))->toBeTrue();
+
+            return;
+        }
+
+        $this->fail('Expected Laravel validation to reject a duplicate name.');
+    });
+
+    it('allows updating a model without failing its own unique name', function () {
+        $user = UserMethodRules::create([
+            'name' => 'OriginalName',
+            'email' => fake()->unique()->safeEmail,
+            'password' => 's3Cr3t@!!!',
+        ]);
+
+        $user->name = 'OriginalName';
+        $user->save();
+
+        $this->assertDatabaseHas(UserMethodRules::class, [
+            'name' => 'OriginalName',
+        ]);
+    });
+
+    it('rejects updating a model name to another model name', function () {
+        $firstUser = UserMethodRules::create([
+            'name' => 'FirstName',
+            'email' => fake()->unique()->safeEmail,
+            'password' => 's3Cr3t@!!!',
+        ]);
+        $secondUser = UserMethodRules::create([
+            'name' => 'SecondName',
+            'email' => fake()->unique()->safeEmail,
+            'password' => 's3Cr3t@!!!',
+        ]);
+
+        try {
+            $secondUser->name = $firstUser->name;
+            $secondUser->save();
+        } catch (ValidationException $exception) {
+            expect($exception->validator->errors()->has('name'))->toBeTrue();
+
+            return;
+        }
+
+        $this->fail('Expected Laravel validation to reject an existing name on update.');
+    });
+});
+
+describe('Method-backed create and update validation rules', function () {
+    it('allows creating a model when a method-backed create rule passes', function () {
+        $user = UserMethodContextRules::create([
+            'name' => 'allowed-create',
+            'email' => fake()->unique()->safeEmail,
+            'password' => 's3Cr3t@!!!',
+        ]);
+
+        $this->assertDatabaseHas(UserMethodContextRules::class, [
+            'name' => $user->name,
+        ]);
+    });
+
+    it('rejects creating a model when a method-backed create rule fails', function () {
+        UserMethodContextRules::create([
+            'name' => 'blocked-create',
+            'email' => fake()->unique()->safeEmail,
+            'password' => 's3Cr3t@!!!',
+        ]);
+    })->throws(ValidationException::class);
+
+    it('allows updating a model when a method-backed update rule passes', function () {
+        $user = UserMethodContextRules::create([
+            'name' => 'allowed-create',
+            'email' => fake()->unique()->safeEmail,
+            'password' => 's3Cr3t@!!!',
+        ]);
+
+        $user->name = 'allowed-update';
+        $user->save();
+
+        $this->assertDatabaseHas(UserMethodContextRules::class, [
+            'name' => 'allowed-update',
+        ]);
+    });
+
+    it('rejects updating a model when a method-backed update rule fails', function () {
+        $user = UserMethodContextRules::create([
+            'name' => 'allowed-create',
+            'email' => fake()->unique()->safeEmail,
+            'password' => 's3Cr3t@!!!',
+        ]);
+
+        $user->name = 'blocked-update';
+        $user->save();
+    })->throws(ValidationException::class);
 });
 
 describe('Gets model validation rules and messages statically', function () {
