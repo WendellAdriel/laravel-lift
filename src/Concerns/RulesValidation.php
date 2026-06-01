@@ -111,13 +111,39 @@ trait RulesValidation
     }
 
     /**
+     * Parse rules to get advanced implementation
+     */
+    private static function parseValidationRules(Model $model, array $properties): array
+    {
+        foreach ($properties as $key => $rules) {
+            $properties[$key] = array_map(function ($rule) use ($model) {
+                if (is_string($rule) && method_exists($model, $rule)) {
+                    $rule = $model->{$rule}($model);
+                }
+
+                return $rule;
+            }, $rules);
+        }
+
+        return $properties;
+    }
+
+    /**
      * @param  Collection<PropertyInfo>  $properties
      *
      * @throws ValidationException
      */
-    private static function applyValidations(Collection $properties): void
+    private static function applyValidations(Model $model, Collection $properties): void
     {
-        $validatedProperties = self::getPropertiesForAttributes($properties, [Rules::class]);
+        self::buildValidationRules(new static());
+
+        $validatedProperties = self::getPropertiesForAttributes(
+            $properties,
+            [
+                Rules::class,
+                blank($model->getKey()) ? CreateRules::class : UpdateRules::class,
+            ]
+        );
         $data = $validatedProperties->mapWithKeys(fn ($property) => [$property->name => static::enumValue($property->value)]);
 
         $configProperties = self::getPropertiesForAttributes($properties, [Config::class]);
@@ -125,8 +151,14 @@ trait RulesValidation
 
         $validator = Validator::make(
             data: $data->toArray(),
-            rules: self::validationRules(),
-            messages: self::validationMessages(),
+            rules: self::parseValidationRules($model, self::mergeValidationRules(
+                self::validationRules(),
+                blank($model->getKey()) ? self::createValidationRules() : self::updateValidationRules(),
+            )),
+            messages: self::mergeValidationMessages(
+                self::validationMessages(),
+                blank($model->getKey()) ? self::createValidationMessages() : self::updateValidationMessages(),
+            ),
         );
 
         if ($validator->fails()) {
@@ -134,46 +166,34 @@ trait RulesValidation
         }
     }
 
-    /**
-     * @param  Collection<PropertyInfo>  $properties
-     *
-     * @throws ValidationException
-     */
-    private static function applyCreateValidations(Collection $properties): void
+    private static function mergeValidationRules(array $baseRules, array $contextRules): array
     {
-        $validatedProperties = self::getPropertiesForAttributes($properties, [CreateRules::class]);
-        $data = $validatedProperties->mapWithKeys(fn ($property) => [$property->name => static::enumValue($property->value)]);
+        foreach ($contextRules as $field => $rules) {
+            if (array_key_exists($field, $baseRules)) {
+                $baseRules[$field] = array_merge($baseRules[$field], $rules);
 
-        $validator = Validator::make(
-            data: $data->toArray(),
-            rules: self::createValidationRules(),
-            messages: self::createValidationMessages(),
-        );
+                continue;
+            }
 
-        if ($validator->fails()) {
-            throw new ValidationException($validator);
+            $baseRules[$field] = $rules;
         }
+
+        return $baseRules;
     }
 
-    /**
-     * @param  Collection<PropertyInfo>  $properties
-     *
-     * @throws ValidationException
-     */
-    private static function applyUpdateValidations(Collection $properties): void
+    private static function mergeValidationMessages(array $baseMessages, array $contextMessages): array
     {
-        $validatedProperties = self::getPropertiesForAttributes($properties, [UpdateRules::class]);
-        $data = $validatedProperties->mapWithKeys(fn (PropertyInfo $property) => [$property->name => static::enumValue($property->value)]);
+        foreach ($contextMessages as $field => $messages) {
+            if (array_key_exists($field, $baseMessages)) {
+                $baseMessages[$field] = array_merge($baseMessages[$field], $messages);
 
-        $validator = Validator::make(
-            data: $data->toArray(),
-            rules: self::updateValidationRules(),
-            messages: self::updateValidationMessages(),
-        );
+                continue;
+            }
 
-        if ($validator->fails()) {
-            throw new ValidationException($validator);
+            $baseMessages[$field] = $messages;
         }
+
+        return $baseMessages;
     }
 
     private static function buildValidationRules(Model $model): void

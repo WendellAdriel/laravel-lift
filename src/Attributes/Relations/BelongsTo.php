@@ -20,7 +20,7 @@ final class BelongsTo implements RelationAttribute
     public string $related;
 
     /**
-     * @var array<string|int|null>
+     * @var array<int, string>
      */
     public array $arguments = [];
 
@@ -34,19 +34,12 @@ final class BelongsTo implements RelationAttribute
     {
         $this->related = $related;
         $this->name = $name;
-        $this->arguments = [$related, ...$arguments];
-
-        $this->arguments = array_pad($this->arguments, 4, null);
-
-        if ($this->arguments[1] === null) {
-            $this->arguments[1] = Str::snake(class_basename($this->related)) . '_id';
-        }
-
-        if ($this->arguments[2] === null) {
-            $this->arguments[2] = 'id';
-        }
-
-        $this->arguments[3] = $this->relationName();
+        $this->arguments = [
+            $related,
+            $arguments[0] ?? Str::snake(class_basename($this->related)) . '_id',
+            $arguments[1] ?? 'id',
+            $this->relationName(),
+        ];
     }
 
     public function relationName(): string
