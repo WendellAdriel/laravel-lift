@@ -26,6 +26,8 @@ final class Product extends Model
 
 You can also set a default value for your **public properties** using the `Column` attribute. In the example below the `price` property will be mapped to the `price` column on the database table and will have a default value of `0.0`:
 
+Default values are applied when an uninitialized public property is omitted while filling a model, before saving a model, and when a retrieved model does not include the backing column in a partial select.
+
 ```php
 use Illuminate\Database\Eloquent\Model;
 use WendellAdriel\Lift\Attributes\Cast;

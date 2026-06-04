@@ -2,6 +2,10 @@
 
 Here's a quick overview of the new features in the latest versions of the package.
 
+## v0.19.1
+
+* Fixed default values for public properties so they are initialized after `castAndFill` and when omitted from partial selects.
+
 ## v0.19.0
 
 * Added support for complex validation rules using model methods.

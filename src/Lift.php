@@ -403,5 +403,6 @@ trait Lift
         }
 
         self::syncColumnsToCustom($model);
+        self::applyDefaultValues($model);
     }
 }

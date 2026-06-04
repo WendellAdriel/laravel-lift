@@ -2,6 +2,8 @@
 
 A replacement for the `fill` method. It will cast your public properties and fill the model instance.
 
+If a public property has a default value configured with `Column` or `Config` and that property is omitted from the given data, `castAndFill` will initialize the property with its default value.
+
 ```php
 $product = new Product();
 $product->castAndFill([

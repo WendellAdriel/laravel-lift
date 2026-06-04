@@ -36,6 +36,8 @@ trait CastValues
                 : $value;
         }
 
+        self::applyDefaultValues($this);
+
         return $this;
     }
 

@@ -92,12 +92,10 @@ trait DatabaseConfigurations
             }
 
             if (
-                (! isset($model->{$property}) || blank($model->{$property})) &&
-                isset($defaultValues[$property])
+                ! isset($model->{$property}) &&
+                array_key_exists($property, $defaultValues)
             ) {
-                $model->{$property} = is_string($defaultValues[$property]) && method_exists($model, $defaultValues[$property])
-                    ? $model->{$defaultValues[$property]}()
-                    : $defaultValues[$property];
+                $model->{$property} = self::resolveDefaultValue($model, $defaultValues[$property]);
             }
 
             if (! isset($model->{$property})) {
@@ -118,9 +116,35 @@ trait DatabaseConfigurations
 
     private static function syncColumnsToCustom(Model $model): void
     {
+        $attributes = $model->getAttributes();
+
         foreach (self::customColumns() as $property => $column) {
-            $model->{$property} = $model->getAttribute($column);
+            if (array_key_exists($column, $attributes)) {
+                $model->{$property} = $model->getAttribute($column);
+            }
         }
+    }
+
+    private static function applyDefaultValues(Model $model): void
+    {
+        $defaultValues = self::defaultValues();
+
+        foreach (self::getModelPublicReflectionProperties($model) as $property) {
+            $propertyName = $property->getName();
+
+            if (! array_key_exists($propertyName, $defaultValues) || $property->isInitialized($model)) {
+                continue;
+            }
+
+            $model->{$propertyName} = self::resolveDefaultValue($model, $defaultValues[$propertyName]);
+        }
+    }
+
+    private static function resolveDefaultValue(Model $model, mixed $defaultValue): mixed
+    {
+        return is_string($defaultValue) && method_exists($model, $defaultValue)
+            ? $model->{$defaultValue}()
+            : $defaultValue;
     }
 
     private function applyDatabaseConfigurations(): void
