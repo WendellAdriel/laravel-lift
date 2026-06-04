@@ -48,6 +48,31 @@ it('returns json with model properties when custom columns are defined', functio
 });
 
 describe('creates new model with custom columns', function () {
+    it('initializes default public properties when cast and fill omits them', function () {
+        $user = new UserColumn();
+        $user->castAndFill([
+            'user_email' => 'john.doe@example.com',
+        ]);
+
+        expect($user->name)->toBe('John Doe')
+            ->and($user->active)->toBeFalse()
+            ->and($user->user_password)->toBe('s3Cr3tP4ssw0rd@!!!');
+    });
+
+    it('keeps explicitly filled public properties over defaults when cast and fill is used', function () {
+        $user = new UserColumn();
+        $user->castAndFill([
+            'name' => 'Jane Doe',
+            'user_email' => 'john.doe@example.com',
+            'user_password' => 's3Cr3T@!!!',
+            'active' => true,
+        ]);
+
+        expect($user->name)->toBe('Jane Doe')
+            ->and($user->active)->toBeTrue()
+            ->and($user->user_password)->toBe('s3Cr3T@!!!');
+    });
+
     it('creates model with individual properties set', function () {
         $user = new UserColumn();
         $user->name = fake()->name;
@@ -265,4 +290,21 @@ it('retrieves model with all custom columns and properties set', function () {
         ->and($user->user_password)->toBe('s3Cr3T@!!!')
         ->and($user->email)->toBe('john.doe@example.com')
         ->and($user->password)->toBe('s3Cr3T@!!!');
+});
+
+it('initializes default public properties omitted from partial selects', function () {
+    UserColumn::create([
+        'name' => 'Jane Doe',
+        'user_email' => 'john.doe@example.com',
+        'user_password' => 's3Cr3T@!!!',
+    ]);
+
+    $user = UserColumn::query()
+        ->select(['id', 'email'])
+        ->first();
+
+    expect($user->name)->toBe('John Doe')
+        ->and($user->active)->toBeFalse()
+        ->and($user->user_password)->toBe('s3Cr3tP4ssw0rd@!!!')
+        ->and($user->user_email)->toBe('john.doe@example.com');
 });
