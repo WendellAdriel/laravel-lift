@@ -39,7 +39,7 @@ trait ManageRelations
     {
         if (is_null(self::$relationsConfig)) {
             self::$relationsConfig = [];
-            self::buildRelations(new static());
+            self::buildRelations(new static);
         }
 
         return self::$relationsConfig[$model::class] ?? [];
@@ -93,7 +93,7 @@ trait ManageRelations
     private static function handleRelationsKeys(Model $model): void
     {
         foreach (self::relationsConfig($model) as $relatedClass => $relationConfig) {
-            $related = new $relatedClass();
+            $related = new $relatedClass;
 
             $foreignKey = $relationConfig->relationArguments()[1] ?? Str::snake($relationConfig->relationName()) . '_' . $related->getKeyName();
             self::syncBelongsToForeignKeyProperty($model, $foreignKey, false);

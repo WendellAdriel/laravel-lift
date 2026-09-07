@@ -20,7 +20,7 @@ trait AttributesGuard
     {
         if (is_null(self::$immutableProperties)) {
             self::$immutableProperties = [];
-            self::buildImmutableProperties(new static());
+            self::buildImmutableProperties(new static);
         }
 
         return self::$immutableProperties;

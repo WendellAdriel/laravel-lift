@@ -21,7 +21,7 @@ trait ListenerHandler
     private static function eventHandlerMethods(): array
     {
         if (is_null(self::$modelEventMethods)) {
-            self::buildEventHandlers(new static());
+            self::buildEventHandlers(new static);
         }
 
         return self::$modelEventMethods;

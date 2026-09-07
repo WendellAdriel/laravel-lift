@@ -33,7 +33,7 @@ trait RulesValidation
     public static function validationRules(): array
     {
         if (is_null(self::$modelRules)) {
-            self::buildValidationRules(new static());
+            self::buildValidationRules(new static);
         }
 
         return self::$modelRules;
@@ -42,7 +42,7 @@ trait RulesValidation
     public static function createValidationRules(): array
     {
         if (is_null(self::$modelCreateRules)) {
-            self::buildValidationRules(new static());
+            self::buildValidationRules(new static);
         }
 
         return self::$modelCreateRules;
@@ -51,7 +51,7 @@ trait RulesValidation
     public static function updateValidationRules(): array
     {
         if (is_null(self::$modelUpdateRules)) {
-            self::buildValidationRules(new static());
+            self::buildValidationRules(new static);
         }
 
         return self::$modelUpdateRules;
@@ -60,7 +60,7 @@ trait RulesValidation
     public static function validationMessages(): array
     {
         if (is_null(self::$modelMessages)) {
-            self::buildValidationRules(new static());
+            self::buildValidationRules(new static);
         }
 
         return self::formatValidationMessages(self::$modelMessages);
@@ -69,7 +69,7 @@ trait RulesValidation
     public static function createValidationMessages(): array
     {
         if (is_null(self::$modelCreateMessages)) {
-            self::buildValidationRules(new static());
+            self::buildValidationRules(new static);
         }
 
         return self::formatValidationMessages(self::$modelCreateMessages);
@@ -78,7 +78,7 @@ trait RulesValidation
     public static function updateValidationMessages(): array
     {
         if (is_null(self::$modelUpdateMessages)) {
-            self::buildValidationRules(new static());
+            self::buildValidationRules(new static);
         }
 
         return self::formatValidationMessages(self::$modelUpdateMessages);
@@ -135,7 +135,7 @@ trait RulesValidation
      */
     private static function applyValidations(Model $model, Collection $properties): void
     {
-        self::buildValidationRules(new static());
+        self::buildValidationRules(new static);
 
         $validatedProperties = self::getPropertiesForAttributes(
             $properties,

@@ -85,7 +85,7 @@ it('loads BelongsTo relation', function () {
 });
 
 it('treats a fresh nullable config BelongsTo foreign key as null', function () {
-    $post = new NullableConfigPost();
+    $post = new NullableConfigPost;
     $author = null;
 
     try {
@@ -108,7 +108,7 @@ it('syncs a nullable config BelongsTo foreign key when associating', function ()
         'password' => 's3Cr3T@!!!',
     ]);
 
-    $post = new NullableConfigPost();
+    $post = new NullableConfigPost;
     $post->title = fake()->sentence;
     $post->content = fake()->paragraph;
 
@@ -126,7 +126,7 @@ it('syncs a nullable config BelongsTo foreign key when associating', function ()
 });
 
 it('saves a nullable config BelongsTo foreign key without association', function () {
-    $post = new NullableConfigPost();
+    $post = new NullableConfigPost;
     $post->title = fake()->sentence;
     $post->content = fake()->paragraph;
 
@@ -298,7 +298,7 @@ it('loads MorphMany/MorphTo relations', function () {
         'title' => fake()->sentence,
         'content' => fake()->paragraph,
     ]);
-    $image = $post->images()->save(new Image());
+    $image = $post->images()->save(new Image);
 
     expect($post->images)->toHaveCount(1)
         ->and($post->images->first()->id)->toBe($image->id)
@@ -318,7 +318,7 @@ it('loads MorphOne relation', function () {
         'email' => fake()->unique()->safeEmail,
         'password' => 's3Cr3T@!!!',
     ]);
-    $image = $user->image()->save(new Image());
+    $image = $user->image()->save(new Image);
 
     expect($user->image->id)->toBe($image->id)
         ->and($image->imageable->id)->toBe($user->id);

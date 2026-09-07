@@ -18,7 +18,7 @@ trait WatchProperties
     {
         if (is_null(self::$watchedProperties)) {
             self::$watchedProperties = [];
-            self::buildWatchedProperties(new static());
+            self::buildWatchedProperties(new static);
         }
 
         return self::$watchedProperties;

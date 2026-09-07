@@ -21,7 +21,7 @@ trait DatabaseConfigurations
         if (is_null(self::$modelCustomColumns)) {
             self::$modelCustomColumns = [];
             self::$modelDefaultValues = [];
-            self::buildCustomColumns(new static());
+            self::buildCustomColumns(new static);
         }
 
         return self::$modelCustomColumns;
@@ -32,7 +32,7 @@ trait DatabaseConfigurations
         if (is_null(self::$modelDefaultValues)) {
             self::$modelCustomColumns = [];
             self::$modelDefaultValues = [];
-            self::buildCustomColumns(new static());
+            self::buildCustomColumns(new static);
         }
 
         return self::$modelDefaultValues;
