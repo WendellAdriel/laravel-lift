@@ -17,7 +17,7 @@ trait CastValues
 
     public static function castAndCreate(array $properties): self
     {
-        $model = new static();
+        $model = new static;
 
         $model->castAndFill($properties);
         $model->save();

@@ -49,7 +49,7 @@ it('returns json with model properties when custom columns are defined', functio
 
 describe('creates new model with custom columns', function () {
     it('initializes default public properties when cast and fill omits them', function () {
-        $user = new UserColumn();
+        $user = new UserColumn;
         $user->castAndFill([
             'user_email' => 'john.doe@example.com',
         ]);
@@ -60,7 +60,7 @@ describe('creates new model with custom columns', function () {
     });
 
     it('keeps explicitly filled public properties over defaults when cast and fill is used', function () {
-        $user = new UserColumn();
+        $user = new UserColumn;
         $user->castAndFill([
             'name' => 'Jane Doe',
             'user_email' => 'john.doe@example.com',
@@ -74,7 +74,7 @@ describe('creates new model with custom columns', function () {
     });
 
     it('creates model with individual properties set', function () {
-        $user = new UserColumn();
+        $user = new UserColumn;
         $user->name = fake()->name;
         $user->user_email = fake()->unique()->safeEmail;
         $user->user_password = 's3Cr3T@!!!';
@@ -89,7 +89,7 @@ describe('creates new model with custom columns', function () {
     });
 
     it('creates model with fill method', function () {
-        $user = new UserColumn();
+        $user = new UserColumn;
         $user->fill([
             'name' => fake()->name,
             'user_email' => fake()->unique()->safeEmail,
@@ -136,7 +136,7 @@ describe('creates new model with custom columns', function () {
     });
 
     it('ignores unrelated non-fillable keys when using mapped database columns', function () {
-        $user = new UserColumn();
+        $user = new UserColumn;
         $user->fill([
             'name' => fake()->name,
             'email' => 'john.doe@example.com',

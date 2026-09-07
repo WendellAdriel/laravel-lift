@@ -44,7 +44,7 @@ final class LiftMigration extends Command
             }
 
             /** @var Model $model */
-            $model = new $class();
+            $model = new $class;
             $table = $model->getTable();
 
             $this->info("Generating migration file for model {$class} (table {$table})");

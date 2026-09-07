@@ -10,7 +10,7 @@ use Tests\Datasets\UserCustom;
 use Tests\Datasets\UserUuid;
 
 it('returns the default values for primary key when not set', function () {
-    $user = new User();
+    $user = new User;
 
     expect($user->getKeyName())->toBe('id')
         ->and($user->getKeyType())->toBe('int')
@@ -19,7 +19,7 @@ it('returns the default values for primary key when not set', function () {
 
 describe('custom primary key with custom incrementing value', function () {
     it('returns custom primary key values', function () {
-        $user = new UserCustom();
+        $user = new UserCustom;
 
         expect($user->getKeyName())->toBe('id')
             ->and($user->getKeyType())->toBe('int')
@@ -80,7 +80,7 @@ describe('custom primary key with custom incrementing value', function () {
 
 describe('custom primary key with custom type and incrementing value', function () {
     it('returns custom primary key values', function () {
-        $user = new UserUuid();
+        $user = new UserUuid;
 
         expect($user->getKeyName())->toBe('uuid')
             ->and($user->getKeyType())->toBe('string')
@@ -141,7 +141,7 @@ describe('custom primary key with custom type and incrementing value', function 
 
 describe('custom primary key with custom column name', function () {
     it('returns custom primary key values', function () {
-        $movie = new Movie();
+        $movie = new Movie;
 
         expect($movie->getKeyName())->toBe('movie_id')
             ->and($movie->getKeyType())->toBe('string')
@@ -185,14 +185,14 @@ describe('custom primary key with custom column name', function () {
 });
 
 it('sets default ULID primary key column', function () {
-    $crew = new Crew();
+    $crew = new Crew;
     $crew->save();
 
     expect($crew->id)->not->toBeNull();
 });
 
 it('sets default UUID primary key column', function () {
-    $game = new Game();
+    $game = new Game;
     $game->save();
 
     expect($game->id)->not->toBeNull();
